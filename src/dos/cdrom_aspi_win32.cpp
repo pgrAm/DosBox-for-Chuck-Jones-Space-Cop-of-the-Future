@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifdef CDROM_ENABLED
 
 #if defined (WIN32)
 
@@ -764,5 +765,7 @@ bool CDROM_Interface_Aspi::ReadSectors(PhysPt buffer, bool raw, unsigned long se
 
 	return (s.execscsicmd.SRB_Status==SS_COMP);
 };
+
+#endif
 
 #endif

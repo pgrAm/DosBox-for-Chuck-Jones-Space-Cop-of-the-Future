@@ -546,6 +546,7 @@ void localFile::Flush(void) {
 	}
 }
 
+#ifdef CDROM_ENABLED
 
 // ********************************************
 // CDROM DRIVE
@@ -649,3 +650,4 @@ Bits cdromDrive::UnMount(void) {
 	}
 	return 2;
 }
+#endif

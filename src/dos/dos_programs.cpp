@@ -29,7 +29,9 @@
 #include "cross.h"
 #include "regs.h"
 #include "callback.h"
+#ifdef CDROM_ENABLED
 #include "cdrom.h"
+#endif
 #include "dos_system.h"
 #include "dos_inc.h"
 #include "bios.h"
@@ -181,6 +183,9 @@ public:
 			}
 			return;
 		}
+
+#ifdef CDROM_ENABLED
+
 		/* Show list of cdroms */
 		if (cmd->FindExist("-cd",false)) {
 			int num = SDL_CDNumDrives();
@@ -190,6 +195,7 @@ public:
 			};
 			return;
 		}
+#endif // CDROM_ENABLED
 
 		std::string type="dir";
 		cmd->FindString("-t",type,true);
@@ -324,6 +330,7 @@ public:
 
 			if (temp_line[temp_line.size()-1]!=CROSS_FILESPLIT) temp_line+=CROSS_FILESPLIT;
 			Bit8u bit8size=(Bit8u) sizes[1];
+#ifdef CDROM_ENABLED
 			if (type=="cdrom") {
 				int num = -1;
 				cmd->FindInt("-usecd",num,true);
@@ -371,7 +378,10 @@ public:
 					delete newdrive;
 					return;
 				}
-			} else {
+			} 
+			else 
+#endif // CDROM_ENABLED
+			{
 				/* Give a warning when mount c:\ or the / */
 #if defined (WIN32) || defined(OS2)
 				if( (temp_line == "c:\\") || (temp_line == "C:\\") || 
@@ -1352,7 +1362,10 @@ public:
 						imageDiskList[0] = ((fatDrive *)newdrive)->loadedDisk;
 					}
 				}
-			} else if (fstype=="iso") {
+			} 
+#ifdef CDROM_ENABLED
+			else if (fstype=="iso") 
+			{
 
 				if (Drives[drive-'A']) {
 					WriteOut(MSG_Get("PROGRAM_IMGMOUNT_ALREADY_MOUNTED"));
@@ -1402,7 +1415,10 @@ public:
 				}
 				WriteOut(MSG_Get("PROGRAM_MOUNT_STATUS_2"), drive, tmp.c_str());
 
-			} else {
+			} 
+#endif
+			else
+			{
 				FILE *newDisk = fopen(temp_line.c_str(), "rb+");
 				if (!newDisk) {
 					WriteOut(MSG_Get("PROGRAM_IMGMOUNT_INVALID_IMAGE"));

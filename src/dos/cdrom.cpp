@@ -21,6 +21,8 @@
 // SDL CDROM 
 // ******************************************************
 
+#ifdef CDROM_ENABLED
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -216,3 +218,4 @@ bool CDROM_Interface_Fake :: GetMediaTrayStatus(bool& mediaPresent, bool& mediaC
 }
 
 
+#endif

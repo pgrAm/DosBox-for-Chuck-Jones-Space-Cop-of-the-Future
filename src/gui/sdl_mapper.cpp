@@ -298,194 +298,22 @@ protected:
 
 };
 
-
-#define MAX_SDLKEYS 323
-
-static bool usescancodes;
-static Bit8u scancode_map[MAX_SDLKEYS];
-
-#define Z SDLK_UNKNOWN
-
-#if defined (MACOSX)
-static SDLKey sdlkey_map[]={
-	/* Main block printables */
-	/*00-05*/ SDLK_a, SDLK_s, SDLK_d, SDLK_f, SDLK_h, SDLK_g,
-	/*06-0B*/ SDLK_z, SDLK_x, SDLK_c, SDLK_v, SDLK_WORLD_0, SDLK_b,
-	/*0C-11*/ SDLK_q, SDLK_w, SDLK_e, SDLK_r, SDLK_y, SDLK_t, 
-	/*12-17*/ SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_6, SDLK_5, 
-	/*18-1D*/ SDLK_EQUALS, SDLK_9, SDLK_7, SDLK_MINUS, SDLK_8, SDLK_0, 
-	/*1E-21*/ SDLK_RIGHTBRACKET, SDLK_o, SDLK_u, SDLK_LEFTBRACKET, 
-	/*22-23*/ SDLK_i, SDLK_p,
-	/*24-29*/ SDLK_RETURN, SDLK_l, SDLK_j, SDLK_QUOTE, SDLK_k, SDLK_SEMICOLON, 
-	/*2A-29*/ SDLK_BACKSLASH, SDLK_COMMA, SDLK_SLASH, SDLK_n, SDLK_m, 
-	/*2F-2F*/ SDLK_PERIOD,
-
-	/* Spaces, controls, modifiers (dosbox uses LMETA only for
-	 * hotkeys, it's not really mapped to an emulated key) */
-	/*30-33*/ SDLK_TAB, SDLK_SPACE, SDLK_BACKQUOTE, SDLK_BACKSPACE,
-	/*34-37*/ Z, SDLK_ESCAPE, Z, SDLK_LMETA,
-	/*38-3B*/ SDLK_LSHIFT, SDLK_CAPSLOCK, SDLK_LALT, SDLK_LCTRL,
-
-	/*3C-40*/ Z, Z, Z, Z, Z,
-
-	/* Keypad (KP_EQUALS not supported, NUMLOCK used on what is CLEAR
-	 * in Mac OS X) */
-	/*41-46*/ SDLK_KP_PERIOD, Z, SDLK_KP_MULTIPLY, Z, SDLK_KP_PLUS, Z,
-	/*47-4A*/ SDLK_NUMLOCK /*==SDLK_CLEAR*/, Z, Z, Z,
-	/*4B-4D*/ SDLK_KP_DIVIDE, SDLK_KP_ENTER, Z,
-	/*4E-51*/ SDLK_KP_MINUS, Z, Z, SDLK_KP_EQUALS,
-	/*52-57*/ SDLK_KP0, SDLK_KP1, SDLK_KP2, SDLK_KP3, SDLK_KP4, SDLK_KP5, 
-	/*58-5C*/ SDLK_KP6, SDLK_KP7, Z, SDLK_KP8, SDLK_KP9, 
-
-	/*5D-5F*/ Z, Z, Z,
-	
-	/* Function keys and cursor blocks (F13 not supported, F14 =>
-	 * PRINT[SCREEN], F15 => SCROLLOCK, F16 => PAUSE, HELP => INSERT) */
-	/*60-64*/ SDLK_F5, SDLK_F6, SDLK_F7, SDLK_F3, SDLK_F8,
-	/*65-6A*/ SDLK_F9, Z, SDLK_F11, Z, SDLK_F13, SDLK_PAUSE /*==SDLK_F16*/,
-	/*6B-70*/ SDLK_PRINT /*==SDLK_F14*/, Z, SDLK_F10, Z, SDLK_F12, Z,
-	/*71-72*/ SDLK_SCROLLOCK /*==SDLK_F15*/, SDLK_INSERT /*==SDLK_HELP*/, 
-	/*73-77*/ SDLK_HOME, SDLK_PAGEUP, SDLK_DELETE, SDLK_F4, SDLK_END,
-	/*78-7C*/ SDLK_F2, SDLK_PAGEDOWN, SDLK_F1, SDLK_LEFT, SDLK_RIGHT,
-	/*7D-7E*/ SDLK_DOWN, SDLK_UP,
-
-	/*7F-7F*/ Z,
-
-	/* 4 extra keys that don't really exist, but are needed for
-	 * round-trip mapping (dosbox uses RMETA only for hotkeys, it's
-	 * not really mapped to an emulated key) */
-	SDLK_RMETA, SDLK_RSHIFT, SDLK_RALT, SDLK_RCTRL
-};
-#define MAX_SCANCODES (0x80+4)
-/* Make sure that the table above has the expected size.  This
-   expression will raise a compiler error if the condition is false.  */
-typedef char assert_right_size [MAX_SCANCODES == (sizeof(sdlkey_map)/sizeof(sdlkey_map[0]))	? 1 : -1];
-
-#else // !MACOSX
-
-#define MAX_SCANCODES 0xdf
-static SDLKey sdlkey_map[MAX_SCANCODES]={SDLK_UNKNOWN,SDLK_ESCAPE,
-	SDLK_1,SDLK_2,SDLK_3,SDLK_4,SDLK_5,SDLK_6,SDLK_7,SDLK_8,SDLK_9,SDLK_0,
-	/* 0x0c: */
-	SDLK_MINUS,SDLK_EQUALS,SDLK_BACKSPACE,SDLK_TAB,
-	SDLK_q,SDLK_w,SDLK_e,SDLK_r,SDLK_t,SDLK_y,SDLK_u,SDLK_i,SDLK_o,SDLK_p,
-	SDLK_LEFTBRACKET,SDLK_RIGHTBRACKET,SDLK_RETURN,SDLK_LCTRL,
-	SDLK_a,SDLK_s,SDLK_d,SDLK_f,SDLK_g,SDLK_h,SDLK_j,SDLK_k,SDLK_l,
-	SDLK_SEMICOLON,SDLK_QUOTE,SDLK_BACKQUOTE,SDLK_LSHIFT,SDLK_BACKSLASH,
-	SDLK_z,SDLK_x,SDLK_c,SDLK_v,SDLK_b,SDLK_n,SDLK_m,
-	/* 0x33: */
-	SDLK_COMMA,SDLK_PERIOD,SDLK_SLASH,SDLK_RSHIFT,SDLK_KP_MULTIPLY,
-	SDLK_LALT,SDLK_SPACE,SDLK_CAPSLOCK,
-	SDLK_F1,SDLK_F2,SDLK_F3,SDLK_F4,SDLK_F5,SDLK_F6,SDLK_F7,SDLK_F8,SDLK_F9,SDLK_F10,
-	/* 0x45: */
-	SDLK_NUMLOCK,SDLK_SCROLLOCK,
-	SDLK_KP7,SDLK_KP8,SDLK_KP9,SDLK_KP_MINUS,SDLK_KP4,SDLK_KP5,SDLK_KP6,SDLK_KP_PLUS,
-	SDLK_KP1,SDLK_KP2,SDLK_KP3,SDLK_KP0,SDLK_KP_PERIOD,
-	SDLK_UNKNOWN,SDLK_UNKNOWN,
-	SDLK_LESS,SDLK_F11,SDLK_F12, Z, Z, Z, Z, Z, Z, Z,
-	/* 0x60: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0x70: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0x80: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0x90: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0xA0: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0xB0: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0xC0: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0xD0: */
-	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z//,Z,Z,
-	/* 0xE0: */
-	//Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z,
-	/* 0xF0: */
-//	Z,Z,Z,Z, Z,Z,Z,Z, Z,Z,Z,Z, Z,Z//,Z,Z
-
-};
-#endif
-
-#undef Z
-
-
-SDLKey MapSDLCode(Bitu skey) {
-//	LOG_MSG("MapSDLCode %d %X",skey,skey);
-	if (usescancodes) {
-		if (skey<MAX_SCANCODES) return sdlkey_map[skey];
-		else return SDLK_UNKNOWN;
-	} else return (SDLKey)skey;
-}
-
-Bitu GetKeyCode(SDL_keysym keysym) {
-//	LOG_MSG("GetKeyCode %X %X %X",keysym.scancode,keysym.sym,keysym.mod);
-	if (usescancodes) {
-		Bitu key=(Bitu)keysym.scancode;
-		if (key==0
-#if defined (MACOSX)
-		    /* On Mac on US keyboards, scancode 0 is actually the 'a'
-		     * key.  For good measure exclude all printables from this
-		     * condition. */
-		    && (keysym.sym < SDLK_SPACE || keysym.sym > SDLK_WORLD_95)
-#endif
-			) {
-			/* try to retrieve key from symbolic key as scancode is zero */
-			if (keysym.sym<MAX_SDLKEYS) key=scancode_map[(Bitu)keysym.sym];
-		} 
-#if !defined (WIN32) && !defined (MACOSX) && !defined(OS2)
-		/* Linux adds 8 to all scancodes */
-		else key-=8;
-#endif
-#if defined (WIN32)
-		switch (key) {
-			case 0x1c:	// ENTER
-			case 0x1d:	// CONTROL
-			case 0x35:	// SLASH
-			case 0x37:	// PRINTSCREEN
-			case 0x38:	// ALT
-			case 0x45:	// PAUSE
-			case 0x47:	// HOME
-			case 0x48:	// cursor UP
-			case 0x49:	// PAGE UP
-			case 0x4b:	// cursor LEFT
-			case 0x4d:	// cursor RIGHT
-			case 0x4f:	// END
-			case 0x50:	// cursor DOWN
-			case 0x51:	// PAGE DOWN
-			case 0x52:	// INSERT
-			case 0x53:	// DELETE
-				if (GFX_SDLUsingWinDIB()) key=scancode_map[(Bitu)keysym.sym];
-				break;
-		}
-#endif
-		return key;
-	} else {
-#if defined (WIN32)
-		/* special handling of 102-key under windows */
-		if ((keysym.sym==SDLK_BACKSLASH) && (keysym.scancode==0x56)) return (Bitu)SDLK_LESS;
-#endif
-		return (Bitu)keysym.sym;
-	}
-}
-
-
 class CKeyBind;
 class CKeyBindGroup;
 
 class CKeyBind : public CBind {
 public:
-	CKeyBind(CBindList * _list,SDLKey _key) : CBind(_list) {
+	CKeyBind(CBindList * _list, SDL_Scancode _key) : CBind(_list) {
 		key = _key;
 	}
 	void BindName(char * buf) {
-		sprintf(buf,"Key %s",SDL_GetKeyName(MapSDLCode((Bitu)key)));
+		sprintf(buf,"Key %s", SDL_GetScancodeName(key));
 	}
 	void ConfigName(char * buf) {
-		sprintf(buf,"key %d",MapSDLCode((Bitu)key));
+		sprintf(buf,"key %d",key);
 	}
 public:
-	SDLKey key;
+	SDL_Scancode key;
 };
 
 class CKeyBindGroup : public  CBindGroup {
@@ -501,28 +329,23 @@ public:
 		if (strncasecmp(buf,configname,strlen(configname))) return 0;
 		StripWord(buf);char * num=StripWord(buf);
 		Bitu code=ConvDecWord(num);
-		if (usescancodes) {
-			if (code<MAX_SDLKEYS) code=scancode_map[code];
-			else code=0;
-		}
-		CBind * bind=CreateKeyBind((SDLKey)code);
+
+		CBind * bind=CreateKeyBind((SDL_Scancode)code);
 		return bind;
 	}
 	CBind * CreateEventBind(SDL_Event * event) {
 		if (event->type!=SDL_KEYDOWN) return 0;
-		return CreateKeyBind((SDLKey)GetKeyCode(event->key.keysym));
+		return CreateKeyBind(event->key.keysym.scancode);
 	};
 	bool CheckEvent(SDL_Event * event) {
 		if (event->type!=SDL_KEYDOWN && event->type!=SDL_KEYUP) return false;
-		Bitu key=GetKeyCode(event->key.keysym);
-//		LOG_MSG("key type %i is %x [%x %x]",event->type,key,event->key.keysym.sym,event->key.keysym.scancode);
-		assert(Bitu(event->key.keysym.sym)<keys);
+		Bitu key = event->key.keysym.scancode;
+
 		if (event->type==SDL_KEYDOWN) ActivateBindList(&lists[key],0x7fff,true);
 		else DeactivateBindList(&lists[key],true);
 		return 0;
 	}
-	CBind * CreateKeyBind(SDLKey _key) {
-		if (!usescancodes) assert((Bitu)_key<keys);
+	CBind * CreateKeyBind(SDL_Scancode _key) {
 		return new CKeyBind(&lists[(Bitu)_key],_key);
 	}
 private:
@@ -675,7 +498,7 @@ public:
 		if (axes_cap>axes) axes_cap=axes;
 		hats_cap=emulated_hats;
 		if (hats_cap>hats) hats_cap=hats;
-		LOG_MSG("Using joystick %s with %d axes, %d buttons and %d hat(s)",SDL_JoystickName(stick),axes,buttons,hats);
+		LOG_MSG("Using joystick %s with %d axes, %d buttons and %d hat(s)",SDL_JoystickName(sdl_joystick),axes,buttons,hats);
 	}
 	~CStickBindGroup() {
 		SDL_JoystickClose(sdl_joystick);
@@ -881,7 +704,7 @@ private:
 		return configname;
 	}
 	const char * BindStart(void) {
-		if (sdl_joystick!=NULL) return SDL_JoystickName(stick);
+		if (sdl_joystick!=NULL) return SDL_JoystickName(sdl_joystick);
 		else return "[missing joystick]";
 	}
 
@@ -1240,7 +1063,7 @@ protected:
 };
 
 static struct CMapper {
-	SDL_Surface * surface;
+	SDL_Window * surface;
 	SDL_Surface * draw_surface;
 	bool exit;
 	CEvent * aevent;				//Active Event
@@ -1277,7 +1100,9 @@ void CBindGroup::DeactivateBindList(CBindList * list,bool ev_trigger) {
 }
 
 static void DrawText(Bitu x,Bitu y,const char * text,Bit8u color) {
-	Bit8u * draw=((Bit8u *)mapper.surface->pixels)+(y*mapper.surface->pitch)+x;
+	SDL_Surface * s = SDL_GetWindowSurface(mapper.surface);
+
+	Bit8u * draw=((Bit8u *)s->pixels)+(y*s->pitch)+x;
 	while (*text) {
 		Bit8u * font=&int10_font_14[(*text)*14];
 		Bitu i,j;Bit8u * draw_line=draw;
@@ -1288,7 +1113,7 @@ static void DrawText(Bitu x,Bitu y,const char * text,Bit8u color) {
 				else *(draw_line+j)=CLR_BLACK;
 				map<<=1;
 			}
-			draw_line+=mapper.surface->pitch;
+			draw_line+=s->pitch;
 		}
 		text++;draw+=8;
 	}
@@ -1305,14 +1130,16 @@ public:
 	}
 	virtual void Draw(void) {
 		if (!enabled) return;
-		Bit8u * point=((Bit8u *)mapper.surface->pixels)+(y*mapper.surface->pitch)+x;
+		SDL_Surface * s = SDL_GetWindowSurface(mapper.surface);
+
+		Bit8u * point=((Bit8u *)s->pixels)+(y*s->pitch)+x;
 		for (Bitu lines=0;lines<dy;lines++)  {
 			if (lines==0 || lines==(dy-1)) {
 				for (Bitu cols=0;cols<dx;cols++) *(point+cols)=color;
 			} else {
 				*point=color;*(point+dx-1)=color;
 			}
-			point+=mapper.surface->pitch;
+			point+=s->pitch;
 		}
 	}
 	virtual bool OnTop(Bitu _x,Bitu _y) {
@@ -1457,10 +1284,12 @@ public:
 			break;
 		}
 		if (checked) {
-			Bit8u * point=((Bit8u *)mapper.surface->pixels)+((y+2)*mapper.surface->pitch)+x+dx-dy+2;
+			SDL_Surface * s = SDL_GetWindowSurface(mapper.surface);
+
+			Bit8u * point=((Bit8u *)s->pixels)+((y+2)*s->pitch)+x+dx-dy+2;
 			for (Bitu lines=0;lines<(dy-4);lines++)  {
 				memset(point,color,dy-4);
-				point+=mapper.surface->pitch;
+				point+=s->pitch;
 			}
 		}
 		CTextButton::Draw();
@@ -1589,25 +1418,25 @@ public:
 		case MK_f1:case MK_f2:case MK_f3:case MK_f4:
 		case MK_f5:case MK_f6:case MK_f7:case MK_f8:
 		case MK_f9:case MK_f10:case MK_f11:case MK_f12:	
-			key=SDLK_F1+(defkey-MK_f1);
+			key= SDL_SCANCODE_F1 +(defkey-MK_f1);
 			break;
 		case MK_return:
-			key=SDLK_RETURN;
+			key= SDL_SCANCODE_RETURN;
 			break;
 		case MK_kpminus:
-			key=SDLK_KP_MINUS;
+			key= SDL_SCANCODE_KP_MINUS;
 			break;
 		case MK_scrolllock:
-			key=SDLK_SCROLLOCK;
+			key= SDL_SCANCODE_SCROLLLOCK;
 			break;
 		case MK_pause:
-			key=SDLK_PAUSE;
+			key= SDL_SCANCODE_PAUSE;
 			break;
 		case MK_printscreen:
-			key=SDLK_PRINT;
+			key= SDL_SCANCODE_PRINTSCREEN;
 			break;
 		case MK_home: 
-			key=SDLK_HOME; 
+			key=SDL_SCANCODE_HOME;
 			break;
 		}
 		sprintf(buf,"%s \"key %d%s%s%s\"",
@@ -1690,13 +1519,15 @@ static void SetActiveEvent(CEvent * event) {
 }
 
 static void DrawButtons(void) {
-	SDL_FillRect(mapper.surface,0,0);
-	SDL_LockSurface(mapper.surface);
+	SDL_Surface * s = SDL_GetWindowSurface(mapper.surface);
+
+	SDL_FillRect(s,0,0);
+	SDL_LockSurface(s);
 	for (CButton_it but_it = buttons.begin();but_it!=buttons.end();but_it++) {
 		(*but_it)->Draw();
 	}
-	SDL_UnlockSurface(mapper.surface);
-	SDL_Flip(mapper.surface);
+	SDL_UnlockSurface(s);
+	SDL_UpdateWindowSurface(mapper.surface);
 }
 
 static CKeyEvent * AddKeyButtonEvent(Bitu x,Bitu y,Bitu dx,Bitu dy,char const * const title,char const * const entry,KBD_KEYS key) {
@@ -2042,46 +1873,41 @@ static struct {
 	const char * eventend;
 	Bitu key;
 } DefaultKeys[]={
-	{"f1",SDLK_F1},		{"f2",SDLK_F2},		{"f3",SDLK_F3},		{"f4",SDLK_F4},
-	{"f5",SDLK_F5},		{"f6",SDLK_F6},		{"f7",SDLK_F7},		{"f8",SDLK_F8},
-	{"f9",SDLK_F9},		{"f10",SDLK_F10},	{"f11",SDLK_F11},	{"f12",SDLK_F12},
+	{"f1",SDL_SCANCODE_F1},		{"f2",SDL_SCANCODE_F2},		{"f3",SDL_SCANCODE_F3},		{"f4",SDL_SCANCODE_F4},
+	{"f5",SDL_SCANCODE_F5},		{"f6",SDL_SCANCODE_F6},		{"f7",SDL_SCANCODE_F7},		{"f8",SDL_SCANCODE_F8},
+	{"f9",SDL_SCANCODE_F9},		{"f10",SDL_SCANCODE_F10},	{"f11",SDL_SCANCODE_F11},	{"f12",SDL_SCANCODE_F12},
 
-	{"1",SDLK_1},		{"2",SDLK_2},		{"3",SDLK_3},		{"4",SDLK_4},
-	{"5",SDLK_5},		{"6",SDLK_6},		{"7",SDLK_7},		{"8",SDLK_8},
-	{"9",SDLK_9},		{"0",SDLK_0},
+	{"1",SDL_SCANCODE_1},		{"2",SDL_SCANCODE_2},		{"3",SDL_SCANCODE_3},		{"4",SDL_SCANCODE_4},
+	{"5",SDL_SCANCODE_5},		{"6",SDL_SCANCODE_6},		{"7",SDL_SCANCODE_7},		{"8",SDL_SCANCODE_8},
+	{"9",SDL_SCANCODE_9},		{"0",SDL_SCANCODE_0},
 
-	{"a",SDLK_a},		{"b",SDLK_b},		{"c",SDLK_c},		{"d",SDLK_d},
-	{"e",SDLK_e},		{"f",SDLK_f},		{"g",SDLK_g},		{"h",SDLK_h},
-	{"i",SDLK_i},		{"j",SDLK_j},		{"k",SDLK_k},		{"l",SDLK_l},
-	{"m",SDLK_m},		{"n",SDLK_n},		{"o",SDLK_o},		{"p",SDLK_p},
-	{"q",SDLK_q},		{"r",SDLK_r},		{"s",SDLK_s},		{"t",SDLK_t},
-	{"u",SDLK_u},		{"v",SDLK_v},		{"w",SDLK_w},		{"x",SDLK_x},
-	{"y",SDLK_y},		{"z",SDLK_z},		{"space",SDLK_SPACE},
-	{"esc",SDLK_ESCAPE},	{"equals",SDLK_EQUALS},		{"grave",SDLK_BACKQUOTE},
-	{"tab",SDLK_TAB},		{"enter",SDLK_RETURN},		{"bspace",SDLK_BACKSPACE},
-	{"lbracket",SDLK_LEFTBRACKET},						{"rbracket",SDLK_RIGHTBRACKET},
-	{"minus",SDLK_MINUS},	{"capslock",SDLK_CAPSLOCK},	{"semicolon",SDLK_SEMICOLON},
-	{"quote", SDLK_QUOTE},	{"backslash",SDLK_BACKSLASH},	{"lshift",SDLK_LSHIFT},
-	{"rshift",SDLK_RSHIFT},	{"lalt",SDLK_LALT},			{"ralt",SDLK_RALT},
-	{"lctrl",SDLK_LCTRL},	{"rctrl",SDLK_RCTRL},		{"comma",SDLK_COMMA},
-	{"period",SDLK_PERIOD},	{"slash",SDLK_SLASH},		{"printscreen",SDLK_PRINT},
-	{"scrolllock",SDLK_SCROLLOCK},	{"pause",SDLK_PAUSE},		{"pagedown",SDLK_PAGEDOWN},
-	{"pageup",SDLK_PAGEUP},	{"insert",SDLK_INSERT},		{"home",SDLK_HOME},
-	{"delete",SDLK_DELETE},	{"end",SDLK_END},			{"up",SDLK_UP},
-	{"left",SDLK_LEFT},		{"down",SDLK_DOWN},			{"right",SDLK_RIGHT},
-	{"kp_0",SDLK_KP0},	{"kp_1",SDLK_KP1},	{"kp_2",SDLK_KP2},	{"kp_3",SDLK_KP3},
-	{"kp_4",SDLK_KP4},	{"kp_5",SDLK_KP5},	{"kp_6",SDLK_KP6},	{"kp_7",SDLK_KP7},
-	{"kp_8",SDLK_KP8},	{"kp_9",SDLK_KP9},	{"numlock",SDLK_NUMLOCK},
-	{"kp_divide",SDLK_KP_DIVIDE},	{"kp_multiply",SDLK_KP_MULTIPLY},
-	{"kp_minus",SDLK_KP_MINUS},		{"kp_plus",SDLK_KP_PLUS},
-	{"kp_period",SDLK_KP_PERIOD},	{"kp_enter",SDLK_KP_ENTER},
+	{"a",SDL_SCANCODE_A},		{"b",SDL_SCANCODE_B},		{"c",SDL_SCANCODE_C},		{"d",SDL_SCANCODE_D},
+	{"e",SDL_SCANCODE_E},		{"f",SDL_SCANCODE_F},		{"g",SDL_SCANCODE_G},		{"h",SDL_SCANCODE_H},
+	{"i",SDL_SCANCODE_I},		{"j",SDL_SCANCODE_J},		{"k",SDL_SCANCODE_K},		{"l",SDL_SCANCODE_L},
+	{"m",SDL_SCANCODE_M},		{"n",SDL_SCANCODE_N},		{"o",SDL_SCANCODE_O},		{"p",SDL_SCANCODE_P},
+	{"q",SDL_SCANCODE_Q},		{"r",SDL_SCANCODE_R},		{"s",SDL_SCANCODE_S},		{"t",SDL_SCANCODE_T},
+	{"u",SDL_SCANCODE_U},		{"v",SDL_SCANCODE_V},		{"w",SDL_SCANCODE_W},		{"x",SDL_SCANCODE_X},
+	{"y",SDL_SCANCODE_Y},		{"z",SDL_SCANCODE_Z},		{"space",SDL_SCANCODE_SPACE},
+	{"esc",SDL_SCANCODE_ESCAPE},	{"equals",SDL_SCANCODE_EQUALS},		{"grave",SDL_SCANCODE_GRAVE },
+	{"tab",SDL_SCANCODE_TAB},		{"enter",SDL_SCANCODE_RETURN},		{"bspace",SDL_SCANCODE_BACKSPACE},
+	{"lbracket",SDL_SCANCODE_LEFTBRACKET},						{"rbracket",SDL_SCANCODE_RIGHTBRACKET},
+	{"minus",SDL_SCANCODE_MINUS},	{"capslock",SDL_SCANCODE_CAPSLOCK},	{"semicolon",SDL_SCANCODE_SEMICOLON},
+	{"quote", SDL_SCANCODE_APOSTROPHE },	{"backslash",SDL_SCANCODE_BACKSLASH},	{"lshift",SDL_SCANCODE_LSHIFT},
+	{"rshift",SDL_SCANCODE_RSHIFT},	{"lalt",SDL_SCANCODE_LALT},			{"ralt",SDL_SCANCODE_RALT},
+	{"lctrl",SDL_SCANCODE_LCTRL},	{"rctrl",SDL_SCANCODE_RCTRL},		{"comma",SDL_SCANCODE_COMMA},
+	{"period",SDL_SCANCODE_PERIOD},	{"slash",SDL_SCANCODE_SLASH},		{"printscreen",SDL_SCANCODE_PRINTSCREEN },
+	{"scrolllock",SDL_SCANCODE_SCROLLLOCK},	{"pause",SDL_SCANCODE_PAUSE},		{"pagedown",SDL_SCANCODE_PAGEDOWN},
+	{"pageup",SDL_SCANCODE_PAGEUP},	{"insert",SDL_SCANCODE_INSERT},		{"home",SDL_SCANCODE_HOME},
+	{"delete",SDL_SCANCODE_DELETE},	{"end",SDL_SCANCODE_END},			{"up",SDL_SCANCODE_UP},
+	{"left",SDL_SCANCODE_LEFT},		{"down",SDL_SCANCODE_DOWN},			{"right",SDL_SCANCODE_RIGHT},
+	{"kp_0",SDL_SCANCODE_KP_0},	{"kp_1",SDL_SCANCODE_KP_1},	{"kp_2",SDL_SCANCODE_KP_2},	{"kp_3",SDL_SCANCODE_KP_3},
+	{"kp_4",SDL_SCANCODE_KP_4},	{"kp_5",SDL_SCANCODE_KP_5},	{"kp_6",SDL_SCANCODE_KP_6},	{"kp_7",SDL_SCANCODE_KP_7},
+	{"kp_8",SDL_SCANCODE_KP_8},	{"kp_9",SDL_SCANCODE_KP_9},	{"numlock",SDL_SCANCODE_NUMLOCKCLEAR},
+	{"kp_divide",SDL_SCANCODE_KP_DIVIDE},	{"kp_multiply",SDL_SCANCODE_KP_MULTIPLY},
+	{"kp_minus",SDL_SCANCODE_KP_MINUS},		{"kp_plus",SDL_SCANCODE_KP_PLUS},
+	{"kp_period",SDL_SCANCODE_KP_PERIOD},	{"kp_enter",SDL_SCANCODE_KP_ENTER},
 
-#if defined (MACOSX)
-	/* Intl Mac keyboards in US layout actually put U+00A7 SECTION SIGN here */
-	{"lessthan",SDLK_WORLD_0},
-#else
-	{"lessthan",SDLK_LESS},
-#endif
+	{"lessthan",SDL_SCANCODE_NONUSBACKSLASH },
 
 	{0,0}
 };
@@ -2094,10 +1920,10 @@ static void CreateDefaultBinds(void) {
 		CreateStringBind(buffer);
 		i++;
 	}
-	sprintf(buffer,"mod_1 \"key %d\"",SDLK_RCTRL);CreateStringBind(buffer);
-	sprintf(buffer,"mod_1 \"key %d\"",SDLK_LCTRL);CreateStringBind(buffer);
-	sprintf(buffer,"mod_2 \"key %d\"",SDLK_RALT);CreateStringBind(buffer);
-	sprintf(buffer,"mod_2 \"key %d\"",SDLK_LALT);CreateStringBind(buffer);
+	sprintf(buffer,"mod_1 \"key %d\"",SDL_SCANCODE_RCTRL);CreateStringBind(buffer);
+	sprintf(buffer,"mod_1 \"key %d\"",SDL_SCANCODE_LCTRL);CreateStringBind(buffer);
+	sprintf(buffer,"mod_2 \"key %d\"",SDL_SCANCODE_RALT);CreateStringBind(buffer);
+	sprintf(buffer,"mod_2 \"key %d\"",SDL_SCANCODE_LALT);CreateStringBind(buffer);
 	for (CHandlerEventVector_it hit=handlergroup.begin();hit!=handlergroup.end();hit++) {
 		(*hit)->MakeDefaultBind(buffer);
 		CreateStringBind(buffer);
@@ -2275,7 +2101,7 @@ static void InitializeJoysticks(void) {
 
 static void CreateBindGroups(void) {
 	bindgroups.clear();
-	new CKeyBindGroup(SDLK_LAST);
+	new CKeyBindGroup(SDL_NUM_SCANCODES);
 	if (joytype != JOY_NONE) {
 #if defined (REDUCE_JOYSTICK_POLLING)
 		// direct access to the SDL joystick, thus removed from the event handling
@@ -2345,7 +2171,7 @@ void MAPPER_Run(bool pressed) {
 	PIC_AddEvent(MAPPER_RunEvent,0);	//In case mapper deletes the key object that ran it
 }
 
-SDL_Surface* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags);
+SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags);
 
 void MAPPER_RunInternal() {
 	int cursor = SDL_ShowCursor(SDL_QUERY);
@@ -2362,7 +2188,7 @@ void MAPPER_RunInternal() {
 	if (mapper.surface == NULL) E_Exit("Could not initialize video mode for mapper: %s",SDL_GetError());
 
 	/* Set some palette entries */
-	SDL_SetPalette(mapper.surface, SDL_LOGPAL|SDL_PHYSPAL, map_pal, 0, 6);
+	//SDL_SetPalette(mapper.surface, SDL_LOGPAL|SDL_PHYSPAL, map_pal, 0, 6);
 	if (last_clicked) {
 		last_clicked->BindColor();
 		last_clicked=NULL;
@@ -2429,127 +2255,6 @@ void MAPPER_StartUp(Section * sec) {
 	mapper.sticks.num=0;
 	mapper.sticks.num_groups=0;
 	memset(&virtual_joysticks,0,sizeof(virtual_joysticks));
-
-	usescancodes = false;
-
-	if (section->Get_bool("usescancodes")) {
-		usescancodes=true;
-
-		/* Note: table has to be tested/updated for various OSs */
-#if defined (MACOSX)
-		/* nothing */
-#elif defined(OS2)
-		sdlkey_map[0x61]=SDLK_UP;
-		sdlkey_map[0x66]=SDLK_DOWN;
-		sdlkey_map[0x63]=SDLK_LEFT;
-		sdlkey_map[0x64]=SDLK_RIGHT;
-		sdlkey_map[0x60]=SDLK_HOME;
-		sdlkey_map[0x65]=SDLK_END;
-		sdlkey_map[0x62]=SDLK_PAGEUP;
-		sdlkey_map[0x67]=SDLK_PAGEDOWN;
-		sdlkey_map[0x68]=SDLK_INSERT;
-		sdlkey_map[0x69]=SDLK_DELETE;
-		sdlkey_map[0x5C]=SDLK_KP_DIVIDE;
-		sdlkey_map[0x5A]=SDLK_KP_ENTER;
-		sdlkey_map[0x5B]=SDLK_RCTRL;
-		sdlkey_map[0x5F]=SDLK_PAUSE;
-//		sdlkey_map[0x00]=SDLK_PRINT;
-		sdlkey_map[0x5E]=SDLK_RALT;
-		sdlkey_map[0x40]=SDLK_KP5;
-		sdlkey_map[0x41]=SDLK_KP6;
-#elif !defined (WIN32) /* => Linux & BSDs */
-		bool evdev_input = false;
-#ifdef C_X11_XKB
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-		if (SDL_GetWMInfo(&info)) {
-			XkbDescPtr desc = NULL;
-			if((desc = XkbGetMap(info.info.x11.display,XkbAllComponentsMask,XkbUseCoreKbd))) {
-				if(XkbGetNames(info.info.x11.display,XkbAllNamesMask,desc) == 0) {
-					const char* keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
-//					const char* geom = XGetAtomName(info.info.x11.display, desc->names->geometry);
-					if(keycodes) {
-						LOG(LOG_MISC,LOG_NORMAL)("keyboard type %s",keycodes);
-						if (strncmp(keycodes,"evdev",5) == 0) evdev_input = true;
-					}
-					XkbFreeNames(desc,XkbAllNamesMask,True);
-				}
-			XkbFreeClientMap(desc,0,True);
-			}
-		}
-#endif
-		if (evdev_input) {
-			sdlkey_map[0x67]=SDLK_UP;
-			sdlkey_map[0x6c]=SDLK_DOWN;
-			sdlkey_map[0x69]=SDLK_LEFT;
-			sdlkey_map[0x6a]=SDLK_RIGHT;
-			sdlkey_map[0x66]=SDLK_HOME;
-			sdlkey_map[0x6b]=SDLK_END;
-			sdlkey_map[0x68]=SDLK_PAGEUP;
-			sdlkey_map[0x6d]=SDLK_PAGEDOWN;
-			sdlkey_map[0x6e]=SDLK_INSERT;
-			sdlkey_map[0x6f]=SDLK_DELETE;
-			sdlkey_map[0x62]=SDLK_KP_DIVIDE;
-			sdlkey_map[0x60]=SDLK_KP_ENTER;
-			sdlkey_map[0x61]=SDLK_RCTRL;
-			sdlkey_map[0x77]=SDLK_PAUSE;
-			sdlkey_map[0x63]=SDLK_PRINT;
-			sdlkey_map[0x64]=SDLK_RALT;
-
-			//Win-keys
-			sdlkey_map[0x7d]=SDLK_LSUPER;
-			sdlkey_map[0x7e]=SDLK_RSUPER;
-			sdlkey_map[0x7f]=SDLK_MENU;
-		} else {
-			sdlkey_map[0x5a]=SDLK_UP;
-			sdlkey_map[0x60]=SDLK_DOWN;
-			sdlkey_map[0x5c]=SDLK_LEFT;
-			sdlkey_map[0x5e]=SDLK_RIGHT;
-			sdlkey_map[0x59]=SDLK_HOME;
-			sdlkey_map[0x5f]=SDLK_END;
-			sdlkey_map[0x5b]=SDLK_PAGEUP;
-			sdlkey_map[0x61]=SDLK_PAGEDOWN;
-			sdlkey_map[0x62]=SDLK_INSERT;
-			sdlkey_map[0x63]=SDLK_DELETE;
-			sdlkey_map[0x68]=SDLK_KP_DIVIDE;
-			sdlkey_map[0x64]=SDLK_KP_ENTER;
-			sdlkey_map[0x65]=SDLK_RCTRL;
-			sdlkey_map[0x66]=SDLK_PAUSE;
-			sdlkey_map[0x67]=SDLK_PRINT;
-			sdlkey_map[0x69]=SDLK_RALT;
-		}
-#else
-		sdlkey_map[0xc8]=SDLK_UP;
-		sdlkey_map[0xd0]=SDLK_DOWN;
-		sdlkey_map[0xcb]=SDLK_LEFT;
-		sdlkey_map[0xcd]=SDLK_RIGHT;
-		sdlkey_map[0xc7]=SDLK_HOME;
-		sdlkey_map[0xcf]=SDLK_END;
-		sdlkey_map[0xc9]=SDLK_PAGEUP;
-		sdlkey_map[0xd1]=SDLK_PAGEDOWN;
-		sdlkey_map[0xd2]=SDLK_INSERT;
-		sdlkey_map[0xd3]=SDLK_DELETE;
-		sdlkey_map[0xb5]=SDLK_KP_DIVIDE;
-		sdlkey_map[0x9c]=SDLK_KP_ENTER;
-		sdlkey_map[0x9d]=SDLK_RCTRL;
-		sdlkey_map[0xc5]=SDLK_PAUSE;
-		sdlkey_map[0xb7]=SDLK_PRINT;
-		sdlkey_map[0xb8]=SDLK_RALT;
-
-		//Win-keys
-		sdlkey_map[0xdb]=SDLK_LMETA;
-		sdlkey_map[0xdc]=SDLK_RMETA;
-		sdlkey_map[0xdd]=SDLK_MENU;
-
-#endif
-
-		Bitu i;
-		for (i=0; i<MAX_SDLKEYS; i++) scancode_map[i]=0;
-		for (i=0; i<MAX_SCANCODES; i++) {
-			SDLKey key=sdlkey_map[i];
-			if (key<MAX_SDLKEYS) scancode_map[key]=(Bit8u)i;
-		}
-	}
 
 	Prop_path* pp = section->Get_path("mapperfile");
 	mapper.filename = pp->realpath;

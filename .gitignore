@@ -24,6 +24,8 @@ bld/
 zlib-1.2.3-lib/
 libpng-1.2.37-lib/
 SDL-1.2.15/
+SDL2-2.0.7/
+chuck/
 
 # Visual Studio 2015 cache/options directory
 .vs/

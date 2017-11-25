@@ -1396,30 +1396,30 @@ static const Key SDL_to_GUI(const SDL_keysym &key)
 {
 	GUI::Key::Special ksym = GUI::Key::None;
 	switch (key.sym) {
-	case SDLK_ESCAPE: ksym = GUI::Key::Escape; break;
-	case SDLK_BACKSPACE: ksym = GUI::Key::Backspace; break;
-	case SDLK_TAB: ksym = GUI::Key::Tab; break;
-	case SDLK_LEFT: ksym = GUI::Key::Left; break;
-	case SDLK_RIGHT: ksym = GUI::Key::Right; break;
-	case SDLK_UP: ksym = GUI::Key::Up; break;
-	case SDLK_DOWN: ksym = GUI::Key::Down; break;
-	case SDLK_HOME: ksym = GUI::Key::Home; break;
-	case SDLK_END: ksym = GUI::Key::End; break;
-	case SDLK_DELETE: ksym = GUI::Key::Delete; break;
-	case SDLK_INSERT: ksym = GUI::Key::Insert; break;
-	case SDLK_RETURN: ksym = GUI::Key::Enter; break;
-	case SDLK_MENU: ksym = GUI::Key::Menu; break;
-	case SDLK_PAGEUP: ksym = GUI::Key::PageUp; break;
-	case SDLK_PAGEDOWN: ksym = GUI::Key::PageDown; break;
-	case SDLK_PRINT: ksym = GUI::Key::Print; break;
-	case SDLK_PAUSE: ksym = GUI::Key::Pause; break;
-	case SDLK_BREAK: ksym = GUI::Key::Break; break;
-	case SDLK_CAPSLOCK: ksym = GUI::Key::CapsLock; break;
-	case SDLK_NUMLOCK: ksym = GUI::Key::NumLock; break;
-	case SDLK_SCROLLOCK: ksym = GUI::Key::ScrollLock; break;
-	case SDLK_F1:case SDLK_F2:case SDLK_F3:case SDLK_F4:case SDLK_F5:case SDLK_F6:
-	case SDLK_F7:case SDLK_F8:case SDLK_F9:case SDLK_F10:case SDLK_F11:case SDLK_F12:
-		ksym = (GUI::Key::Special)(GUI::Key::F1 + key.sym-SDLK_F1);
+	case SDL_SCANCODE_ESCAPE: ksym = GUI::Key::Escape; break;
+	case SDL_SCANCODE_BACKSPACE: ksym = GUI::Key::Backspace; break;
+	case SDL_SCANCODE_TAB: ksym = GUI::Key::Tab; break;
+	case SDL_SCANCODE_LEFT: ksym = GUI::Key::Left; break;
+	case SDL_SCANCODE_RIGHT: ksym = GUI::Key::Right; break;
+	case SDL_SCANCODE_UP: ksym = GUI::Key::Up; break;
+	case SDL_SCANCODE_DOWN: ksym = GUI::Key::Down; break;
+	case SDL_SCANCODE_HOME: ksym = GUI::Key::Home; break;
+	case SDL_SCANCODE_END: ksym = GUI::Key::End; break;
+	case SDL_SCANCODE_DELETE: ksym = GUI::Key::Delete; break;
+	case SDL_SCANCODE_INSERT: ksym = GUI::Key::Insert; break;
+	case SDL_SCANCODE_RETURN: ksym = GUI::Key::Enter; break;
+	case SDL_SCANCODE_MENU: ksym = GUI::Key::Menu; break;
+	case SDL_SCANCODE_PAGEUP: ksym = GUI::Key::PageUp; break;
+	case SDL_SCANCODE_PAGEDOWN: ksym = GUI::Key::PageDown; break;
+	case SDL_SCANCODE_PRINT: ksym = GUI::Key::Print; break;
+	case SDL_SCANCODE_PAUSE: ksym = GUI::Key::Pause; break;
+	case SDL_SCANCODE_BREAK: ksym = GUI::Key::Break; break;
+	case SDL_SCANCODE_CAPSLOCK: ksym = GUI::Key::CapsLock; break;
+	case SDL_SCANCODE_NUMLOCK: ksym = GUI::Key::NumLock; break;
+	case SDL_SCANCODE_SCROLLOCK: ksym = GUI::Key::ScrollLock; break;
+	case SDL_SCANCODE_F1:case SDL_SCANCODE_F2:case SDL_SCANCODE_F3:case SDL_SCANCODE_F4:case SDL_SCANCODE_F5:case SDL_SCANCODE_F6:
+	case SDL_SCANCODE_F7:case SDL_SCANCODE_F8:case SDL_SCANCODE_F9:case SDL_SCANCODE_F10:case SDL_SCANCODE_F11:case SDL_SCANCODE_F12:
+		ksym = (GUI::Key::Special)(GUI::Key::F1 + key.sym-SDL_SCANCODE_F1);
 	default: break;
 	}
 	return Key(key.unicode, ksym,
