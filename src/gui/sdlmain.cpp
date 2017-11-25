@@ -221,6 +221,27 @@ struct SDL_Block {
 
 static SDL_Block sdl;
 
+void setupFullscreenResolution(int displayindex = 0)
+{
+	SDL_DisplayMode vidinfo;
+
+	SDL_GetCurrentDisplayMode(displayindex, &vidinfo);
+
+	sdl.desktop.full.width = vidinfo.w;
+	sdl.desktop.full.height = vidinfo.h;
+
+	int w = getFullscreenResolutionW();
+	int h = getFullscreenResolutionH();
+
+	if ((double)w / (double)h < (4.0 / 3.0))
+	{
+		sdl.opengl.bilinear = (w % 320) != 0;
+	}
+	else
+	{
+		sdl.opengl.bilinear = (h % 240) != 0;
+	}
+}
 
 bool isFullScreen()
 {
@@ -465,6 +486,9 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp) {
 	Bit16u fixedHeight;
 
 	if (sdl.desktop.fullscreen) {
+
+		setupFullscreenResolution(SDL_GetWindowDisplayIndex(sdl.surface));
+
 		fixedWidth = sdl.desktop.full.fixed ? sdl.desktop.full.width : 0;
 		fixedHeight = sdl.desktop.full.fixed ? sdl.desktop.full.height : 0;
 		sdl_flags |= SDL_WINDOW_FULLSCREEN;// | SDL_HWSURFACE;
@@ -1276,24 +1300,7 @@ static void GUI_StartUp(Section * sec) {
 
 	if (!sdl.desktop.full.width || !sdl.desktop.full.height){
 		//Can only be done on the very first call! Not restartable.
-		SDL_DisplayMode vidinfo;
-
-		SDL_GetCurrentDisplayMode(0, &vidinfo);
-
-			sdl.desktop.full.width = vidinfo.w;
-			sdl.desktop.full.height = vidinfo.h;
-
-			int w = getFullscreenResolutionW();
-			int h = getFullscreenResolutionH();
-
-			if ((double)w / (double)h < (4.0 / 3.0))
-			{
-				sdl.opengl.bilinear = (w % 320) != 0;
-			}
-			else
-			{
-				sdl.opengl.bilinear = (h % 240) != 0;
-			}
+		setupFullscreenResolution();
 	}
 #endif
 
@@ -1352,7 +1359,7 @@ static void GUI_StartUp(Section * sec) {
 
 #if C_OPENGL
    if(sdl.desktop.want_type==SCREEN_OPENGL){ /* OPENGL is requested */
-	sdl.surface=SDL_SetVideoMode_Wrap(windowWidth, windowHeight,0,SDL_WINDOW_OPENGL| defaultFlags);
+	sdl.surface=SDL_SetVideoMode_Wrap(windowWidth, windowHeight,0,SDL_WINDOW_OPENGL);
 	if (sdl.surface == NULL) {
 		LOG_MSG("Could not initialize OpenGL, switching back to surface");
 		sdl.desktop.want_type=SCREEN_SURFACE;
