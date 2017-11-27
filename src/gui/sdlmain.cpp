@@ -179,6 +179,8 @@ struct SDL_Block {
 	{
 		SDL_Renderer* renderer;
 		SDL_Texture* texture;
+		SDL_Texture* screen_tex;
+		int scaleFactor;
 	} render;
 #if C_OPENGL
 	struct {
@@ -242,32 +244,34 @@ void setupFullscreenResolution(int displayindex = 0)
 	int h = getFullscreenResolutionH();
 	if ((double)w / (double)h < (4.0 / 3.0))
 	{
+		//sdl.render.scaleFactor = (w / 320);
 #ifdef C_OPENGL
 		sdl.opengl.bilinear = (w % 320) != 0;
 #endif
-		if ((w % 320) != 0)
-		{
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-		}
-		else
-		{
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-		}
+		//if ((w % 320) != 0)
+		//{
+		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+		//}
+		//else
+		//{
+		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+		//}
 	}
 	else
 	{
+		//sdl.render.scaleFactor = (h / 240);
 #ifdef C_OPENGL
 		sdl.opengl.bilinear = (h % 240) != 0;
 #endif
 
-		if ((h % 240) != 0)
-		{
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-		}
-		else
-		{
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-		}
+		//if ((h % 240) != 0)
+		//{
+		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+		//}
+		//else
+		//{
+		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+		//}
 	}
 
 }
@@ -876,11 +880,36 @@ Bitu GFX_SetSize(Bitu width,Bitu height,Bitu flags,double scalex,double scaley,G
 		if (sdl.render.texture)
 		{
 			SDL_DestroyTexture(sdl.render.texture);
+			SDL_DestroyTexture(sdl.render.screen_tex);
 		}
 
 		GFX_SetupSurfaceScaled(0, 0);
 
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
 		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
+
+		int w, h;
+
+		SDL_GetWindowSize(sdl.surface, &w, &h);
+
+		if ((double)w/(double)h < ((double)sdl.draw.width / (double)sdl.draw.height))
+		{
+			//contrary popular belief 5:4 monitors do exist
+			//I like them quite a bit
+			sdl.render.scaleFactor = int(w / 320);
+		}
+		else
+		{
+			sdl.render.scaleFactor = int(h / 240);
+		}
+
+		w = sdl.draw.width * sdl.render.scaleFactor;
+		h = sdl.draw.height * sdl.render.scaleFactor;
+
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
+		sdl.render.screen_tex = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_TARGET, w, h);
 
 		sdl.desktop.type = SCREEN_SDL_RENDER;
 
@@ -1221,7 +1250,14 @@ void GFX_EndUpdate( const Bit16u *changedLines ) {
 	{
 		SDL_UnlockTexture(sdl.render.texture);
 
-		SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, &sdl.clip);
+		SDL_SetRenderTarget(sdl.render.renderer, sdl.render.screen_tex);
+
+		SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0);
+
+		SDL_SetRenderTarget(sdl.render.renderer, NULL);
+
+		SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip);
+
 		SDL_RenderPresent(sdl.render.renderer);
 	}
 		break;

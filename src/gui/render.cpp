@@ -290,16 +290,16 @@ static void RENDER_Reset( void ) {
 		{
 			//contrary popular belief 5:4 monitors do exist
 			//I like them quite a bit
-			render.scale.size = int(w / 320);
+			render.scale.size = 1;// int(w / 320);
 		}
 		else
 		{
-			render.scale.size = int(h / 240);
+			render.scale.size = 1; //int(h / 240);
 		}
 	}
 	else
 	{
-		render.scale.size = 3;
+		render.scale.size = 1;
 	}
 
 	if ((dblh && dblw) || (render.scale.forced && !dblh && !dblw)) {
