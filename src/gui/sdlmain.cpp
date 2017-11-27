@@ -883,7 +883,26 @@ Bitu GFX_SetSize(Bitu width,Bitu height,Bitu flags,double scalex,double scaley,G
 		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
 
 		sdl.desktop.type = SCREEN_SDL_RENDER;
-		retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
+
+		Uint32 f;
+
+		SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
+
+		SDL_PixelFormat* fmt = SDL_AllocFormat(f);
+
+		switch (fmt->BitsPerPixel) {
+		case 15:
+			retFlags = GFX_CAN_15 | GFX_SCALING | GFX_HARDWARE;
+			break;
+		case 16:
+			retFlags = GFX_CAN_16 | GFX_SCALING | GFX_HARDWARE;
+			break;
+		case 32:
+			retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
+			break;
+		}
+
+		SDL_FreeFormat(fmt);
 	}
 		break;
 	default:
@@ -1229,11 +1248,23 @@ Bitu GFX_GetRGB(Bit8u red,Bit8u green,Bit8u blue) {
 	switch (sdl.desktop.type) {
 	case SCREEN_SURFACE:
 	case SCREEN_SURFACE_DDRAW:
-	case SCREEN_SDL_RENDER:
 	{
-
 		SDL_PixelFormat* fmt = SDL_AllocFormat(SDL_GetWindowPixelFormat(sdl.surface));
 
+		Bitu c = SDL_MapRGB(fmt, red, green, blue);
+
+		SDL_FreeFormat(fmt);
+
+		return c;
+	}
+	case SCREEN_SDL_RENDER:
+	{
+		Uint32 f;
+
+		SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
+
+		SDL_PixelFormat* fmt = SDL_AllocFormat(f);
+		
 		Bitu c = SDL_MapRGB(fmt, red, green, blue);
 
 		SDL_FreeFormat(fmt);
