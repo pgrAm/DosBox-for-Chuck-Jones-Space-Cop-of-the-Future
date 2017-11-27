@@ -212,6 +212,7 @@ private:
 	Bit32u curFatSect;
 };
 
+#ifdef CDROM_ENABLED
 
 class cdromDrive : public localDrive
 {
@@ -372,7 +373,7 @@ private:
 	char driveLetter;
 	char discLabel[32];
 };
-
+#endif
 struct VFILE_Block;
 
 class Virtual_Drive: public DOS_Drive {

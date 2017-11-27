@@ -1,7 +1,5 @@
 #define VERSION "SVN"
 
-#ifdef _WIN32
-
 /* Define to 1 to enable internal debugger, requires libcurses */
 #define C_DEBUG 0
 
@@ -23,9 +21,13 @@
 /* Enable some heavy debugging options */
 #define C_HEAVY_DEBUG 0
 
+#ifdef _M_ARM
+#define C_TARGETCPU ARMV4LE
+#else
 /* The type of cpu this host has */
 #define C_TARGETCPU X86
 //#define C_TARGETCPU X86_64
+#endif
 
 /* Define to 1 to use x86 dynamic cpu core */
 #define C_DYNAMIC_X86 1
@@ -78,4 +80,3 @@ typedef   signed __int64	Bit64s;
 typedef unsigned int		Bitu;
 typedef signed int			Bits;
 
-#endif

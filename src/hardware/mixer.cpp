@@ -49,6 +49,8 @@
 #include "programs.h"
 #include "midi.h"
 
+#include <stdlib.h> 
+
 #define MIXER_SSIZE 4
 
 //#define MIXER_SHIFT 14
@@ -464,6 +466,9 @@ static void SDLCALL MIXER_CallBack(void * userdata, Uint8 *stream, int len) {
 	//Local resampling counter to manipulate the data when sending it off to the callback
 	Bitu index, index_add;
 	Bits sample;
+
+	SDL_memset(stream, 0, len);
+
 	/* Enough room in the buffer ? */
 	if (mixer.done < need) {
 //		LOG_MSG("Full underrun need %d, have %d, min %d", need, mixer.done, mixer.min_needed);

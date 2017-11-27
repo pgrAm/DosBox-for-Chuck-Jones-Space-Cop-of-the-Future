@@ -26,9 +26,10 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <sys/types.h>
+
 #ifdef WIN32
-#include <signal.h>
-#include <process.h>
+	#include <signal.h>
+	#include <process.h>
 #endif
 
 #include "cross.h"
@@ -83,6 +84,7 @@ typedef GLboolean (APIENTRYP PFNGLUNMAPBUFFERARBPROC) (GLenum target);
 PFNGLGENBUFFERSARBPROC glGenBuffersARB = NULL;
 PFNGLBINDBUFFERARBPROC glBindBufferARB = NULL;
 PFNGLDELETEBUFFERSARBPROC glDeleteBuffersARB = NULL;
+PFNGLISBUFFERARBPROC glIsBufferARB = NULL;
 PFNGLBUFFERDATAARBPROC glBufferDataARB = NULL;
 PFNGLMAPBUFFERARBPROC glMapBufferARB = NULL;
 PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB = NULL;
@@ -178,7 +180,7 @@ struct SDL_Block {
 		void * framebuf;
 		GLuint buffer;
 		GLuint texture;
-		GLuint displaylist;
+		//GLuint vertexArray;
 		GLint max_texsize;
 		bool bilinear;
 		bool packed_pixel;
@@ -264,9 +266,22 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags){
 
 	if (s == NULL)
 	{
-		s = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+#ifdef __ANDROID__
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#endif //__ANDROID__
 
+		s = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+		
+		if (s == NULL) 
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
+
+		}
 		SDL_GL_CreateContext(s);
+
+		sdl.surface = s;
 	}
 
 	if (flags & SDL_WINDOW_FULLSCREEN)
@@ -550,6 +565,9 @@ void GFX_TearDown(void) {
 	}
 }
 
+const float screenvertices[8] = { -1.0f, -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f };
+float screenTexCoords[8];
+
 Bitu GFX_SetSize(Bitu width,Bitu height,Bitu flags,double scalex,double scaley,GFX_CallBack_t callback) {
 	if (sdl.updating)
 		GFX_EndUpdate( 0 );
@@ -719,10 +737,9 @@ dosurface:
 			goto dosurface;
 		}
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-#if defined (WIN32) && SDL_VERSION_ATLEAST(1, 2, 11)
-		//SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, 1 );
+
 		SDL_GL_SetSwapInterval(1);
-#endif
+
 		GFX_SetupSurfaceScaled(SDL_WINDOW_OPENGL,0);
 
 		SDL_Surface* s = SDL_GetWindowSurface(sdl.surface);
@@ -774,21 +791,22 @@ dosurface:
 		GLfloat tex_width=((GLfloat)(width)/(GLfloat)texsize);
 		GLfloat tex_height=((GLfloat)(height)/(GLfloat)texsize);
 
-		if (glIsList(sdl.opengl.displaylist)) glDeleteLists(sdl.opengl.displaylist, 1);
-		sdl.opengl.displaylist = glGenLists(1);
-		glNewList(sdl.opengl.displaylist, GL_COMPILE);
-		glBindTexture(GL_TEXTURE_2D, sdl.opengl.texture);
-		glBegin(GL_QUADS);
-		// lower left
-		glTexCoord2f(0,tex_height); glVertex2f(-1.0f,-1.0f);
-		// lower right
-		glTexCoord2f(tex_width,tex_height); glVertex2f(1.0f, -1.0f);
-		// upper right
-		glTexCoord2f(tex_width,0); glVertex2f(1.0f, 1.0f);
-		// upper left
-		glTexCoord2f(0,0); glVertex2f(-1.0f, 1.0f);
-		glEnd();
-		glEndList();
+		//if (glIsBufferARB(sdl.opengl.vertexArray))
+		//{
+		//	glDeleteBuffersARB(1, &sdl.opengl.vertexArray);
+		//}
+		//
+		//glGenBuffersARB(1, &sdl.opengl.vertexArray);
+
+		screenTexCoords[0] = 0;
+		screenTexCoords[1] = tex_height;
+		screenTexCoords[2] = tex_width;
+		screenTexCoords[3] = tex_height;
+		screenTexCoords[4] = 0;
+		screenTexCoords[5] = 0;
+		screenTexCoords[6] = tex_width;
+		screenTexCoords[7] = 0;
+
 		sdl.desktop.type=SCREEN_OPENGL;
 		retFlags = GFX_CAN_32 | GFX_SCALING;
 		if (sdl.opengl.pixel_buffer_object)
@@ -969,6 +987,17 @@ bool GFX_StartUpdate(Bit8u * & pixels,Bitu & pitch) {
 	return false;
 }
 
+void drawGLRect()
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glVertexPointer(2, GL_FLOAT, 0, (void*)(screenvertices));
+	glTexCoordPointer(2, GL_FLOAT, 0, (void*)(screenTexCoords));
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 
 void GFX_EndUpdate( const Bit16u *changedLines ) {
 #if C_DDRAW
@@ -1049,7 +1078,10 @@ void GFX_EndUpdate( const Bit16u *changedLines ) {
 					sdl.draw.width, sdl.draw.height, GL_BGRA_EXT,
 					GL_UNSIGNED_INT_8_8_8_8_REV, 0);
 			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, 0);
-			glCallList(sdl.opengl.displaylist);
+			//glCallList(sdl.opengl.displaylist);
+
+			drawGLRect();
+
 			SDL_GL_SwapWindow(sdl.surface);
 		} else if (changedLines) {
 			Bitu y = 0, index = 0;
@@ -1067,7 +1099,7 @@ void GFX_EndUpdate( const Bit16u *changedLines ) {
 				}
 				index++;
 			}
-			glCallList(sdl.opengl.displaylist);
+			drawGLRect();
 			SDL_GL_SwapWindow(sdl.surface);
 		}
 		break;
@@ -1325,6 +1357,10 @@ static void GUI_StartUp(Section * sec) {
 	sdl.mouse.sensitivity=section->Get_int("sensitivity");
 	std::string output=section->Get_string("output");
 
+#ifdef __ANDROID__
+	output = "openglnb";
+#endif
+
 	if (output == "surface") {
 		sdl.desktop.want_type=SCREEN_SURFACE;
 #if C_DDRAW
@@ -1367,7 +1403,6 @@ static void GUI_StartUp(Section * sec) {
 	sdl.opengl.buffer=0;
 	sdl.opengl.framebuf=0;
 	sdl.opengl.texture=0;
-	sdl.opengl.displaylist=0;
 	glGetIntegerv (GL_MAX_TEXTURE_SIZE, &sdl.opengl.max_texsize);
 	glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)SDL_GL_GetProcAddress("glGenBuffersARB");
 	glBindBufferARB = (PFNGLBINDBUFFERARBPROC)SDL_GL_GetProcAddress("glBindBufferARB");
@@ -1986,6 +2021,7 @@ static void erasemapperfile() {
 
 //extern void UI_Init(void);
 int main(int argc, char* argv[]) {
+	
 	try {
 		CommandLine com_line(argc,argv);
 		Config myconf(&com_line);
@@ -2077,6 +2113,10 @@ int main(int argc, char* argv[]) {
 	}
 	sdl.inited = true;
 
+#ifdef __ANDROID__  
+	sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN|SDL_WINDOW_OPENGL| SDL_WINDOW_BORDERLESS);
+#endif
+
 #ifndef DISABLE_JOYSTICK
 	//Initialise Joystick separately. This way we can warn when it fails instead
 	//of exiting the application
@@ -2150,7 +2190,11 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	// if none found => parse localdir conf
-	if(!control->configfiles.size()) control->ParseConfigFile("dosbox.conf");
+#ifdef __ANDROID__  
+	if(!control->configfiles.size()) control->ParseConfigFile("/storage/emulated/0/dosbox.conf");
+#else
+	if (!control->configfiles.size()) control->ParseConfigFile("dosbox.conf");
+#endif
 
 	// if none found => parse userlevel conf
 	if(!control->configfiles.size()) {
