@@ -267,7 +267,9 @@ static void RENDER_Reset( void ) {
 	
 	Bitu gfx_flags, xscale, yscale;
 	ScalerSimpleBlock_t		*simpleBlock = &ScaleNormal1x;
+#ifdef ENABLE_SCALING
 	ScalerComplexBlock_t	*complexBlock = 0;
+#endif
 	if (render.aspect) {
 		if (render.src.ratio>1.0) {
 			gfx_scalew = 1;
@@ -281,28 +283,8 @@ static void RENDER_Reset( void ) {
 		gfx_scaleh = 1;
 	}
 
-	if (isFullScreen())
-	{
-		int w = getFullscreenResolutionW();
-		int h = getFullscreenResolutionH();
-
-		if ((double)w / (double)h < (4.0 / 3.0))
-		{
-			//contrary popular belief 5:4 monitors do exist
-			//I like them quite a bit
-			render.scale.size = 1;// int(w / 320);
-		}
-		else
-		{
-			render.scale.size = 1; //int(h / 240);
-		}
-	}
-	else
-	{
-		render.scale.size = 1;
-	}
-
 	if ((dblh && dblw) || (render.scale.forced && !dblh && !dblw)) {
+#ifdef ENABLE_SCALING
 		/* Initialize always working defaults */
 		if (render.scale.size == 2)
 			simpleBlock = &ScaleNormal2x;
@@ -313,6 +295,7 @@ static void RENDER_Reset( void ) {
 		else if (render.scale.size == 5)
 			simpleBlock = &ScaleNormal5x;
 		else
+#endif
 			simpleBlock = &ScaleNormal1x;
 		/* Maybe override them */
 #if RENDER_USE_ADVANCED_SCALERS>0
@@ -376,10 +359,13 @@ static void RENDER_Reset( void ) {
 	} else if (dblh) {
 		simpleBlock = &ScaleNormalDh;
 	} else  {
-forcenormal:
+	forcenormal:
+#ifdef ENABLE_SCALING
 		complexBlock = 0;
+#endif
 		simpleBlock = &ScaleNormal1x;
 	}
+#ifdef ENABLE_SCALING
 	if (complexBlock) {
 #if RENDER_USE_ADVANCED_SCALERS>1
 		if ((width >= SCALER_COMPLEXWIDTH - 16) || height >= SCALER_COMPLEXHEIGHT - 16) {
@@ -393,7 +379,10 @@ forcenormal:
 		xscale = complexBlock->xscale;	
 		yscale = complexBlock->yscale;
 //		LOG_MSG("Scaler:%s",complexBlock->name);
-	} else {
+	} 
+	else 
+#endif
+	{
 		gfx_flags = simpleBlock->gfxFlags;
 		xscale = simpleBlock->xscale;	
 		yscale = simpleBlock->yscale;
@@ -425,13 +414,19 @@ forcenormal:
 	}
 	gfx_flags=GFX_GetBestMode(gfx_flags);
 	if (!gfx_flags) {
+#ifdef ENABLE_SCALING
 		if (!complexBlock && simpleBlock == &ScaleNormal1x) 
 			E_Exit("Failed to create a rendering output");
 		else 
+#endif
 			goto forcenormal;
 	}
 	width *= xscale;
+#ifdef ENABLE_SCALING
 	Bitu skip = complexBlock ? 1 : 0;
+#else
+	Bitu skip = 0;
+#endif
 	if (gfx_flags & GFX_SCALING) {
 		height = MakeAspectTable(skip, render.src.height, yscale, yscale );
 	} else {
@@ -603,6 +598,9 @@ void RENDER_Init(Section * sec) {
 	render.aspect=section->Get_bool("aspect");
 	render.frameskip.max=section->Get_int("frameskip");
 	render.frameskip.count=0;
+
+#ifdef ENABLE_SCALING
+
 	std::string cline;
 	std::string scaler;
 	//Check for commandline paramters and parse them through the configclass so they get checked against allowed values
@@ -614,8 +612,12 @@ void RENDER_Init(Section * sec) {
 	   
 	Prop_multival* prop = section->Get_multival("scaler");
 	scaler = prop->GetSection()->Get_string("type");
+
+
 	std::string f = prop->GetSection()->Get_string("force");
+
 	render.scale.forced = false;
+
 	if(f == "forced") render.scale.forced = true;
    
 	if (scaler == "none") { render.scale.op = scalerOpNormal;render.scale.size = 1; }
@@ -623,6 +625,11 @@ void RENDER_Init(Section * sec) {
 	else if (scaler == "normal3x") { render.scale.op = scalerOpNormal;render.scale.size = 3; }
 	else if (scaler == "normal4x") { render.scale.op = scalerOpNormal; render.scale.size = 4; }
 	else if (scaler == "normal5x") { render.scale.op = scalerOpNormal; render.scale.size = 5; }
+#else
+	render.scale.forced = false;
+	render.scale.op = scalerOpNormal; 
+	render.scale.size = 1;
+#endif
 #if RENDER_USE_ADVANCED_SCALERS>2
 	else if (scaler == "advmame2x") { render.scale.op = scalerOpAdvMame;render.scale.size = 2; }
 	else if (scaler == "advmame3x") { render.scale.op = scalerOpAdvMame;render.scale.size = 3; }

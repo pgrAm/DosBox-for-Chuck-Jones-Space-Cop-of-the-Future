@@ -140,7 +140,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Debug/dosbox.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -186,7 +186,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;opengl32.lib;winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Release/dosbox.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -234,7 +234,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;opengl32.lib;winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Release/dosbox.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>

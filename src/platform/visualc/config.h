@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
+
 /* Define to 1 to enable internal debugger, requires libcurses */
 #define C_DEBUG 0
 

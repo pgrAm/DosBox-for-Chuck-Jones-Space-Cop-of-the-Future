@@ -222,6 +222,8 @@ ScalerSimpleBlock_t ScaleNormalDh = {
 {	NormalDh_8_8_R,		NormalDh_9_15_R ,	NormalDh_9_16_R ,	NormalDh_9_32_R }
 }};
 
+#ifdef ENABLE_SCALING
+
 ScalerSimpleBlock_t ScaleNormal2x = {
 	"Normal2x",
 	GFX_CAN_8|GFX_CAN_15|GFX_CAN_16|GFX_CAN_32,
@@ -289,6 +291,8 @@ ScalerSimpleBlock_t ScaleNormal5x = {
 		{ 0,					Normal5x_32_15_R,    Normal5x_32_16_R,    Normal5x_32_32_R },
 		{ Normal5x_8_8_R,		Normal5x_9_15_R ,    Normal5x_9_16_R ,    Normal5x_9_32_R }
 	} };
+
+#endif
 
 #if RENDER_USE_ADVANCED_SCALERS>0
 ScalerSimpleBlock_t ScaleTV2x = {

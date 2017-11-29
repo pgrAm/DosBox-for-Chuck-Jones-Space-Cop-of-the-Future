@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
+#include <algorithm>
+
 #ifdef WIN32
 	#include <signal.h>
 	#include <process.h>
@@ -49,6 +51,7 @@
 #include "cpu.h"
 #include "cross.h"
 #include "control.h"
+
 
 #define MAPPERFILE "mapper-" VERSION ".map"
 //#define DISABLE_JOYSTICK
@@ -180,7 +183,7 @@ struct SDL_Block {
 		SDL_Renderer* renderer;
 		SDL_Texture* texture;
 		SDL_Texture* screen_tex;
-		int scaleFactor;
+		double scaleFactor;
 	} render;
 #if C_OPENGL
 	struct {
@@ -227,6 +230,7 @@ struct SDL_Block {
 	// state of alt-keys for certain special handlings
 	Bit32u laltstate;
 	Bit32u raltstate;
+	int curr_w, curr_h;
 };
 
 static SDL_Block sdl;
@@ -240,55 +244,6 @@ void setupFullscreenResolution(int displayindex = 0)
 	sdl.desktop.full.width = vidinfo.w;
 	sdl.desktop.full.height = vidinfo.h;
 
-	int w = getFullscreenResolutionW();
-	int h = getFullscreenResolutionH();
-	if ((double)w / (double)h < (4.0 / 3.0))
-	{
-		//sdl.render.scaleFactor = (w / 320);
-#ifdef C_OPENGL
-		sdl.opengl.bilinear = (w % 320) != 0;
-#endif
-		//if ((w % 320) != 0)
-		//{
-		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-		//}
-		//else
-		//{
-		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-		//}
-	}
-	else
-	{
-		//sdl.render.scaleFactor = (h / 240);
-#ifdef C_OPENGL
-		sdl.opengl.bilinear = (h % 240) != 0;
-#endif
-
-		//if ((h % 240) != 0)
-		//{
-		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-		//}
-		//else
-		//{
-		//	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-		//}
-	}
-
-}
-
-bool isFullScreen()
-{
-	return sdl.desktop.fullscreen;
-}
-
-int getFullscreenResolutionW()
-{
-	return sdl.desktop.full.width;
-}
-
-int getFullscreenResolutionH()
-{
-	return sdl.desktop.full.height;
 }
 
 SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags){
@@ -366,6 +321,9 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags){
 
 		SDL_SetWindowPosition(sdl.surface, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	}
+
+	sdl.curr_w = width;
+	sdl.curr_w = height;
 
 	return s;
 }
@@ -588,12 +546,8 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp) {
 			sdl.surface = SDL_SetVideoMode_Wrap(sdl.clip.w,sdl.clip.h,bpp,sdl_flags);
 		if (sdl.surface && SDL_GetWindowFlags(sdl.surface) & SDL_WINDOW_FULLSCREEN) 
 		{
-			int surface_xsize, surface_ysize;
-
-			SDL_GetWindowSize(sdl.surface, &surface_xsize, &surface_ysize);
-
-			sdl.clip.x = (Sint16)((surface_xsize - sdl.clip.w) / 2);
-			sdl.clip.y = (Sint16)((surface_ysize - sdl.clip.h) / 2);
+			sdl.clip.x = (Sint16)((sdl.curr_w - sdl.clip.w) / 2);
+			sdl.clip.y = (Sint16)((sdl.curr_h - sdl.clip.h) / 2);
 		} else {
 			sdl.clip.x = 0;
 			sdl.clip.y = 0;
@@ -889,23 +843,19 @@ Bitu GFX_SetSize(Bitu width,Bitu height,Bitu flags,double scalex,double scaley,G
 
 		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
 
-		int w, h;
-
-		SDL_GetWindowSize(sdl.surface, &w, &h);
-
-		if ((double)w/(double)h < ((double)sdl.draw.width / (double)sdl.draw.height))
+		if ((double)sdl.curr_w /(double)sdl.curr_h < ((double)sdl.draw.width / (double)sdl.draw.height))
 		{
 			//contrary popular belief 5:4 monitors do exist
 			//I like them quite a bit
-			sdl.render.scaleFactor = int(w / 320);
+			sdl.render.scaleFactor = sdl.curr_w / (double)sdl.draw.width;
 		}
 		else
 		{
-			sdl.render.scaleFactor = int(h / 240);
+			sdl.render.scaleFactor = sdl.curr_h / (double)sdl.draw.height;
 		}
 
-		w = sdl.draw.width * sdl.render.scaleFactor;
-		h = sdl.draw.height * sdl.render.scaleFactor;
+		int w = sdl.draw.width * int(sdl.render.scaleFactor);
+		int h = sdl.draw.height * int(sdl.render.scaleFactor);
 
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
@@ -1772,7 +1722,11 @@ static void HandleMouseButton(SDL_MouseButtonEvent * button) {
 		}
 		switch (button->button) {
 		case SDL_BUTTON_LEFT:
+		{
+			int x, y;
+			SDL_GetMouseState(&x,&y);
 			Mouse_ButtonPressed(0);
+		}
 			break;
 		case SDL_BUTTON_RIGHT:
 			Mouse_ButtonPressed(1);
@@ -1794,6 +1748,36 @@ static void HandleMouseButton(SDL_MouseButtonEvent * button) {
 			Mouse_ButtonReleased(2);
 			break;
 		}
+		break;
+	}
+}
+
+float lastposx = 0.5, lastposy = 0.5;
+
+static void HandleTouch(SDL_TouchFingerEvent * finger) {
+
+	switch (finger->type) {
+	case SDL_FINGERDOWN:
+	{
+		double xscale = (sdl.curr_w / sdl.render.scaleFactor);
+		double yscale = (sdl.curr_h / sdl.render.scaleFactor);
+
+		double x = (finger->x - lastposx) * xscale;
+		double y = (finger->y - lastposy) * yscale;
+
+		Mouse_CursorMoved(x, y, 0, 0, true);
+
+		double xdiff = (xscale - sdl.draw.width) / (xscale * 2);
+		double ydiff = (yscale - sdl.draw.height) / (yscale * 2);
+
+		lastposx = std::min(std::max((double)finger->x, xdiff), 1.0 - xdiff);
+		lastposy = std::min(std::max((double)finger->y, ydiff), 1.0 - ydiff);
+
+		Mouse_ButtonPressed(0);
+	}
+		break;
+	case SDL_FINGERUP:
+			Mouse_ButtonReleased(0);
 		break;
 	}
 }
@@ -1887,6 +1871,10 @@ void GFX_Events() {
 			break;
 		case SDL_MOUSEMOTION:
 			HandleMouseMotion(&event.motion);
+			break;
+		case SDL_FINGERDOWN:
+		case SDL_FINGERUP:
+			HandleTouch(&event.tfinger);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
@@ -2306,6 +2294,8 @@ int main(int argc, char* argv[]) {
 
 #ifdef __ANDROID__  
 	sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN|SDL_WINDOW_OPENGL| SDL_WINDOW_BORDERLESS);
+
+	SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
 #endif
 
 #ifndef DISABLE_JOYSTICK
