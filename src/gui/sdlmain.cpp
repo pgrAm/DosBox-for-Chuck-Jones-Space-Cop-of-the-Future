@@ -323,7 +323,7 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags){
 	}
 
 	sdl.curr_w = width;
-	sdl.curr_w = height;
+	sdl.curr_h = height;
 
 	return s;
 }
