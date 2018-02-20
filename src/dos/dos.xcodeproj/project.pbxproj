@@ -1,0 +1,198 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXFileReference section */
+		45B085A9203C8A8100755D32 /* cdrom.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom.cpp; sourceTree = "<group>"; };
+		45B085AA203C8A8100755D32 /* cdrom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cdrom.h; sourceTree = "<group>"; };
+		45B085AB203C8A8100755D32 /* cdrom_aspi_win32.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom_aspi_win32.cpp; sourceTree = "<group>"; };
+		45B085AC203C8A8100755D32 /* cdrom_image.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom_image.cpp; sourceTree = "<group>"; };
+		45B085AD203C8A8100755D32 /* cdrom_ioctl_linux.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom_ioctl_linux.cpp; sourceTree = "<group>"; };
+		45B085AE203C8A8100755D32 /* cdrom_ioctl_os2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom_ioctl_os2.cpp; sourceTree = "<group>"; };
+		45B085AF203C8A8100755D32 /* cdrom_ioctl_win32.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cdrom_ioctl_win32.cpp; sourceTree = "<group>"; };
+		45B085B0203C8A8100755D32 /* dev_con.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dev_con.h; sourceTree = "<group>"; };
+		45B085B1203C8A8100755D32 /* dos.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos.cpp; sourceTree = "<group>"; };
+		45B085B2203C8A8100755D32 /* dos_classes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_classes.cpp; sourceTree = "<group>"; };
+		45B085B3203C8A8100755D32 /* dos_codepages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dos_codepages.h; sourceTree = "<group>"; };
+		45B085B4203C8A8100755D32 /* dos_devices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_devices.cpp; sourceTree = "<group>"; };
+		45B085B5203C8A8100755D32 /* dos_execute.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_execute.cpp; sourceTree = "<group>"; };
+		45B085B6203C8A8100755D32 /* dos_files.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_files.cpp; sourceTree = "<group>"; };
+		45B085B7203C8A8100755D32 /* dos_ioctl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_ioctl.cpp; sourceTree = "<group>"; };
+		45B085B8203C8A8100755D32 /* dos_keyboard_layout.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_keyboard_layout.cpp; sourceTree = "<group>"; };
+		45B085B9203C8A8100755D32 /* dos_keyboard_layout_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dos_keyboard_layout_data.h; sourceTree = "<group>"; };
+		45B085BA203C8A8100755D32 /* dos_memory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_memory.cpp; sourceTree = "<group>"; };
+		45B085BB203C8A8100755D32 /* dos_misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_misc.cpp; sourceTree = "<group>"; };
+		45B085BC203C8A8100755D32 /* dos_mscdex.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_mscdex.cpp; sourceTree = "<group>"; };
+		45B085BD203C8A8100755D32 /* dos_programs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_programs.cpp; sourceTree = "<group>"; };
+		45B085BE203C8A8100755D32 /* dos_tables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dos_tables.cpp; sourceTree = "<group>"; };
+		45B085BF203C8A8100755D32 /* drive_cache.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drive_cache.cpp; sourceTree = "<group>"; };
+		45B085C0203C8A8100755D32 /* drive_fat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drive_fat.cpp; sourceTree = "<group>"; };
+		45B085C1203C8A8100755D32 /* drive_iso.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drive_iso.cpp; sourceTree = "<group>"; };
+		45B085C2203C8A8100755D32 /* drive_local.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drive_local.cpp; sourceTree = "<group>"; };
+		45B085C3203C8A8100755D32 /* drive_virtual.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drive_virtual.cpp; sourceTree = "<group>"; };
+		45B085C4203C8A8100755D32 /* drives.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drives.cpp; sourceTree = "<group>"; };
+		45B085C5203C8A8100755D32 /* drives.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = drives.h; sourceTree = "<group>"; };
+		45B085C6203C8A8100755D32 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		45B085C7203C8A8100755D32 /* scsidefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scsidefs.h; sourceTree = "<group>"; };
+		45B085C8203C8A8100755D32 /* wnaspi32.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wnaspi32.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		45B085A3203C8A8100755D32 = {
+			isa = PBXGroup;
+			children = (
+				45B085A9203C8A8100755D32 /* cdrom.cpp */,
+				45B085AA203C8A8100755D32 /* cdrom.h */,
+				45B085AB203C8A8100755D32 /* cdrom_aspi_win32.cpp */,
+				45B085AC203C8A8100755D32 /* cdrom_image.cpp */,
+				45B085AD203C8A8100755D32 /* cdrom_ioctl_linux.cpp */,
+				45B085AE203C8A8100755D32 /* cdrom_ioctl_os2.cpp */,
+				45B085AF203C8A8100755D32 /* cdrom_ioctl_win32.cpp */,
+				45B085B0203C8A8100755D32 /* dev_con.h */,
+				45B085B1203C8A8100755D32 /* dos.cpp */,
+				45B085B2203C8A8100755D32 /* dos_classes.cpp */,
+				45B085B3203C8A8100755D32 /* dos_codepages.h */,
+				45B085B4203C8A8100755D32 /* dos_devices.cpp */,
+				45B085B5203C8A8100755D32 /* dos_execute.cpp */,
+				45B085B6203C8A8100755D32 /* dos_files.cpp */,
+				45B085B7203C8A8100755D32 /* dos_ioctl.cpp */,
+				45B085B8203C8A8100755D32 /* dos_keyboard_layout.cpp */,
+				45B085B9203C8A8100755D32 /* dos_keyboard_layout_data.h */,
+				45B085BA203C8A8100755D32 /* dos_memory.cpp */,
+				45B085BB203C8A8100755D32 /* dos_misc.cpp */,
+				45B085BC203C8A8100755D32 /* dos_mscdex.cpp */,
+				45B085BD203C8A8100755D32 /* dos_programs.cpp */,
+				45B085BE203C8A8100755D32 /* dos_tables.cpp */,
+				45B085BF203C8A8100755D32 /* drive_cache.cpp */,
+				45B085C0203C8A8100755D32 /* drive_fat.cpp */,
+				45B085C1203C8A8100755D32 /* drive_iso.cpp */,
+				45B085C2203C8A8100755D32 /* drive_local.cpp */,
+				45B085C3203C8A8100755D32 /* drive_virtual.cpp */,
+				45B085C4203C8A8100755D32 /* drives.cpp */,
+				45B085C5203C8A8100755D32 /* drives.h */,
+				45B085C6203C8A8100755D32 /* Makefile.am */,
+				45B085C7203C8A8100755D32 /* scsidefs.h */,
+				45B085C8203C8A8100755D32 /* wnaspi32.h */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		45B085A8203C8A8100755D32 /* dos */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 45B085C9203C8A8100755D32 /* Build configuration list for PBXLegacyTarget "dos" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/Home1/Documents/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos";
+			dependencies = (
+			);
+			name = dos;
+			passBuildSettingsInEnvironment = 1;
+			productName = dos;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		45B085A4203C8A8100755D32 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 45B085A7203C8A8100755D32 /* Build configuration list for PBXProject "dos" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 45B085A3203C8A8100755D32;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				45B085A8203C8A8100755D32 /* dos */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		45B085A5203C8A8100755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		45B085A6203C8A8100755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		45B085CA203C8A8100755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = dos;
+			};
+			name = Debug;
+		};
+		45B085CB203C8A8100755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = dos;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		45B085A7203C8A8100755D32 /* Build configuration list for PBXProject "dos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B085A5203C8A8100755D32 /* Debug */,
+				45B085A6203C8A8100755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		45B085C9203C8A8100755D32 /* Build configuration list for PBXLegacyTarget "dos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B085CA203C8A8100755D32 /* Debug */,
+				45B085CB203C8A8100755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 45B085A4203C8A8100755D32 /* Project object */;
+}

@@ -252,12 +252,6 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags){
 
 	if (s == NULL)
 	{
-#ifdef __ANDROID__
-		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-#endif //__ANDROID__
-
 		s = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 		
 		if (s == NULL) 
@@ -401,8 +395,8 @@ static void PauseDOSBox(bool pressed) {
 				GFX_SetTitle(-1,-1,false);
 				break;
 			}
-#if defined (MACOSX)
-			if (event.key.keysym.sym == SDL_SCANCODE_q && (event.key.keysym.mod == KMOD_RMETA || event.key.keysym.mod == KMOD_LMETA) ) {
+#if defined (MACOSX) && !defined(__IPHONEOS__)
+                if (event.key.keysym.sym == SDL_SCANCODE_q && (event.key.keysym.mod == KMOD_RALT || event.key.keysym.mod == KMOD_LALT) ) {
 				/* On macs, all aps exit when pressing cmd-q */
 				KillSwitch(true);
 				break;
@@ -1484,7 +1478,7 @@ static void GUI_StartUp(Section * sec) {
 	sdl.mouse.sensitivity = section->Get_int("sensitivity");
 	std::string output = section->Get_string("output");
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__)|| defined(__IPHONEOS__)
 	output = "sdlrender";
 #endif
 
@@ -1870,7 +1864,9 @@ void GFX_Events() {
 			}
 			break;
 		case SDL_MOUSEMOTION:
+#ifndef __IPHONEOS__
 			HandleMouseMotion(&event.motion);
+#endif
 			break;
 		case SDL_FINGERDOWN:
 		case SDL_FINGERUP:
@@ -1878,7 +1874,9 @@ void GFX_Events() {
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
+#ifndef __IPHONEOS__
 			HandleMouseButton(&event.button);
+#endif
 			break;
 //		case SDL_VIDEORESIZE:
 ////			HandleVideoResize(&event.resize);
@@ -1902,11 +1900,11 @@ void GFX_Events() {
 			// ignore tab events that arrive just after regaining focus. (likely the result of alt-tab)
 			if ((event.key.keysym.sym == SDL_SCANCODE_TAB) && (GetTicks() - sdl.focus_ticks < 2)) break;
 #endif
-#if defined (MACOSX)
+#if defined (MACOSX) && !defined(__IPHONEOS__)
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
 			/* On macs CMD-Q is the default key to close an application */
-			if (event.key.keysym.sym == SDL_SCANCODE_q && (event.key.keysym.mod == KMOD_RMETA || event.key.keysym.mod == KMOD_LMETA) ) {
+                if (event.key.keysym.sym == SDL_SCANCODE_q && (event.key.keysym.mod == KMOD_RALT || event.key.keysym.mod == KMOD_LALT) ) {
 				KillSwitch(true);
 				break;
 			}
@@ -1947,7 +1945,6 @@ void GFX_ShowMsg(char const* format,...) {
 	va_end(msg);
 	if(!no_stdout) printf("%s",buf); //Else buf is parsed again.
 }
-
 
 void Config_Add_SDL() {
 	Section_prop * sdl_sec=control->AddSection_prop("sdl",&GUI_StartUp);
@@ -2292,7 +2289,7 @@ int main(int argc, char* argv[]) {
 	}
 	sdl.inited = true;
 
-#ifdef __ANDROID__  
+#if defined(__ANDROID__)|| defined(__IPHONEOS__)
 	sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN|SDL_WINDOW_OPENGL| SDL_WINDOW_BORDERLESS);
 
 	SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");

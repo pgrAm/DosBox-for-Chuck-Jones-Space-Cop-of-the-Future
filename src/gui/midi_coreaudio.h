@@ -16,10 +16,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
+#ifndef IOS_TARGET
 #include <AudioToolbox/AUGraph.h>
 #include <CoreServices/CoreServices.h>
-
+#else
+#include <AudioToolbox/AudioToolbox.h>
+#include <CoreMIDI/MIDIServices.h>
+#endif
 // A macro to simplify error handling a bit.
 #define RequireNoErr(error)                                         \
 do {                                                                \
@@ -80,7 +83,7 @@ public:
 
 		// The default output device
 		desc.componentType = kAudioUnitType_Output;
-		desc.componentSubType = kAudioUnitSubType_DefaultOutput;
+        desc.componentSubType = kAudioUnitSubType_GenericOutput;
 		desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 		desc.componentFlags = 0;
 		desc.componentFlagsMask = 0;
@@ -92,7 +95,7 @@ public:
 
 		// The built-in default (softsynth) music device
 		desc.componentType = kAudioUnitType_MusicDevice;
-		desc.componentSubType = kAudioUnitSubType_DLSSynth;
+        desc.componentSubType = kAudioUnitSubType_MIDISynth;
 		desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 #if USE_DEPRECATED_COREAUDIO_API
 		RequireNoErr(AUGraphNewNode(m_auGraph, &desc, 0, NULL, &synthNode));

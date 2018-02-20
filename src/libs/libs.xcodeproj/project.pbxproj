@@ -1,0 +1,140 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXFileReference section */
+		45B08640203C8A9A00755D32 /* gui_tk */ = {isa = PBXFileReference; lastKnownFileType = folder; path = gui_tk; sourceTree = "<group>"; };
+		45B08641203C8A9A00755D32 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		45B08642203C8A9A00755D32 /* zmbv */ = {isa = PBXFileReference; lastKnownFileType = folder; path = zmbv; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		45B0863A203C8A9A00755D32 = {
+			isa = PBXGroup;
+			children = (
+				45B08640203C8A9A00755D32 /* gui_tk */,
+				45B08641203C8A9A00755D32 /* Makefile.am */,
+				45B08642203C8A9A00755D32 /* zmbv */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		45B0863F203C8A9A00755D32 /* libs */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 45B08643203C8A9A00755D32 /* Build configuration list for PBXLegacyTarget "libs" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/Home1/Documents/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs";
+			dependencies = (
+			);
+			name = libs;
+			passBuildSettingsInEnvironment = 1;
+			productName = libs;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		45B0863B203C8A9A00755D32 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 45B0863E203C8A9A00755D32 /* Build configuration list for PBXProject "libs" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 45B0863A203C8A9A00755D32;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				45B0863F203C8A9A00755D32 /* libs */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		45B0863C203C8A9A00755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		45B0863D203C8A9A00755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		45B08644203C8A9A00755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = libs;
+			};
+			name = Debug;
+		};
+		45B08645203C8A9A00755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = libs;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		45B0863E203C8A9A00755D32 /* Build configuration list for PBXProject "libs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B0863C203C8A9A00755D32 /* Debug */,
+				45B0863D203C8A9A00755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		45B08643203C8A9A00755D32 /* Build configuration list for PBXLegacyTarget "libs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B08644203C8A9A00755D32 /* Debug */,
+				45B08645203C8A9A00755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 45B0863B203C8A9A00755D32 /* Project object */;
+}

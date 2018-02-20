@@ -1,0 +1,220 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXFileReference section */
+		45B085F0203C8A9A00755D32 /* adlib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adlib.cpp; sourceTree = "<group>"; };
+		45B085F1203C8A9A00755D32 /* adlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = adlib.h; sourceTree = "<group>"; };
+		45B085F2203C8A9A00755D32 /* cmos.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cmos.cpp; sourceTree = "<group>"; };
+		45B085F3203C8A9A00755D32 /* dbopl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dbopl.cpp; sourceTree = "<group>"; };
+		45B085F4203C8A9A00755D32 /* dbopl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbopl.h; sourceTree = "<group>"; };
+		45B085F5203C8A9A00755D32 /* disney.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = disney.cpp; sourceTree = "<group>"; };
+		45B085F6203C8A9A00755D32 /* dma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dma.cpp; sourceTree = "<group>"; };
+		45B085F7203C8A9A00755D32 /* gameblaster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gameblaster.cpp; sourceTree = "<group>"; };
+		45B085F8203C8A9A00755D32 /* gus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gus.cpp; sourceTree = "<group>"; };
+		45B085F9203C8A9A00755D32 /* hardware.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hardware.cpp; sourceTree = "<group>"; };
+		45B085FA203C8A9A00755D32 /* iohandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = iohandler.cpp; sourceTree = "<group>"; };
+		45B085FB203C8A9A00755D32 /* ipx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ipx.cpp; sourceTree = "<group>"; };
+		45B085FC203C8A9A00755D32 /* ipxserver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ipxserver.cpp; sourceTree = "<group>"; };
+		45B085FD203C8A9A00755D32 /* joystick.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = joystick.cpp; sourceTree = "<group>"; };
+		45B085FE203C8A9A00755D32 /* keyboard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = keyboard.cpp; sourceTree = "<group>"; };
+		45B085FF203C8A9A00755D32 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		45B08600203C8A9A00755D32 /* memory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
+		45B08601203C8A9A00755D32 /* mixer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mixer.cpp; sourceTree = "<group>"; };
+		45B08602203C8A9A00755D32 /* mpu401.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mpu401.cpp; sourceTree = "<group>"; };
+		45B08603203C8A9A00755D32 /* opl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = opl.cpp; sourceTree = "<group>"; };
+		45B08604203C8A9A00755D32 /* opl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = opl.h; sourceTree = "<group>"; };
+		45B08605203C8A9A00755D32 /* pci_bus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pci_bus.cpp; sourceTree = "<group>"; };
+		45B08606203C8A9A00755D32 /* pci_devices.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pci_devices.h; sourceTree = "<group>"; };
+		45B08607203C8A9A00755D32 /* pcspeaker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pcspeaker.cpp; sourceTree = "<group>"; };
+		45B08608203C8A9A00755D32 /* pic.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pic.cpp; sourceTree = "<group>"; };
+		45B08609203C8A9A00755D32 /* sblaster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sblaster.cpp; sourceTree = "<group>"; };
+		45B0860A203C8A9A00755D32 /* serialport */ = {isa = PBXFileReference; lastKnownFileType = folder; path = serialport; sourceTree = "<group>"; };
+		45B0860B203C8A9A00755D32 /* tandy_sound.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tandy_sound.cpp; sourceTree = "<group>"; };
+		45B0860C203C8A9A00755D32 /* timer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
+		45B0860D203C8A9A00755D32 /* vga.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga.cpp; sourceTree = "<group>"; };
+		45B0860E203C8A9A00755D32 /* vga_attr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_attr.cpp; sourceTree = "<group>"; };
+		45B0860F203C8A9A00755D32 /* vga_crtc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_crtc.cpp; sourceTree = "<group>"; };
+		45B08610203C8A9A00755D32 /* vga_dac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_dac.cpp; sourceTree = "<group>"; };
+		45B08611203C8A9A00755D32 /* vga_draw.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_draw.cpp; sourceTree = "<group>"; };
+		45B08612203C8A9A00755D32 /* vga_gfx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_gfx.cpp; sourceTree = "<group>"; };
+		45B08613203C8A9A00755D32 /* vga_memory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_memory.cpp; sourceTree = "<group>"; };
+		45B08614203C8A9A00755D32 /* vga_misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_misc.cpp; sourceTree = "<group>"; };
+		45B08615203C8A9A00755D32 /* vga_other.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_other.cpp; sourceTree = "<group>"; };
+		45B08616203C8A9A00755D32 /* vga_paradise.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_paradise.cpp; sourceTree = "<group>"; };
+		45B08617203C8A9A00755D32 /* vga_s3.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_s3.cpp; sourceTree = "<group>"; };
+		45B08618203C8A9A00755D32 /* vga_seq.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_seq.cpp; sourceTree = "<group>"; };
+		45B08619203C8A9A00755D32 /* vga_tseng.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_tseng.cpp; sourceTree = "<group>"; };
+		45B0861A203C8A9A00755D32 /* vga_xga.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vga_xga.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		45B085EA203C8A9A00755D32 = {
+			isa = PBXGroup;
+			children = (
+				45B085F0203C8A9A00755D32 /* adlib.cpp */,
+				45B085F1203C8A9A00755D32 /* adlib.h */,
+				45B085F2203C8A9A00755D32 /* cmos.cpp */,
+				45B085F3203C8A9A00755D32 /* dbopl.cpp */,
+				45B085F4203C8A9A00755D32 /* dbopl.h */,
+				45B085F5203C8A9A00755D32 /* disney.cpp */,
+				45B085F6203C8A9A00755D32 /* dma.cpp */,
+				45B085F7203C8A9A00755D32 /* gameblaster.cpp */,
+				45B085F8203C8A9A00755D32 /* gus.cpp */,
+				45B085F9203C8A9A00755D32 /* hardware.cpp */,
+				45B085FA203C8A9A00755D32 /* iohandler.cpp */,
+				45B085FB203C8A9A00755D32 /* ipx.cpp */,
+				45B085FC203C8A9A00755D32 /* ipxserver.cpp */,
+				45B085FD203C8A9A00755D32 /* joystick.cpp */,
+				45B085FE203C8A9A00755D32 /* keyboard.cpp */,
+				45B085FF203C8A9A00755D32 /* Makefile.am */,
+				45B08600203C8A9A00755D32 /* memory.cpp */,
+				45B08601203C8A9A00755D32 /* mixer.cpp */,
+				45B08602203C8A9A00755D32 /* mpu401.cpp */,
+				45B08603203C8A9A00755D32 /* opl.cpp */,
+				45B08604203C8A9A00755D32 /* opl.h */,
+				45B08605203C8A9A00755D32 /* pci_bus.cpp */,
+				45B08606203C8A9A00755D32 /* pci_devices.h */,
+				45B08607203C8A9A00755D32 /* pcspeaker.cpp */,
+				45B08608203C8A9A00755D32 /* pic.cpp */,
+				45B08609203C8A9A00755D32 /* sblaster.cpp */,
+				45B0860A203C8A9A00755D32 /* serialport */,
+				45B0860B203C8A9A00755D32 /* tandy_sound.cpp */,
+				45B0860C203C8A9A00755D32 /* timer.cpp */,
+				45B0860D203C8A9A00755D32 /* vga.cpp */,
+				45B0860E203C8A9A00755D32 /* vga_attr.cpp */,
+				45B0860F203C8A9A00755D32 /* vga_crtc.cpp */,
+				45B08610203C8A9A00755D32 /* vga_dac.cpp */,
+				45B08611203C8A9A00755D32 /* vga_draw.cpp */,
+				45B08612203C8A9A00755D32 /* vga_gfx.cpp */,
+				45B08613203C8A9A00755D32 /* vga_memory.cpp */,
+				45B08614203C8A9A00755D32 /* vga_misc.cpp */,
+				45B08615203C8A9A00755D32 /* vga_other.cpp */,
+				45B08616203C8A9A00755D32 /* vga_paradise.cpp */,
+				45B08617203C8A9A00755D32 /* vga_s3.cpp */,
+				45B08618203C8A9A00755D32 /* vga_seq.cpp */,
+				45B08619203C8A9A00755D32 /* vga_tseng.cpp */,
+				45B0861A203C8A9A00755D32 /* vga_xga.cpp */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		45B085EF203C8A9A00755D32 /* hardware */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 45B0861B203C8A9A00755D32 /* Build configuration list for PBXLegacyTarget "hardware" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/Home1/Documents/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware";
+			dependencies = (
+			);
+			name = hardware;
+			passBuildSettingsInEnvironment = 1;
+			productName = hardware;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		45B085EB203C8A9A00755D32 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 45B085EE203C8A9A00755D32 /* Build configuration list for PBXProject "hardware" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 45B085EA203C8A9A00755D32;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				45B085EF203C8A9A00755D32 /* hardware */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		45B085EC203C8A9A00755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		45B085ED203C8A9A00755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		45B0861C203C8A9A00755D32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = hardware;
+			};
+			name = Debug;
+		};
+		45B0861D203C8A9A00755D32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = hardware;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		45B085EE203C8A9A00755D32 /* Build configuration list for PBXProject "hardware" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B085EC203C8A9A00755D32 /* Debug */,
+				45B085ED203C8A9A00755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		45B0861B203C8A9A00755D32 /* Build configuration list for PBXLegacyTarget "hardware" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B0861C203C8A9A00755D32 /* Debug */,
+				45B0861D203C8A9A00755D32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 45B085EB203C8A9A00755D32 /* Project object */;
+}
