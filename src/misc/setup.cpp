@@ -829,9 +829,11 @@ Section* Config::GetSectionFromProperty(char const * const prop) const{
 
 
 bool Config::ParseConfigFile(char const * const configfilename){
+
 	//static bool first_configfile = true;
 	ifstream in(configfilename);
 	if (!in) return false;
+
 	const char * settings_type;
 	settings_type = (configfiles.size() == 0)? "primary":"additional";
 	configfiles.push_back(configfilename);
@@ -882,6 +884,7 @@ bool Config::ParseConfigFile(char const * const configfilename){
 		}
 	}
 	current_config_dir.clear();//So internal changes don't use the path information
+
 	return true;
 }
 

@@ -110,7 +110,8 @@ struct RawHeader {
 	Bit8u id[8];				/* 0x00, "DBRAWOPL" */
 	Bit16u versionHigh;			/* 0x08, size of the data following the m */
 	Bit16u versionLow;			/* 0x0a, size of the data following the m */
-	Bit32u commands;			/* 0x0c, Bit32u amount of command/data pairs */
+	Bit32u commands;			/* 0x0c, Bit32u a
+								of command/data pairs */
 	Bit32u milliseconds;		/* 0x10, Bit32u Total milliseconds of data in this chunk */
 	Bit8u hardware;				/* 0x14, Bit8u Hardware Type 0=opl2,1=dual-opl2,2=opl3 */
 	Bit8u format;				/* 0x15, Bit8u Format 0=cmd/data interleaved, 1 maybe all cdms, followed by all data */
