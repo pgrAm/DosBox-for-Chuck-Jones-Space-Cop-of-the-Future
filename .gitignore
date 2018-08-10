@@ -247,4 +247,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /defFileEditor/adventure/page/
+/visualc_net/chuck
 /visualc_net/doom
