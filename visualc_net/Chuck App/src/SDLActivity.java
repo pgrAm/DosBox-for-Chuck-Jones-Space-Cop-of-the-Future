@@ -249,7 +249,6 @@ public class SDLActivity extends Activity {
         SDLActivity.handleNativeState();
     }
 
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);

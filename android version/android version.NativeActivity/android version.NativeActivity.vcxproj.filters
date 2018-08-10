@@ -115,22 +115,7 @@
     <ClInclude Include="..\..\src\hardware\font-switch.h">
       <Filter>hardware</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\hardware\serialport\directserial.h">
-      <Filter>hardware\serialport</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\hardware\serialport\libserial.h">
-      <Filter>hardware\serialport</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\hardware\serialport\misc_util.h">
-      <Filter>hardware\serialport</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\hardware\serialport\nullmodem.h">
-      <Filter>hardware\serialport</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\hardware\serialport\serialdummy.h">
-      <Filter>hardware\serialport</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\hardware\serialport\softmodem.h">
       <Filter>hardware\serialport</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ints\xms.h">
@@ -456,25 +441,10 @@
     <ClCompile Include="..\..\src\hardware\tandy_sound.cpp">
       <Filter>hardware\sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\hardware\serialport\directserial.cpp">
-      <Filter>hardware\serialport</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\hardware\serialport\libserial.cpp">
-      <Filter>hardware\serialport</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\hardware\serialport\misc_util.cpp">
-      <Filter>hardware\serialport</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\hardware\serialport\nullmodem.cpp">
-      <Filter>hardware\serialport</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\hardware\serialport\serialdummy.cpp">
       <Filter>hardware\serialport</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\hardware\serialport\serialport.cpp">
-      <Filter>hardware\serialport</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\hardware\serialport\softmodem.cpp">
       <Filter>hardware\serialport</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ints\bios.cpp">

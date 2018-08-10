@@ -73,21 +73,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>gnustl_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <ThumbMode>Disabled</ThumbMode>
+    <UseOfStl>gnustl_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <ThumbMode>Disabled</ThumbMode>
+    <UseOfStl>gnustl_shared</UseOfStl>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -120,12 +124,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <TargetName>libmain</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <TargetName>libmain</TargetName>
+    <UseMultiToolTask>true</UseMultiToolTask>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <TargetName>libmain</TargetName>
+    <UseMultiToolTask>false</UseMultiToolTask>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
@@ -143,12 +151,18 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>../../include;../../SDL2-2.0.7/include;../../libpng-1.2.37-lib/include;../../zlib-1.2.3-lib/include;../../src/platform/android;$(Sysroot)\usr\include;$(StlIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <EnableNeonCodegen>true</EnableNeonCodegen>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <CLanguageStandard>Default</CLanguageStandard>
     </ClCompile>
     <Link>
-      <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;</LibraryDependencies>
+      <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
+      <AdditionalLibraryDirectories>C:\Users\jaked\Documents\GitHub\DosBox-for-Chuck-Jones-Space-Cop-of-the-Future\visualc_net\ARM64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -160,11 +174,11 @@
       <ExceptionHandling>Enabled</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UndefinePreprocessorDefinitions>_WIN32</UndefinePreprocessorDefinitions>
-      <AdditionalOptions>-lm %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
       <AdditionalLibraryDirectories>../;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName)\$(PlatformShortName);$(StlLibraryPath)</AdditionalLibraryDirectories>
+      <IncrementalLink>false</IncrementalLink>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -175,10 +189,12 @@
       <AdditionalIncludeDirectories>../../include;../../SDL2-2.0.7/include;../../libpng-1.2.37-lib/include;../../zlib-1.2.3-lib/include;../../src/platform/android;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <CppLanguageStandard>Default</CppLanguageStandard>
     </ClCompile>
     <Link>
       <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
-      <AdditionalLibraryDirectories>../;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../;%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+      <IncrementalLink>false</IncrementalLink>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -295,12 +311,7 @@
     <ClInclude Include="..\..\src\gui\render_scalers.h" />
     <ClInclude Include="..\..\src\gui\render_templates.h" />
     <ClInclude Include="..\..\src\hardware\font-switch.h" />
-    <ClInclude Include="..\..\src\hardware\serialport\directserial.h" />
-    <ClInclude Include="..\..\src\hardware\serialport\libserial.h" />
-    <ClInclude Include="..\..\src\hardware\serialport\misc_util.h" />
-    <ClInclude Include="..\..\src\hardware\serialport\nullmodem.h" />
     <ClInclude Include="..\..\src\hardware\serialport\serialdummy.h" />
-    <ClInclude Include="..\..\src\hardware\serialport\softmodem.h" />
     <ClInclude Include="..\..\src\ints\int10.h" />
     <ClInclude Include="..\..\src\ints\xms.h" />
   </ItemGroup>
@@ -359,13 +370,8 @@
     <ClCompile Include="..\..\src\hardware\pcspeaker.cpp" />
     <ClCompile Include="..\..\src\hardware\pic.cpp" />
     <ClCompile Include="..\..\src\hardware\sblaster.cpp" />
-    <ClCompile Include="..\..\src\hardware\serialport\directserial.cpp" />
-    <ClCompile Include="..\..\src\hardware\serialport\libserial.cpp" />
-    <ClCompile Include="..\..\src\hardware\serialport\misc_util.cpp" />
-    <ClCompile Include="..\..\src\hardware\serialport\nullmodem.cpp" />
     <ClCompile Include="..\..\src\hardware\serialport\serialdummy.cpp" />
     <ClCompile Include="..\..\src\hardware\serialport\serialport.cpp" />
-    <ClCompile Include="..\..\src\hardware\serialport\softmodem.cpp" />
     <ClCompile Include="..\..\src\hardware\tandy_sound.cpp" />
     <ClCompile Include="..\..\src\hardware\timer.cpp" />
     <ClCompile Include="..\..\src\hardware\vga.cpp" />

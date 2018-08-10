@@ -25,16 +25,28 @@
 
 #define DB_HAVE_CLOCK_GETTIME
 
-#define C_TARGETCPU ARMV7LE
+#ifdef __aarch64__
+	#define C_DYNREC 1
+	#define C_TARGETCPU ARMV8LE
+	#define C_UNALIGNED_MEMORY 1
 
-/* Define to 1 to use recompiling cpu core. Can not be used together with the dynamic-x86 core */
-#define C_DYNREC 1
+	/* The size of `int *', as computed by sizeof. */
+	#define SIZEOF_INT_P 8
+#else
+	#define C_TARGETCPU ARMV7LE
+	
+	/* Define to 1 to use recompiling cpu core. Can not be used together with the dynamic-x86 core */
+	#define C_DYNREC 1
+	
+	/* Enable memory function inlining in */
+	#define C_CORE_INLINE 0
+	
+	/* Define to 1 to use a unaligned memory access */
+	//#define C_UNALIGNED_MEMORY 1
 
-/* Enable memory function inlining in */
-#define C_CORE_INLINE 0
-
-/* Define to 1 to use a unaligned memory access */
-//#define C_UNALIGNED_MEMORY 1
+	/* The size of `int *', as computed by sizeof. */
+	#define SIZEOF_INT_P 4
+#endif
 
 /* environ is defined */
 #define ENVIRON_INCLUDED 1
@@ -88,8 +100,6 @@ prediction. */
 #define ANDROID
 #endif
 
-/* The size of `int *', as computed by sizeof. */
-#define SIZEOF_INT_P 4
 
 /* The size of `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
