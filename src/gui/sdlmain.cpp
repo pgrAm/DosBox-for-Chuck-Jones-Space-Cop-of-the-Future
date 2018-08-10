@@ -16,6 +16,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -2163,7 +2167,8 @@ void GFX_Events()
 		switch(event.type)
 		{
 		case SDL_WINDOWEVENT:
-			switch(event.window.type)
+
+		switch(event.window.type)
 			{
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 #ifdef WIN32
@@ -2190,11 +2195,8 @@ void GFX_Events()
 				GFX_LosingFocus();
 				CPU_Enable_SkipAutoAdjust();
 				break;
-			case SDL_WINDOWEVENT_SIZE_CHANGED:
-				SDL_RenderClear(sdl.render.renderer);
-				break;
 			}
-			
+#ifndef __ANDROID__			
 			/* Non-focus priority is set to pause; check to see if we've lost window or input focus
 			*/
 			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
@@ -2206,19 +2208,19 @@ void GFX_Events()
 				*/
 				bool paused = true;
 				SDL_Event ev;
-
+			
 				GFX_SetTitle(-1, -1, true);
 				KEYBOARD_ClrBuffer();
 				//					SDL_Delay(500);
 				//					while (SDL_PollEvent(&ev)) {
 				// flush event queue.
 				//					}
-
+			
 				while(paused)
 				{
 					// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
 					SDL_WaitEvent(&ev);
-
+			
 					switch(ev.type)
 					{
 					case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
@@ -2228,7 +2230,7 @@ void GFX_Events()
 							// We've got focus back, so unpause and break out of the loop
 							paused = false;
 							GFX_SetTitle(-1, -1, false);
-
+			
 							/* Now poke a "release ALT" command into the keyboard buffer
 							* we have to do this, otherwise ALT will 'stick' and cause
 							* problems with the app running in the DOSBox.
@@ -2240,6 +2242,10 @@ void GFX_Events()
 					}
 				}
 			}
+#endif
+			break;
+		case SDL_APP_DIDENTERFOREGROUND:
+			GFX_ResetScreen();
 			break;
 		case SDL_MOUSEMOTION:
 #ifndef __IPHONEOS__
@@ -2311,10 +2317,6 @@ static BOOL WINAPI ConsoleEventHandler(DWORD event)
 		return FALSE;
 	}
 }
-#endif
-
-#ifdef __ANDROID__
-#include <android/log.h>
 #endif
 
 /* static variable to show wether there is not a valid stdout.
