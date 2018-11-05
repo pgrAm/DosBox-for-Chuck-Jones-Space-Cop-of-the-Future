@@ -287,26 +287,22 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 	if(flags & SDL_WINDOW_FULLSCREEN)
 	{
 		SDL_DisplayMode mode;
-		
+
 		SDL_GetWindowDisplayMode(sdl.surface, &mode);
-		
+
 		if(mode.h != height || mode.w != width || mode.refresh_rate != 60)
 		{
 			mode.h = height;
 			mode.w = width;
 			mode.refresh_rate = 60;
 			mode.driverdata = NULL;
-		
+
 			SDL_SetWindowDisplayMode(sdl.surface, &mode);
 		}
 
-		SDL_SetWindowSize(sdl.surface, width, height);
-
-		SDL_RenderClear(sdl.render.renderer);
-
 		if(!fullscreen)
 		{
-			if(SDL_SetWindowFullscreen(sdl.surface, SDL_WINDOW_FULLSCREEN))
+			if(SDL_SetWindowFullscreen(sdl.surface, SDL_WINDOW_FULLSCREEN) != 0)
 			{
 				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 			}
@@ -424,9 +420,7 @@ static void PauseDOSBox(bool pressed)
 		switch(event.type)
 		{
 
-		case SDL_QUIT: 
-			KillSwitch(true);
-			break;
+		case SDL_QUIT: KillSwitch(true); break;
 		case SDL_KEYDOWN:   // Must use Pause/Break Key to resume.
 		case SDL_KEYUP:
 			if(event.key.keysym.sym == SDL_SCANCODE_PAUSE)
@@ -550,9 +544,7 @@ void GFX_ResetScreen(void)
 {
 	GFX_Stop();
 	if(sdl.draw.callback)
-	{
 		(sdl.draw.callback)(GFX_CallBackReset);
-	}
 	GFX_Start();
 	CPU_Reset_AutoAdjust();
 }
@@ -769,9 +761,7 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp)
 void GFX_TearDown(void)
 {
 	if(sdl.updating)
-	{
 		GFX_EndUpdate(0);
-	}
 
 	if(sdl.blit.surface)
 	{
@@ -1255,11 +1245,7 @@ void GFX_SwitchFullscreenNoReset(void)
 
 bool GFX_LazyFullscreenRequested(void)
 {
-	if(sdl.desktop.lazy_fullscreen)
-	{
-		return sdl.desktop.lazy_fullscreen_req;
-	}
-
+	if(sdl.desktop.lazy_fullscreen) return sdl.desktop.lazy_fullscreen_req;
 	return false;
 }
 
@@ -1271,7 +1257,7 @@ void GFX_RestoreMode(void)
 
 
 bool GFX_StartUpdate(Bit8u * & pixels, Bitu & pitch)
-{ 
+{
 	if(!sdl.active || sdl.updating)
 	{
 		return false;
@@ -1596,9 +1582,7 @@ Bitu GFX_GetRGB(Bit8u red, Bit8u green, Bit8u blue)
 void GFX_Stop()
 {
 	if(sdl.updating)
-	{
 		GFX_EndUpdate(0);
-	}
 	sdl.active = false;
 }
 
@@ -1610,9 +1594,9 @@ void GFX_Start()
 static void GUI_ShutDown(Section * /*sec*/)
 {
 	GFX_Stop();
-	if(sdl.draw.callback) { (sdl.draw.callback)(GFX_CallBackStop); }
-	if(sdl.mouse.locked) { GFX_CaptureMouse(); }
-	if(sdl.desktop.fullscreen) { GFX_SwitchFullScreen(); }
+	if(sdl.draw.callback) (sdl.draw.callback)(GFX_CallBackStop);
+	if(sdl.mouse.locked) GFX_CaptureMouse();
+	if(sdl.desktop.fullscreen) GFX_SwitchFullScreen();
 }
 
 

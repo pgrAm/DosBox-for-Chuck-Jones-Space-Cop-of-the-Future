@@ -712,4 +712,7 @@
   <ItemGroup>
     <Image Include="..\src\dosbox.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="dosbox.conf" />
+  </ItemGroup>
 </Project>

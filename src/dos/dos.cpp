@@ -1130,7 +1130,14 @@ static Bitu DOS_21Handler(void) {
 		CALLBACK_SCF(true); //Check this! What needs this ? See default case
 		LOG(LOG_DOSMISC,LOG_NORMAL)("DOS:Windows long file name support call %2X",reg_al);
 		break;
-
+	//text input interrupt, CUSTOM FOR CHUCK
+	case 0xFF:
+		SDL_StopTextInput();
+		break;
+	//text input interrupt, CUSTOM FOR CHUCK
+	case 0xFE:
+		SDL_StartTextInput();
+		break;
 	case 0xE0:
 	case 0x18:	            	/* NULL Function for CP/M compatibility or Extended rename FCB */
 	case 0x1d:	            	/* NULL Function for CP/M compatibility or Extended rename FCB */
