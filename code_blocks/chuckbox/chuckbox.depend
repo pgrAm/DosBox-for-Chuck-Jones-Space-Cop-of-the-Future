@@ -1,0 +1,2167 @@
+# depslib dependency file v1.0
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/callback.cpp
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"cpu.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/dosbox.h
+	"config.h"
+	"logging.h"
+
+1541531280 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/platform/linux86/config.h
+	<stdint.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/logging.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/callback.h
+	"mem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/mem.h
+	"dosbox.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/cpu.h
+	"dosbox.h"
+	"regs.h"
+	"mem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/regs.h
+	"mem.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86.cpp
+	"dosbox.h"
+	<assert.h>
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	<stddef.h>
+	<stdlib.h>
+	<windows.h>
+	<winbase.h>
+	<sys/mman.h>
+	<limits.h>
+	"callback.h"
+	"regs.h"
+	"mem.h"
+	"cpu.h"
+	"debug.h"
+	"paging.h"
+	"inout.h"
+	"fpu.h"
+	"core_dyn_x86/cache.h"
+	"core_dyn_x86/risc_x86.h"
+	"core_dyn_x86/decoder.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/debug.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/paging.h
+	"dosbox.h"
+	"mem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/inout.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/fpu.h
+	"mem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/cache.h
+
+1541526692 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/risc_x86.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/decoder.h
+	"pic.h"
+	"helpers.h"
+	"string.h"
+	"dyn_fpu_dh.h"
+	"dyn_fpu.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/pic.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/helpers.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/string.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/dyn_fpu_dh.h
+	"dosbox.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dyn_x86/dyn_fpu.h
+	"dosbox.h"
+	<math.h>
+	<float.h>
+	"cross.h"
+	"mem.h"
+	"fpu.h"
+	"cpu.h"
+	"../../fpu/fpu_instructions_x86.h"
+	"../../fpu/fpu_instructions.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/cross.h
+	"dosbox.h"
+	<stdio.h>
+	<sys/stat.h>
+	<sys/types.h>
+	<string>
+	<direct.h>
+	<io.h>
+	<dirent.h>
+	<unistd.h>
+	<math.h>
+	<windows.h>
+	<dirent.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/fpu/fpu_instructions_x86.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/fpu/fpu_instructions.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec.cpp
+	"dosbox.h"
+	<assert.h>
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	<stddef.h>
+	<stdlib.h>
+	<windows.h>
+	<winbase.h>
+	<sys/mman.h>
+	<limits.h>
+	"callback.h"
+	"regs.h"
+	"mem.h"
+	"cpu.h"
+	"debug.h"
+	"paging.h"
+	"inout.h"
+	"lazyflags.h"
+	"pic.h"
+	"core_dynrec/cache.h"
+	"core_dynrec/risc_x64.h"
+	"core_dynrec/risc_x86.h"
+	"core_dynrec/risc_mipsel32.h"
+	"core_dynrec/risc_armv4le.h"
+	"core_dynrec/risc_armv8le.h"
+	"core_dynrec/decoder.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/lazyflags.h
+	"regs.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/cache.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_x64.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_x86.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_mipsel32.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_armv4le.h
+	"risc_armv4le-common.h"
+	"risc_armv4le-o3.h"
+	"risc_armv4le-thumb-iw.h"
+	"risc_armv4le-o3.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_armv4le-common.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_armv4le-o3.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_armv4le-thumb-iw.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/risc_armv8le.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/decoder.h
+	"decoder_basic.h"
+	"operators.h"
+	"decoder_opcodes.h"
+	"dyn_fpu.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/decoder_basic.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/operators.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/decoder_opcodes.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_dynrec/dyn_fpu.h
+	"dosbox.h"
+	<math.h>
+	<float.h>
+	"cross.h"
+	"mem.h"
+	"fpu.h"
+	"cpu.h"
+	"../../fpu/fpu_instructions_x86.h"
+	"../../fpu/fpu_instructions.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full.cpp
+	"dosbox.h"
+	"pic.h"
+	"regs.h"
+	"cpu.h"
+	"lazyflags.h"
+	"paging.h"
+	"fpu.h"
+	"debug.h"
+	"inout.h"
+	"callback.h"
+	"core_full/loadwrite.h"
+	"core_full/support.h"
+	"core_full/optable.h"
+	"instructions.h"
+	"core_full/load.h"
+	"core_full/op.h"
+	"core_full/save.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/loadwrite.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/support.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/optable.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/instructions.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/load.h
+	"ea_lookup.h"
+	"string.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/ea_lookup.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/string.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/op.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_full/save.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal.cpp
+	<stdio.h>
+	"dosbox.h"
+	"mem.h"
+	"cpu.h"
+	"lazyflags.h"
+	"inout.h"
+	"callback.h"
+	"pic.h"
+	"fpu.h"
+	"paging.h"
+	"debug.h"
+	"paging.h"
+	"instructions.h"
+	"core_normal/support.h"
+	"core_normal/string.h"
+	"core_normal/prefix_none.h"
+	"core_normal/prefix_0f.h"
+	"core_normal/prefix_66.h"
+	"core_normal/prefix_66_0f.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/support.h
+	"helpers.h"
+	"table_ea.h"
+	"../modrm.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/helpers.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/table_ea.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/modrm.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/string.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/prefix_none.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/prefix_0f.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/prefix_66.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_normal/prefix_66_0f.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_prefetch.cpp
+	<stdio.h>
+	"dosbox.h"
+	"mem.h"
+	"cpu.h"
+	"lazyflags.h"
+	"inout.h"
+	"callback.h"
+	"pic.h"
+	"fpu.h"
+	"paging.h"
+	"debug.h"
+	"paging.h"
+	"instructions.h"
+	"core_normal/support.h"
+	"core_normal/string.h"
+	"core_normal/prefix_none.h"
+	"core_normal/prefix_0f.h"
+	"core_normal/prefix_66.h"
+	"core_normal/prefix_66_0f.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/core_simple.cpp
+	<stdio.h>
+	"dosbox.h"
+	"mem.h"
+	"cpu.h"
+	"lazyflags.h"
+	"inout.h"
+	"callback.h"
+	"pic.h"
+	"fpu.h"
+	"debug.h"
+	"paging.h"
+	"instructions.h"
+	"core_normal/support.h"
+	"core_normal/string.h"
+	"core_normal/prefix_none.h"
+	"core_normal/prefix_0f.h"
+	"core_normal/prefix_66.h"
+	"core_normal/prefix_66_0f.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/cpu.cpp
+	<assert.h>
+	<sstream>
+	<stddef.h>
+	"dosbox.h"
+	"cpu.h"
+	"memory.h"
+	"debug.h"
+	"mapper.h"
+	"setup.h"
+	"programs.h"
+	"paging.h"
+	"lazyflags.h"
+	"support.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/mapper.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/setup.h
+	<list>
+	<vector>
+	<string>
+	<cstdio>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/programs.h
+	"dosbox.h"
+	"dos_inc.h"
+	<list>
+	<string>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/dos_inc.h
+	"dos_system.h"
+	"mem.h"
+	<stddef.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/dos_system.h
+	<vector>
+	"dosbox.h"
+	"cross.h"
+	"support.h"
+	"mem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/support.h
+	<string.h>
+	<string>
+	<ctype.h>
+	"dosbox.h"
+	<strings.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/flags.cpp
+	"dosbox.h"
+	"cpu.h"
+	"lazyflags.h"
+	"pic.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/modrm.cpp
+	"cpu.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/cpu/paging.cpp
+	<stdlib.h>
+	<assert.h>
+	<string.h>
+	"dosbox.h"
+	"mem.h"
+	"paging.h"
+	"regs.h"
+	"lazyflags.h"
+	"cpu.h"
+	"debug.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/cdrom.cpp
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	"dosbox.h"
+	"SDL.h"
+	"support.h"
+	"cdrom.h"
+
+1541465506 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/cdrom.h
+	<string.h>
+	<string>
+	<iostream>
+	<vector>
+	<fstream>
+	<sstream>
+	"dosbox.h"
+	"mem.h"
+	"mixer.h"
+	"SDL.h"
+	"SDL_thread.h"
+	"SDL_sound.h"
+	<windows.h>
+	"wnaspi32.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/mixer.h
+	"dosbox.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/wnaspi32.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/cdrom_aspi_win32.cpp
+	<ctype.h>
+	"dosbox.h"
+	"cdrom.h"
+	"support.h"
+	"wnaspi32.h"
+	<ntddcdrm.h>
+	<ntddscsi.h>
+	<winioctl.h>
+	<winioctl.h>
+	<ntddcdrm.h>
+	<ntddscsi.h>
+	"ddk/ntddcdrm.h"
+	"ddk/ntddscsi.h"
+	"scsidefs.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/scsidefs.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/cdrom_image.cpp
+	<cctype>
+	<cmath>
+	<cstdio>
+	<fstream>
+	<iostream>
+	<limits>
+	<limits.h>
+	<sstream>
+	<vector>
+	<sys/stat.h>
+	"cdrom.h"
+	"drives.h"
+	"support.h"
+	"setup.h"
+	<libgen.h>
+	<string.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drives.h
+	<vector>
+	<sys/types.h>
+	"dos_system.h"
+	"shell.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/shell.h
+	<ctype.h>
+	"dosbox.h"
+	"programs.h"
+	<string>
+	<list>
+
+1540424538 /usr/include/SDL2/SDL.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_gamecontroller.h"
+	"SDL_haptic.h"
+	"SDL_hints.h"
+	"SDL_joystick.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_shape.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<wchar.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<math.h>
+	<float.h>
+	<sal.h>
+	"begin_code.h"
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_config.h
+	"SDL_platform.h"
+
+1540424538 /usr/include/SDL2/SDL_platform.h
+	"AvailabilityMacros.h"
+	"TargetConditionals.h"
+	<winapifamily.h>
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/begin_code.h
+
+1540424538 /usr/include/SDL2/close_code.h
+
+1540424538 /usr/include/SDL2/SDL_assert.h
+	"SDL_config.h"
+	"begin_code.h"
+	<signal.h>
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_atomic.h
+	"SDL_stdinc.h"
+	"SDL_platform.h"
+	"begin_code.h"
+	<mbarrier.h>
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_endian.h
+	"SDL_stdinc.h"
+	<endian.h>
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_atomic.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	<process.h>
+	<process.h>
+	<stdlib.h>
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_clipboard.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_cpuinfo.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<intrin.h>
+	<altivec.h>
+	<mm3dnow.h>
+	<immintrin.h>
+	<mmintrin.h>
+	<xmmintrin.h>
+	<emmintrin.h>
+	<pmmintrin.h>
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_quit.h"
+	"SDL_gesture.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_video.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_pixels.h
+	"SDL_stdinc.h"
+	"SDL_endian.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_rect.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_pixels.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_surface.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_blendmode.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_blendmode.h
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keycode.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_keycode.h
+	"SDL_stdinc.h"
+	"SDL_scancode.h"
+
+1540424538 /usr/include/SDL2/SDL_scancode.h
+	"SDL_stdinc.h"
+
+1540424538 /usr/include/SDL2/SDL_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_gamecontroller.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1540424538 /usr/include/SDL2/SDL_gesture.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_touch.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_filesystem.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_haptic.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_hints.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_log.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_messagebox.h
+	"SDL_stdinc.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_power.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_render.h
+	"SDL_stdinc.h"
+	"SDL_rect.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_shape.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_system.h
+	"SDL_stdinc.h"
+	"SDL_keyboard.h"
+	"SDL_render.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos.cpp
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"dosbox.h"
+	"bios.h"
+	"mem.h"
+	"callback.h"
+	"regs.h"
+	"dos_inc.h"
+	"setup.h"
+	"support.h"
+	"serialport.h"
+	"cpu.h"
+	"cpu.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/bios.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/serialport.h
+	"dosbox.h"
+	"inout.h"
+	"timer.h"
+	"dos_inc.h"
+	"programs.h"
+	"hardware.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/timer.h
+	"SDL.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/hardware.h
+	<stdio.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_classes.cpp
+	<string.h>
+	<stdlib.h>
+	"dosbox.h"
+	"mem.h"
+	"dos_inc.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_devices.cpp
+	<string.h>
+	"dosbox.h"
+	"callback.h"
+	"regs.h"
+	"mem.h"
+	"bios.h"
+	"dos_inc.h"
+	"support.h"
+	"drives.h"
+	"dev_con.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dev_con.h
+	"dos_inc.h"
+	"../ints/int10.h"
+	<string.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10.h
+	"vga.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/vga.h
+	"dosbox.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_execute.cpp
+	<string.h>
+	<ctype.h>
+	"dosbox.h"
+	"mem.h"
+	"dos_inc.h"
+	"regs.h"
+	"callback.h"
+	"debug.h"
+	"cpu.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_files.cpp
+	<string.h>
+	<stdlib.h>
+	<time.h>
+	<ctype.h>
+	"dosbox.h"
+	"bios.h"
+	"mem.h"
+	"regs.h"
+	"dos_inc.h"
+	"drives.h"
+	"cross.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_ioctl.cpp
+	<string.h>
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"regs.h"
+	"dos_inc.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_keyboard_layout.cpp
+	"dosbox.h"
+	"bios.h"
+	"bios_disk.h"
+	"setup.h"
+	"support.h"
+	"../ints/int10.h"
+	"regs.h"
+	"callback.h"
+	"mapper.h"
+	"drives.h"
+	"dos_inc.h"
+	"dos_codepages.h"
+	"dos_keyboard_layout_data.h"
+	<windows.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/bios_disk.h
+	<stdio.h>
+	"mem.h"
+	"dos_inc.h"
+	"bios.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_codepages.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_keyboard_layout_data.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_memory.cpp
+	"dosbox.h"
+	"mem.h"
+	"dos_inc.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_misc.cpp
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"regs.h"
+	"dos_inc.h"
+	<list>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_mscdex.cpp
+	<string.h>
+	<ctype.h>
+	"regs.h"
+	"callback.h"
+	"dos_system.h"
+	"dos_inc.h"
+	"setup.h"
+	"support.h"
+	"bios_disk.h"
+	"cpu.h"
+	"cdrom.h"
+
+1541465998 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_programs.cpp
+	"dosbox.h"
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<string>
+	<vector>
+	"programs.h"
+	"support.h"
+	"drives.h"
+	"cross.h"
+	"regs.h"
+	"callback.h"
+	"cdrom.h"
+	"dos_system.h"
+	"dos_inc.h"
+	"bios.h"
+	"bios_disk.h"
+	"setup.h"
+	"control.h"
+	"inout.h"
+	"dma.h"
+	"os2.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/control.h
+	"programs.h"
+	"setup.h"
+	<list>
+	<vector>
+	<string>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/dma.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/dos_tables.cpp
+	"dosbox.h"
+	"mem.h"
+	"dos_inc.h"
+	"callback.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drive_cache.cpp
+	"drives.h"
+	"dos_inc.h"
+	"support.h"
+	"cross.h"
+	<vector>
+	<iterator>
+	<algorithm>
+	<windows.h>
+	<os2.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drive_fat.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"dosbox.h"
+	"dos_inc.h"
+	"drives.h"
+	"support.h"
+	"cross.h"
+	"bios.h"
+	"bios_disk.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drive_iso.cpp
+	<cctype>
+	<cstring>
+	"cdrom.h"
+	"dosbox.h"
+	"dos_system.h"
+	"support.h"
+	"drives.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drive_local.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<errno.h>
+	<sys/stat.h>
+	"dosbox.h"
+	"dos_inc.h"
+	"drives.h"
+	"support.h"
+	"cross.h"
+	"inout.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drive_virtual.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"dosbox.h"
+	"dos_inc.h"
+	"drives.h"
+	"support.h"
+	"cross.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dos/drives.cpp
+	"dosbox.h"
+	"dos_system.h"
+	"drives.h"
+	"mapper.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/dosbox.cpp
+	<stdlib.h>
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	<unistd.h>
+	"dosbox.h"
+	"debug.h"
+	"cpu.h"
+	"video.h"
+	"pic.h"
+	"cpu.h"
+	"callback.h"
+	"inout.h"
+	"mixer.h"
+	"timer.h"
+	"dos_inc.h"
+	"setup.h"
+	"control.h"
+	"cross.h"
+	"programs.h"
+	"support.h"
+	"mapper.h"
+	"ints/int10.h"
+	"render.h"
+	"pci_bus.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/video.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/render.h
+	"../src/gui/render_scalers.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_scalers.h
+	"video.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/pci_bus.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/fpu/fpu.cpp
+	"dosbox.h"
+	<math.h>
+	<float.h>
+	"cross.h"
+	"mem.h"
+	"fpu.h"
+	"cpu.h"
+	"fpu_instructions_x86.h"
+	"fpu_instructions.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi.cpp
+	<assert.h>
+	<string.h>
+	<stdlib.h>
+	<string>
+	<algorithm>
+	"SDL.h"
+	"dosbox.h"
+	"midi.h"
+	"cross.h"
+	"support.h"
+	"setup.h"
+	"mapper.h"
+	"pic.h"
+	"hardware.h"
+	"timer.h"
+	"midi_coremidi.h"
+	"midi_coreaudio.h"
+	"midi_win32.h"
+	"midi_oss.h"
+	"midi_alsa.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/midi.h
+	"programs.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi_coremidi.h
+	<CoreMIDI/MIDIServices.h>
+	<sstream>
+	<string>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi_coreaudio.h
+	<AudioToolbox/AUGraph.h>
+	<CoreServices/CoreServices.h>
+	<AudioToolbox/AudioToolbox.h>
+	<CoreMIDI/MIDIServices.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi_win32.h
+	<windows.h>
+	<mmsystem.h>
+	<string>
+	<sstream>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi_oss.h
+	<fcntl.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/midi_alsa.h
+	<alsa/asoundlib.h>
+	<ctype.h>
+	<string>
+	<sstream>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render.cpp
+	<sys/types.h>
+	<assert.h>
+	<math.h>
+	"dosbox.h"
+	"video.h"
+	"render.h"
+	"setup.h"
+	"control.h"
+	"mapper.h"
+	"cross.h"
+	"hardware.h"
+	"support.h"
+	"render_scalers.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_scalers.cpp
+	"dosbox.h"
+	"render.h"
+	<string.h>
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+	"render_templates.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_templates.h
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_simple.h"
+	"render_templates_hq.h"
+	"render_templates_hq2x.h"
+	"render_loops.h"
+	"render_templates_hq3x.h"
+	"render_loops.h"
+	"render_templates_sai.h"
+	"render_loops.h"
+	"render_loops.h"
+	"render_loops.h"
+	"render_loops.h"
+	"render_loops.h"
+	"render_loops.h"
+	"render_loops.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_simple.h
+	"render_simple.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_templates_hq.h
+	<stdlib.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_templates_hq2x.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_loops.h
+	"render_loops.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_templates_hq3x.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/render_templates_sai.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/sdl_gui.cpp
+	"SDL.h"
+	"../libs/gui_tk/gui_tk.h"
+	"dosbox.h"
+	"keyboard.h"
+	"video.h"
+	"render.h"
+	"mapper.h"
+	"setup.h"
+	"control.h"
+	"shell.h"
+	<iostream>
+	<sstream>
+	<stdexcept>
+	<algorithm>
+	<cctype>
+	<assert.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs/gui_tk/gui_tk.h
+	<stdint.h>
+	<list>
+	<map>
+	<vector>
+	<typeinfo>
+	<string>
+	<iostream>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/keyboard.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/sdl_mapper.cpp
+	<vector>
+	<list>
+	<string.h>
+	<ctype.h>
+	<stdarg.h>
+	<stdio.h>
+	<assert.h>
+	"SDL.h"
+	"SDL_thread.h"
+	"dosbox.h"
+	"video.h"
+	"keyboard.h"
+	"joystick.h"
+	"support.h"
+	"mapper.h"
+	"setup.h"
+	"pic.h"
+	"SDL_syswm.h"
+	<X11/XKBlib.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/joystick.h
+
+1540424538 /usr/include/SDL2/SDL_syswm.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_version.h"
+	"begin_code.h"
+	<windows.h>
+	<Inspectable.h>
+	<X11/Xlib.h>
+	<X11/Xatom.h>
+	<directfb.h>
+	<UIKit/UIKit.h>
+	"SDL_egl.h"
+	"close_code.h"
+
+1540424538 /usr/include/SDL2/SDL_egl.h
+	<EGL/egl.h>
+	<EGL/eglext.h>
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+	<windows.h>
+	<Unknwn.h>
+	<mir_toolkit/mir_client_library.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+
+1541486349 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/sdlmain.cpp
+	<android/log.h>
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	<unistd.h>
+	<stdarg.h>
+	<sys/types.h>
+	<algorithm>
+	<signal.h>
+	<process.h>
+	"cross.h"
+	"SDL.h"
+	"dosbox.h"
+	"video.h"
+	"mouse.h"
+	"pic.h"
+	"timer.h"
+	"setup.h"
+	"support.h"
+	"debug.h"
+	"mapper.h"
+	"vga.h"
+	"keyboard.h"
+	"cpu.h"
+	"cross.h"
+	"control.h"
+	"SDL_opengl.h"
+	<windows.h>
+	<ddraw.h>
+	<sys/resource.h>
+	<os2.h>
+	"dosbox_logo.h"
+	"SDL_system.h"
+	"dosbox_splash.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/mouse.h
+
+1540424538 /usr/include/SDL2/SDL_opengl.h
+	"SDL_config.h"
+	"gl_mangle.h"
+	<windows.h>
+	"SDL_opengl_glext.h"
+
+1540424538 /usr/include/SDL2/SDL_opengl_glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/dosbox_logo.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/gui/dosbox_splash.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/adlib.cpp
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<sys/types.h>
+	"adlib.h"
+	"setup.h"
+	"mapper.h"
+	"mem.h"
+	"dbopl.h"
+	"opl.cpp"
+	"opl.cpp"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/adlib.h
+	"dosbox.h"
+	"mixer.h"
+	"inout.h"
+	"setup.h"
+	"pic.h"
+	"hardware.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/dbopl.h
+	"adlib.h"
+	"dosbox.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/opl.cpp
+	<math.h>
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"opl.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/opl.h
+	<stdint.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/cmos.cpp
+	<time.h>
+	<math.h>
+	"dosbox.h"
+	"timer.h"
+	"pic.h"
+	"inout.h"
+	"mem.h"
+	"bios_disk.h"
+	"setup.h"
+	"cross.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/dbopl.cpp
+	<math.h>
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"dbopl.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/disney.cpp
+	<string.h>
+	"dosbox.h"
+	"inout.h"
+	"mixer.h"
+	"pic.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/dma.cpp
+	<string.h>
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"dma.h"
+	"pic.h"
+	"paging.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/gameblaster.cpp
+	"dosbox.h"
+	"inout.h"
+	"mixer.h"
+	"mem.h"
+	"hardware.h"
+	"setup.h"
+	"support.h"
+	"pic.h"
+	<cstring>
+	<math.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/gus.cpp
+	<string.h>
+	<iomanip>
+	<sstream>
+	"dosbox.h"
+	"inout.h"
+	"mixer.h"
+	"dma.h"
+	"pic.h"
+	"setup.h"
+	"shell.h"
+	"math.h"
+	"regs.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/hardware.cpp
+	<string.h>
+	<stdlib.h>
+	<stdio.h>
+	"dosbox.h"
+	"hardware.h"
+	"setup.h"
+	"support.h"
+	"mem.h"
+	"mapper.h"
+	"pic.h"
+	"render.h"
+	"cross.h"
+	<png.h>
+	"../libs/zmbv/zmbv.cpp"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs/zmbv/zmbv.cpp
+	<zlib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"zmbv.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs/zmbv/zmbv.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/iohandler.cpp
+	<string.h>
+	"dosbox.h"
+	"inout.h"
+	"setup.h"
+	"cpu.h"
+	"../src/cpu/lazyflags.h"
+	"callback.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/ipx.cpp
+	"dosbox.h"
+	<string.h>
+	<time.h>
+	<stdio.h>
+	"cross.h"
+	"support.h"
+	"cpu.h"
+	"regs.h"
+	"inout.h"
+	"setup.h"
+	"debug.h"
+	"callback.h"
+	"dos_system.h"
+	"mem.h"
+	"ipx.h"
+	"ipxserver.h"
+	"timer.h"
+	"SDL_net.h"
+	"programs.h"
+	"pic.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/ipx.h
+	"dosbox.h"
+	"mem.h"
+	"SDL_net.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/include/ipxserver.h
+	"SDL_net.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/ipxserver.cpp
+	"dosbox.h"
+	"dosbox.h"
+	"ipxserver.h"
+	"timer.h"
+	<stdlib.h>
+	<string.h>
+	"ipx.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/joystick.cpp
+	<string.h>
+	"dosbox.h"
+	"inout.h"
+	"setup.h"
+	"joystick.h"
+	"pic.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/keyboard.cpp
+	"dosbox.h"
+	"keyboard.h"
+	"inout.h"
+	"pic.h"
+	"mem.h"
+	"mixer.h"
+	"timer.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/memory.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"setup.h"
+	"paging.h"
+	"regs.h"
+	<string.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/mixer.cpp
+	<string.h>
+	<sys/types.h>
+	<math.h>
+	<windows.h>
+	<mmsystem.h>
+	"SDL.h"
+	"mem.h"
+	"pic.h"
+	"dosbox.h"
+	"mixer.h"
+	"timer.h"
+	"setup.h"
+	"cross.h"
+	"support.h"
+	"mapper.h"
+	"hardware.h"
+	"programs.h"
+	"midi.h"
+	<stdlib.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/mpu401.cpp
+	<string.h>
+	"dosbox.h"
+	"inout.h"
+	"pic.h"
+	"setup.h"
+	"cpu.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/opl.cpp
+	<math.h>
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"opl.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/pci_bus.cpp
+	"dosbox.h"
+	"inout.h"
+	"mem.h"
+	"pci_bus.h"
+	"setup.h"
+	"debug.h"
+	"callback.h"
+	"regs.h"
+	"pci_devices.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/pci_devices.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/pcspeaker.cpp
+	<math.h>
+	"dosbox.h"
+	"mixer.h"
+	"timer.h"
+	"setup.h"
+	"pic.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/pic.cpp
+	"dosbox.h"
+	"inout.h"
+	"cpu.h"
+	"callback.h"
+	"pic.h"
+	"timer.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/sblaster.cpp
+	<iomanip>
+	<sstream>
+	<string.h>
+	<math.h>
+	"dosbox.h"
+	"inout.h"
+	"mixer.h"
+	"dma.h"
+	"pic.h"
+	"hardware.h"
+	"setup.h"
+	"support.h"
+	"shell.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/directserial.cpp
+	"dosbox.h"
+	"serialport.h"
+	"directserial.h"
+	"misc_util.h"
+	"pic.h"
+	"libserial.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/directserial.h
+	"dosbox.h"
+	"serialport.h"
+	"libserial.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/libserial.h
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/misc_util.h
+	"dosbox.h"
+	"support.h"
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdio.h>
+	<stdlib.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	"SDL_net.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/libserial.cpp
+	"libserial.h"
+	"config.h"
+	<windows.h>
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<termios.h>
+	<unistd.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<sys/ioctl.h>
+	<errno.h>
+	<fcntl.h>
+	<stdio.h>
+	<os2.h>
+	<malloc.h>
+	<string.h>
+	<stdio.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/misc_util.cpp
+	"config.h"
+	"misc_util.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/nullmodem.cpp
+	"dosbox.h"
+	"control.h"
+	"serialport.h"
+	"nullmodem.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/nullmodem.h
+	"dosbox.h"
+	"misc_util.h"
+	"serialport.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/serialdummy.cpp
+	"dosbox.h"
+	"setup.h"
+	"serialdummy.h"
+	"serialport.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/serialdummy.h
+	"serialport.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/serialport.cpp
+	<string.h>
+	<ctype.h>
+	"dosbox.h"
+	"inout.h"
+	"pic.h"
+	"setup.h"
+	"bios.h"
+	"callback.h"
+	"serialport.h"
+	"directserial.h"
+	"serialdummy.h"
+	"softmodem.h"
+	"nullmodem.h"
+	"cpu.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/softmodem.h
+	"dosbox.h"
+	"serialport.h"
+	"misc_util.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/serialport/softmodem.cpp
+	"dosbox.h"
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+	"support.h"
+	"serialport.h"
+	"softmodem.h"
+	"misc_util.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/tandy_sound.cpp
+	"dosbox.h"
+	"inout.h"
+	"mixer.h"
+	"mem.h"
+	"setup.h"
+	"pic.h"
+	"dma.h"
+	"hardware.h"
+	<cstring>
+	<math.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/timer.cpp
+	<math.h>
+	"dosbox.h"
+	"inout.h"
+	"pic.h"
+	"mem.h"
+	"mixer.h"
+	"timer.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga.cpp
+	"dosbox.h"
+	"video.h"
+	"pic.h"
+	"vga.h"
+	<string.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_attr.cpp
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_crtc.cpp
+	<stdlib.h>
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+	"debug.h"
+	"cpu.h"
+	"video.h"
+	"pic.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_dac.cpp
+	"dosbox.h"
+	"inout.h"
+	"render.h"
+	"vga.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_draw.cpp
+	<string.h>
+	<math.h>
+	"dosbox.h"
+	"video.h"
+	"render.h"
+	"../gui/render_scalers.h"
+	"vga.h"
+	"pic.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_gfx.cpp
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_memory.cpp
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"mem.h"
+	"vga.h"
+	"paging.h"
+	"pic.h"
+	"inout.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_misc.cpp
+	"dosbox.h"
+	"inout.h"
+	"pic.h"
+	"vga.h"
+	<math.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_paradise.cpp
+	"dosbox.h"
+	"setup.h"
+	"vga.h"
+	"inout.h"
+	"mem.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_s3.cpp
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+	"mem.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_seq.cpp
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_tseng.cpp
+	"dosbox.h"
+	"setup.h"
+	"vga.h"
+	"inout.h"
+	"mem.h"
+	<cstdlib>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_xga.cpp
+	<string.h>
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+	<math.h>
+	<stdio.h>
+	"callback.h"
+	"cpu.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/bios.cpp
+	"dosbox.h"
+	"mem.h"
+	"bios.h"
+	"regs.h"
+	"cpu.h"
+	"callback.h"
+	"inout.h"
+	"pic.h"
+	"hardware.h"
+	"pci_bus.h"
+	"joystick.h"
+	"mouse.h"
+	"setup.h"
+	"serialport.h"
+	<time.h>
+	<sys/timeb.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/bios_disk.cpp
+	"dosbox.h"
+	"callback.h"
+	"bios.h"
+	"bios_disk.h"
+	"regs.h"
+	"mem.h"
+	"dos_inc.h"
+	"../dos/drives.h"
+	"mapper.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/bios_keyboard.cpp
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"bios.h"
+	"keyboard.h"
+	"regs.h"
+	"inout.h"
+	"dos_inc.h"
+	"SDL.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/ems.cpp
+	<string.h>
+	<stdlib.h>
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"paging.h"
+	"bios.h"
+	"keyboard.h"
+	"regs.h"
+	"inout.h"
+	"dos_inc.h"
+	"setup.h"
+	"support.h"
+	"cpu.h"
+	"dma.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10.cpp
+	"dosbox.h"
+	"mem.h"
+	"callback.h"
+	"regs.h"
+	"inout.h"
+	"int10.h"
+	"mouse.h"
+	"setup.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_char.cpp
+	"dosbox.h"
+	"bios.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+	"pic.h"
+	"callback.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_memory.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_misc.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_modes.cpp
+	<string.h>
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+	"vga.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_pal.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_put_pixel.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_vesa.cpp
+	<string.h>
+	<stddef.h>
+	"dosbox.h"
+	"callback.h"
+	"regs.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+	"dos_inc.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_video_state.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/int10_vptable.cpp
+	"dosbox.h"
+	"mem.h"
+	"inout.h"
+	"int10.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/mouse.cpp
+	<string.h>
+	<math.h>
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"regs.h"
+	"cpu.h"
+	"mouse.h"
+	"pic.h"
+	"inout.h"
+	"int10.h"
+	"bios.h"
+	"dos_inc.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/xms.cpp
+	<stdlib.h>
+	<string.h>
+	<stddef.h>
+	"dosbox.h"
+	"callback.h"
+	"mem.h"
+	"regs.h"
+	"dos_inc.h"
+	"setup.h"
+	"inout.h"
+	"xms.h"
+	"bios.h"
+
+1541452825 /home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/ints/xms.h
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs/gui_tk/gui_tk.cpp
+	<SDL.h>
+	"gui_tk.h"
+	<stdio.h>
+	"testfont.h"
+
+1541466550 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/hardware/vga_other.cpp
+	<string.h>
+	<math.h>
+	"dosbox.h"
+	"inout.h"
+	"vga.h"
+	"mem.h"
+	"pic.h"
+	"render.h"
+	"mapper.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/libs/zmbv/zmbv.cpp
+	<zlib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"zmbv.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/misc/cross.cpp
+	"dosbox.h"
+	"cross.h"
+	"support.h"
+	<string>
+	<stdlib.h>
+	"SDL_system.h"
+	<shlobj.h>
+	<sys/types.h>
+	<pwd.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/misc/messages.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"dosbox.h"
+	"cross.h"
+	"support.h"
+	"setup.h"
+	"control.h"
+	<list>
+	<string>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/misc/programs.cpp
+	<vector>
+	<sstream>
+	<ctype.h>
+	<stdlib.h>
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	"programs.h"
+	"callback.h"
+	"regs.h"
+	"support.h"
+	"cross.h"
+	"control.h"
+	"shell.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/misc/setup.cpp
+	"dosbox.h"
+	"cross.h"
+	"setup.h"
+	"control.h"
+	"support.h"
+	<fstream>
+	<string>
+	<sstream>
+	<list>
+	<stdlib.h>
+	<stdio.h>
+	<limits>
+	<limits.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/misc/support.cpp
+	<string.h>
+	<stdlib.h>
+	<assert.h>
+	<ctype.h>
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	<algorithm>
+	<cctype>
+	<string>
+	"dosbox.h"
+	"debug.h"
+	"support.h"
+	"video.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/shell/shell.cpp
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	"dosbox.h"
+	"regs.h"
+	"control.h"
+	"shell.h"
+	"callback.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/shell/shell_batch.cpp
+	<stdlib.h>
+	<string.h>
+	"shell.h"
+	"support.h"
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/shell/shell_cmds.cpp
+	"dosbox.h"
+	"shell.h"
+	"callback.h"
+	"regs.h"
+	"bios.h"
+	"../dos/drives.h"
+	"support.h"
+	"control.h"
+	<cstring>
+	<cctype>
+	<cstdlib>
+	<vector>
+	<string>
+	<time.h>
+
+1541452825 source:/home/jake/DosBox-for-Chuck-Jones-Space-Cop-of-the-Future/src/shell/shell_misc.cpp
+	<stdlib.h>
+	<string.h>
+	<algorithm>
+	<iterator>
+	"shell.h"
+	"regs.h"
+	"callback.h"
+	"support.h"
+

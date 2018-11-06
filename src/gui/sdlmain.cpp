@@ -122,7 +122,7 @@ struct private_hwdata
 #elif defined(MACOSX)
 #define DEFAULT_CONFIG_FILE "/Library/Preferences/DOSBox Preferences"
 #else /*linux freebsd*/
-#define DEFAULT_CONFIG_FILE "/.dosboxrc"
+#define DEFAULT_CONFIG_FILE "./dosbox.conf"
 #endif
 
 #if C_SET_PRIORITY
@@ -287,16 +287,16 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 	if(flags & SDL_WINDOW_FULLSCREEN)
 	{
 		SDL_DisplayMode mode;
-		
+
 		SDL_GetWindowDisplayMode(sdl.surface, &mode);
-		
+
 		if(mode.h != height || mode.w != width || mode.refresh_rate != 60)
 		{
 			mode.h = height;
 			mode.w = width;
 			mode.refresh_rate = 60;
 			mode.driverdata = NULL;
-		
+
 			SDL_SetWindowDisplayMode(sdl.surface, &mode);
 		}
 
@@ -424,7 +424,7 @@ static void PauseDOSBox(bool pressed)
 		switch(event.type)
 		{
 
-		case SDL_QUIT: 
+		case SDL_QUIT:
 			KillSwitch(true);
 			break;
 		case SDL_KEYDOWN:   // Must use Pause/Break Key to resume.
@@ -1271,7 +1271,7 @@ void GFX_RestoreMode(void)
 
 
 bool GFX_StartUpdate(Bit8u * & pixels, Bitu & pitch)
-{ 
+{
 	if(!sdl.active || sdl.updating)
 	{
 		return false;
@@ -2277,7 +2277,7 @@ void GFX_Events()
 				SDL_RenderClear(sdl.render.renderer);
 				break;
 			}
-#ifndef __ANDROID__			
+#ifndef __ANDROID__
 			/* Non-focus priority is set to pause; check to see if we've lost window or input focus
 			*/
 			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)

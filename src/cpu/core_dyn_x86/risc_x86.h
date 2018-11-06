@@ -45,7 +45,7 @@ public:
 		notusable=false;dynreg=0;
 	}
 	DynReg  * dynreg;
-	Bitu last_used;			//Keeps track of last assigned regs 
+	Bitu last_used;			//Keeps track of last assigned regs
     Bit8u index;
 	bool notusable;
 	void Load(DynReg * _dynreg,bool stale=false) {
@@ -231,7 +231,7 @@ static void gen_synchreg(DynReg * dnew,DynReg * dsynch) {
 	/* Always use the loadonce flag from either state */
 	dnew->flags|=(dsynch->flags & dnew->flags&DYNFLG_ACTIVE);
 	if ((dnew->flags ^ dsynch->flags) & DYNFLG_CHANGED) {
-		/* Ensure the changed value gets saved */	
+		/* Ensure the changed value gets saved */
 		if (dnew->flags & DYNFLG_CHANGED) {
 			dnew->genreg->Save();
 		} else dnew->flags|=DYNFLG_CHANGED;
@@ -531,7 +531,7 @@ static void gen_dop_word_imm(DualOps op,bool dword,DynReg * dr1,Bits imm) {
 	Bit16u tmp;
 	if (!dword) cache_addb(0x66);
 	switch (op) {
-	case DOP_ADD:	tmp=0xc081; break; 
+	case DOP_ADD:	tmp=0xc081; break;
 	case DOP_ADC:	tmp=0xd081; break;
 	case DOP_SUB:	tmp=0xe881; break;
 	case DOP_SBB:	tmp=0xd881; break;
@@ -556,7 +556,7 @@ static void gen_dop_word_imm_mem(DualOps op,bool dword,DynReg * dr1,void* data) 
 	GenReg * gr1=FindDynReg(dr1,dword && op==DOP_MOV);
 	Bit16u tmp;
 	switch (op) {
-	case DOP_ADD:	tmp=0x0503; break; 
+	case DOP_ADD:	tmp=0x0503; break;
 	case DOP_ADC:	tmp=0x0513; break;
 	case DOP_SUB:	tmp=0x052b; break;
 	case DOP_SBB:	tmp=0x051b; break;
@@ -671,7 +671,7 @@ static void gen_shift_word_imm(Bitu op,bool dword,DynReg * dr1,Bit8u imm) {
 	dr1->flags|=DYNFLG_CHANGED;
 	if (!dword) {
 		cache_addd(0x66|((0xc0c1+((Bit16u)op << 11) + (gr1->index<<8))|imm<<16)<<8);
-	} else { 
+	} else {
 		cache_addw(0xc0c1+((Bit16u)op << 11) + (gr1->index<<8));
 		cache_addb(imm);
 	}
@@ -887,7 +887,7 @@ static void gen_call_function(void * func,char const* ops,...) {
 			cache_addw(0xc08b+(genreg->index <<(8+3)));	//mov reg,eax
 			break;
 		case 'w':
-			cache_addb(0x66);							
+			cache_addb(0x66);
 			cache_addw(0xc08b+(genreg->index <<(8+3)));	//mov reg,eax
 			break;
 		case 'l':

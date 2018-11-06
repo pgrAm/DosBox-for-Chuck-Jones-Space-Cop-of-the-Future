@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<FileVersion major="1" minor="0" />
+	<ActiveTarget name="Release" />
+	<File name="../../src/gui/render.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7010" topLine="273" />
+		</Cursor>
+	</File>
+	<File name="../../src/hardware/hardware.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1064" topLine="30" />
+		</Cursor>
+	</File>
+	<File name="../../src/dos/cdrom.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7786" topLine="239" />
+		</Cursor>
+	</File>
+	<File name="../../src/platform/linux86/config.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1426" topLine="60" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dyn_x86/decoder.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="56075" topLine="1904" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dyn_x86/cache.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="18086" topLine="607" />
+		</Cursor>
+	</File>
+	<File name="../../src/dosbox.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3126" topLine="133" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dyn_x86.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="813" topLine="107" />
+		</Cursor>
+	</File>
+	<File name="../../src/hardware/serialport/libserial.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6850" topLine="308" />
+		</Cursor>
+	</File>
+	<File name="../../src/misc/programs.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="24811" topLine="771" />
+		</Cursor>
+	</File>
+	<File name="../../src/misc/cross.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="796" topLine="18" />
+		</Cursor>
+	</File>
+	<File name="../../include/dosbox.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="846" topLine="75" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dynrec.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="993" topLine="30" />
+		</Cursor>
+	</File>
+	<File name="../../src/libs/zmbv/zmbv.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="50" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../../src/ints/int10_vesa.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8356" topLine="248" />
+		</Cursor>
+	</File>
+	<File name="../../src/gui/sdl_gui.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3211" topLine="93" />
+		</Cursor>
+	</File>
+	<File name="../../src/hardware/vga_other.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11185" topLine="21" />
+		</Cursor>
+	</File>
+	<File name="../../src/gui/sdlmain.cpp" open="1" top="1" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="36270" topLine="1508" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dynrec/cache.h" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="19208" topLine="456" />
+		</Cursor>
+	</File>
+	<File name="../../src/hardware/tandy_sound.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10160" topLine="403" />
+		</Cursor>
+	</File>
+	<File name="../../src/libs/gui_tk/gui_tk.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="240" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/core_dyn_x86/risc_x86.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3539" topLine="132" />
+		</Cursor>
+	</File>
+	<File name="../../src/dos/dos_programs.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2278" topLine="104" />
+		</Cursor>
+	</File>
+	<File name="../../src/cpu/callback.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="823" topLine="18" />
+		</Cursor>
+	</File>
+</CodeBlocks_layout_file>
