@@ -229,6 +229,7 @@
     <ClInclude Include="..\..\include\video.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\platform\android\config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cpu\callback.cpp">

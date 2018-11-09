@@ -190,7 +190,7 @@ bool RENDER_StartUpdate(void)
 
 #ifdef _WIN32
 	//TODO, a little sneaky fix for windows fullscreen not updating all the time
-	//render.scale.clearCache = true;
+	render.scale.clearCache = true;
 #endif
 
 	/* Clearing the cache will first process the line to make sure it's never the same */

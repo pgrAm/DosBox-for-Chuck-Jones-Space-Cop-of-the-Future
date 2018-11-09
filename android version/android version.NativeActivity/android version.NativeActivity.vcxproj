@@ -314,6 +314,7 @@
     <ClInclude Include="..\..\src\hardware\serialport\serialdummy.h" />
     <ClInclude Include="..\..\src\ints\int10.h" />
     <ClInclude Include="..\..\src\ints\xms.h" />
+    <ClInclude Include="..\..\src\platform\android\config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cpu\callback.cpp" />

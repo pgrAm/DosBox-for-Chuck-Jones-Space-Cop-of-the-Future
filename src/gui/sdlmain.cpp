@@ -239,7 +239,7 @@ struct SDL_Block
 	SDL_Rect updateRects[1024];
 	Bitu num_joysticks;
 #if defined (WIN32)
-	bool using_windib;
+	//bool using_windib;
 	// Time when sdl regains focus (alt-tab) in windowed mode
 	Bit32u focus_ticks;
 #endif
@@ -2751,7 +2751,7 @@ int main(int argc, char* argv[])
 
 		/* Can't disable the console with debugger enabled */
 #if defined(WIN32) && !(C_DEBUG)
-		no_stdout = true;
+
 
 		//if (control->cmdline->FindExist("-noconsole")) {
 		//	FreeConsole();
@@ -2762,15 +2762,19 @@ int main(int argc, char* argv[])
 		//	setvbuf(stdout, NULL, _IOLBF, BUFSIZ);	/* Line buffered */
 		//	setbuf(stderr, NULL);					/* No buffering */
 		//} else {
-		//	//if (AllocConsole()) {
-		//	//	fclose(stdin);
-		//	//	fclose(stdout);
-		//	//	fclose(stderr);
-		//	//	freopen("CONIN$","r",stdin);
-		//	//	freopen("CONOUT$","w",stdout);
-		//	//	freopen("CONOUT$","w",stderr);
-		//	//}
-		//	//SetConsoleTitle("DOSBox Status Window");
+#ifdef _DEBUG
+		if (AllocConsole()) {
+			fclose(stdin);
+			fclose(stdout);
+			fclose(stderr);
+			freopen("CONIN$","r",stdin);
+			freopen("CONOUT$","w",stdout);
+			freopen("CONOUT$","w",stderr);
+		}
+		SetConsoleTitle("DOSBox Status Window");
+#else
+		no_stdout = true;
+#endif
 		//}
 #endif  //defined(WIN32) && !(C_DEBUG)
 		if(control->cmdline->FindExist("-version") ||
@@ -2842,7 +2846,7 @@ int main(int argc, char* argv[])
 
 #if defined (WIN32)
 #if SDL_VERSION_ATLEAST(1, 2, 10)
-		sdl.using_windib = true;
+		//sdl.using_windib = true;
 #else
 		sdl.using_windib = false;
 #endif
