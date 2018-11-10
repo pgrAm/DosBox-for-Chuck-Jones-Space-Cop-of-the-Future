@@ -380,7 +380,7 @@ static void INLINE gen_call_function_raw(void * func) {
 	cache_addb(0x48);
 	cache_addw(0xc483);
 #if defined (_WIN64)
-	cache_addb(0x28);	// add rsp,0x08 (reset alignment)
+	cache_addb(0x28);	// allocate windows shadow space
 #else
 	cache_addb(0x08);	// add rsp,0x08 (reset alignment)
 #endif 
@@ -398,7 +398,7 @@ static Bit64u INLINE gen_call_function_setup(void * func,Bitu paramcount,bool fa
 	cache_addb(0x48);
 	cache_addw(0xec83);		// sub rsp,0x08
 #if defined (_WIN64)
-	cache_addb(0x28);	// add rsp,0x08 (reset alignment)
+	cache_addb(0x28);// 0x28==return address & shadow space pushed onto stack by call
 #else
 	cache_addb(0x08);	// 0x08==return address pushed onto stack by call
 #endif 
@@ -407,22 +407,17 @@ static Bit64u INLINE gen_call_function_setup(void * func,Bitu paramcount,bool fa
 	cache_addw(0xe483);		// and esp,0xfffffffffffffff0
 	cache_addb(0xf0);
 
+#if defined (_WIN64)
+	//restore our original stack pointer
+	cache_addd(0x24448948); //mov  [rsp+0x20], rax (==old rsp)
+	cache_addb(0x20);
+#else
 	cache_addb(0x48);
 	cache_addw(0xc483);		// add rsp,0x08
-#if defined (_WIN64)
-	cache_addb(0x28);	// add rsp,0x08 (reset alignment)
-#else
 	cache_addb(0x08);
-#endif 
 
 	// stack is 16 byte aligned now
-
 	cache_addb(0x50);		// push rax (==old rsp)
-
-#if defined (_WIN64)
-	cache_addb(0x48);
-	cache_addw(0xec83);		// sub rsp,0x20
-	cache_addb(0x20);	// allocate windows shadow space
 #endif 
 
 	// returned address relates to where the address is stored in gen_call_function_raw
@@ -435,13 +430,13 @@ static Bit64u INLINE gen_call_function_setup(void * func,Bitu paramcount,bool fa
 	cache_addw(0xd0ff);
 
 #if defined (_WIN64)
-	cache_addb(0x48);
-	cache_addw(0xc483);		// add rsp,0x20
-	cache_addb(0x20);	// allocate windows shadow space
-#endif 
-
+	//restore our original stack pointer
+	cache_addd(0x24648b48); //mov rsp, [rsp+0x20]
+	cache_addb(0x20);
+#else
 	// restore stack
 	cache_addb(0x5c);		// pop rsp
+#endif 
 
 	return proc_addr;
 }
@@ -657,7 +652,6 @@ static Bit64u gen_create_branch_long_leqzero(HostReg reg) {
 static void gen_fill_branch_long(Bit64u data) {
 	*(Bit32u*)data=(Bit32u)((Bit64u)cache.pos-data-4);
 }
-
 
 static void gen_run_code(void) {
 	cache_addb(0x53);					// push rbx

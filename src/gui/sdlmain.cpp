@@ -60,44 +60,6 @@
 #define MAPPERFILE "mapper-" VERSION ".map"
 //#define DISABLE_JOYSTICK
 
-#if C_OPENGL
-#include "SDL_opengl.h"
-
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-
-#ifndef GL_ARB_pixel_buffer_object
-#define GL_ARB_pixel_buffer_object 1
-#define GL_PIXEL_PACK_BUFFER_ARB           0x88EB
-#define GL_PIXEL_UNPACK_BUFFER_ARB         0x88EC
-#define GL_PIXEL_PACK_BUFFER_BINDING_ARB   0x88ED
-#define GL_PIXEL_UNPACK_BUFFER_BINDING_ARB 0x88EF
-#endif
-
-#ifndef GL_ARB_vertex_buffer_object
-#define GL_ARB_vertex_buffer_object 1
-typedef void (APIENTRYP PFNGLGENBUFFERSARBPROC) (GLsizei n, GLuint *buffers);
-typedef void (APIENTRYP PFNGLBINDBUFFERARBPROC) (GLenum target, GLuint buffer);
-typedef void (APIENTRYP PFNGLDELETEBUFFERSARBPROC) (GLsizei n, const GLuint *buffers);
-typedef void (APIENTRYP PFNGLBUFFERDATAARBPROC) (GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
-typedef GLvoid* (APIENTRYP PFNGLMAPBUFFERARBPROC) (GLenum target, GLenum access);
-typedef GLboolean(APIENTRYP PFNGLUNMAPBUFFERARBPROC) (GLenum target);
-#endif
-
-PFNGLGENBUFFERSARBPROC glGenBuffersARB = NULL;
-PFNGLBINDBUFFERARBPROC glBindBufferARB = NULL;
-PFNGLDELETEBUFFERSARBPROC glDeleteBuffersARB = NULL;
-PFNGLISBUFFERARBPROC glIsBufferARB = NULL;
-PFNGLBUFFERDATAARBPROC glBufferDataARB = NULL;
-PFNGLMAPBUFFERARBPROC glMapBufferARB = NULL;
-PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB = NULL;
-
-#endif //C_OPENGL
-
 #if !(ENVIRON_INCLUDED)
 extern char** environ;
 #endif
@@ -107,14 +69,6 @@ extern char** environ;
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#if C_DDRAW
-#include <ddraw.h>
-struct private_hwdata
-{
-	LPDIRECTDRAWSURFACE3 dd_surface;
-	LPDIRECTDRAWSURFACE3 dd_writebuf;
-};
-#endif
 
 #define STDOUT_FILE	TEXT("stdout.txt")
 #define STDERR_FILE	TEXT("stderr.txt")
@@ -135,15 +89,6 @@ struct private_hwdata
 #define INCL_WIN
 #include <os2.h>
 #endif
-
-enum SCREEN_TYPES
-{
-	SCREEN_SURFACE,
-	SCREEN_SURFACE_DDRAW,
-	SCREEN_OVERLAY,
-	SCREEN_OPENGL,
-	SCREEN_SDL_RENDER
-};
 
 enum PRIORITY_LEVELS
 {
@@ -182,13 +127,10 @@ struct SDL_Block
 		{
 			Bit16u width, height;
 		} window;
-		Bit8u bpp;
 		bool fullscreen;
 		bool lazy_fullscreen;
 		bool lazy_fullscreen_req;
 		bool doublebuf;
-		SCREEN_TYPES type;
-		SCREEN_TYPES want_type;
 	} desktop;
 	struct
 	{
@@ -197,27 +139,9 @@ struct SDL_Block
 		SDL_Texture* screen_tex;
 		double scaleFactor;
 	} render;
-#if C_OPENGL
-	struct
-	{
-		Bitu pitch;
-		void * framebuf;
-		GLuint buffer;
-		GLuint texture;
-		//GLuint vertexArray;
-		GLint max_texsize;
-		bool bilinear;
-		bool packed_pixel;
-		bool paletted_texture;
-		bool pixel_buffer_object;
-	} opengl;
-#endif
 	struct
 	{
 		SDL_Surface * surface;
-#if C_DDRAW
-		RECT rect;
-#endif
 	} blit;
 	struct
 	{
@@ -277,10 +201,6 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 		}
 
-#if C_OPENGL
-		SDL_GL_CreateContext(s);
-#endif
-
 		sdl.surface = s;
 	}
 
@@ -300,20 +220,16 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			SDL_SetWindowDisplayMode(sdl.surface, &mode);
 		}
 
-		SDL_SetWindowSize(sdl.surface, width, height);
-
-		SDL_RenderClear(sdl.render.renderer);
-
 		if(!fullscreen)
 		{
-			if(SDL_SetWindowFullscreen(sdl.surface, SDL_WINDOW_FULLSCREEN))
-			{
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
-			}
-
 			if(sdl.render.renderer)
 			{
 				SDL_DestroyRenderer(sdl.render.renderer);
+			}
+
+			if(SDL_SetWindowFullscreen(sdl.surface, SDL_WINDOW_FULLSCREEN))
+			{
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 			}
 
 			sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
@@ -323,23 +239,23 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 	}
 	else
 	{
-		SDL_SetWindowSize(sdl.surface, width, height);
-
-		SDL_RenderClear(sdl.render.renderer);
+		if(sdl.render.renderer)
+		{
+			SDL_DestroyRenderer(sdl.render.renderer);
+		}
 
 		if(SDL_SetWindowFullscreen(sdl.surface, 0))
 		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 		}
 
-		if(sdl.render.renderer)
+		if(sdl.curr_w != width || sdl.curr_h != height)
 		{
-			SDL_DestroyRenderer(sdl.render.renderer);
+			SDL_SetWindowSize(sdl.surface, width, height);
+			SDL_SetWindowPosition(sdl.surface, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 
 		sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
-
-		SDL_SetWindowPosition(sdl.surface, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 		fullscreen = false;
 	}
@@ -459,89 +375,29 @@ bool GFX_SDLUsingWinDIB(void)
 /* Reset the screen with current values in the sdl structure */
 Bitu GFX_GetBestMode(Bitu flags)
 {
-#if 0
-	Bitu testbpp, gotbpp;
-	switch(sdl.desktop.want_type)
+	flags |= GFX_SCALING;
+	flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_16);
+
+	flags &= ~GFX_LOVE_8;		//Disable love for 8bpp modes
+								/* Check if we can satisfy the depth it loves */
+	switch(sdl.draw.bpp)
 	{
-	case SCREEN_SURFACE:
-
-	check_surface:
-		flags &= ~GFX_LOVE_8;		//Disable love for 8bpp modes
-									/* Check if we can satisfy the depth it loves */
-		if(flags & GFX_LOVE_8) { testbpp = 8; }
-		else if(flags & GFX_LOVE_15) { testbpp = 15; }
-		else if(flags & GFX_LOVE_16) { testbpp = 16; }
-		else if(flags & GFX_LOVE_32) { testbpp = 32; }
-		else { testbpp = 0; }
-#if C_DDRAW
-		check_gotbpp :
-#endif
-					 gotbpp = (sdl.desktop.fullscreen) ? testbpp : sdl.desktop.bpp;
-
-					 /* If we can't get our favorite mode check for another working one */
-					 switch(gotbpp)
-					 {
-					 case 8:
-						 if(flags & GFX_CAN_8) flags &= ~(GFX_CAN_15 | GFX_CAN_16 | GFX_CAN_32);
-						 break;
-					 case 15:
-						 if(flags & GFX_CAN_15) flags &= ~(GFX_CAN_8 | GFX_CAN_16 | GFX_CAN_32);
-						 break;
-					 case 16:
-						 if(flags & GFX_CAN_16) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_32);
-						 break;
-					 case 24:
-					 case 32:
-						 if(flags & GFX_CAN_32) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_16);
-						 break;
-					 }
-					 flags |= GFX_CAN_RANDOM;
-					 break;
-#if C_DDRAW
-	case SCREEN_SURFACE_DDRAW:
-		if(!(flags&(GFX_CAN_15 | GFX_CAN_16 | GFX_CAN_32))) goto check_surface;
-		if(flags & GFX_LOVE_15) testbpp = 15;
-		else if(flags & GFX_LOVE_16) testbpp = 16;
-		else if(flags & GFX_LOVE_32) testbpp = 32;
-		else testbpp = 0;
-		flags |= GFX_SCALING;
-		goto check_gotbpp;
-#endif
-	case SCREEN_OVERLAY:
-#if C_OPENGL
-	case SCREEN_OPENGL:
-#endif
-	case SCREEN_SDL_RENDER:
-#endif
-		flags |= GFX_SCALING;
-		flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_16);
-
-		flags &= ~GFX_LOVE_8;		//Disable love for 8bpp modes
-									/* Check if we can satisfy the depth it loves */
-		switch(sdl.desktop.bpp)
-		{
-		case 8:
-			if(flags & GFX_CAN_8) flags &= ~(GFX_CAN_15 | GFX_CAN_16 | GFX_CAN_32);
-			break;
-		case 15:
-			if(flags & GFX_CAN_15) flags &= ~(GFX_CAN_8 | GFX_CAN_16 | GFX_CAN_32);
-			break;
-		case 16:
-			if(flags & GFX_CAN_16) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_32);
-			break;
-		case 24:
-		case 32:
-			if(flags & GFX_CAN_32) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_16);
-			break;
-		}
-		flags |= GFX_SCALING;
-#if 0
+	case 8:
+		if(flags & GFX_CAN_8) flags &= ~(GFX_CAN_15 | GFX_CAN_16 | GFX_CAN_32);
 		break;
-	default:
-		goto check_surface;
+	case 15:
+		if(flags & GFX_CAN_15) flags &= ~(GFX_CAN_8 | GFX_CAN_16 | GFX_CAN_32);
+		break;
+	case 16:
+		if(flags & GFX_CAN_16) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_32);
+		break;
+	case 24:
+	case 32:
+		if(flags & GFX_CAN_32) flags &= ~(GFX_CAN_8 | GFX_CAN_15 | GFX_CAN_16);
 		break;
 	}
-#endif
+	flags |= GFX_SCALING;
+
 	return flags;
 }
 
@@ -780,10 +636,7 @@ void GFX_TearDown(void)
 	}
 }
 
-#ifdef C_OPENGL
-const float screenvertices[8] = {-1.0f, -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f};
-float screenTexCoords[8];
-#endif
+#define DEFAULT_PIXEL_FORMAT SDL_PIXELFORMAT_RGBA32
 
 Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scaley, GFX_CallBack_t callback)
 {
@@ -805,265 +658,6 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 		SDL_FreeSurface(sdl.blit.surface);
 		sdl.blit.surface = 0;
 	}
-#if 0
-	switch(sdl.desktop.want_type)
-	{
-	case SCREEN_SURFACE:
-	dosurface:
-		if(flags & GFX_CAN_8) bpp = 8;
-		if(flags & GFX_CAN_15) bpp = 15;
-		if(flags & GFX_CAN_16) bpp = 16;
-		if(flags & GFX_CAN_32) bpp = 32;
-		sdl.desktop.type = SCREEN_SURFACE;
-		sdl.clip.w = width;
-		sdl.clip.h = height;
-		if(sdl.desktop.fullscreen)
-		{
-			if(sdl.desktop.full.fixed)
-			{
-				sdl.clip.x = (Sint16)((sdl.desktop.full.width - width) / 2);
-				sdl.clip.y = (Sint16)((sdl.desktop.full.height - height) / 2);
-				sdl.surface = SDL_SetVideoMode_Wrap(sdl.desktop.full.width, sdl.desktop.full.height, bpp, SDL_WINDOW_FULLSCREEN);
-				if(sdl.surface == NULL) E_Exit("Could not set fullscreen video mode %ix%i-%i: %s", sdl.desktop.full.width, sdl.desktop.full.height, bpp, SDL_GetError());
-			}
-			else
-			{
-				sdl.clip.x = 0; sdl.clip.y = 0;
-				sdl.surface = SDL_SetVideoMode_Wrap(width, height, bpp, SDL_WINDOW_FULLSCREEN);
-				if(sdl.surface == NULL)
-					E_Exit("Could not set fullscreen video mode %ix%i-%i: %s", (int)width, (int)height, bpp, SDL_GetError());
-			}
-		}
-		else
-		{
-			sdl.clip.x = 0; sdl.clip.y = 0;
-			sdl.surface = SDL_SetVideoMode_Wrap(width, height, bpp, 0);
-#ifdef WIN32
-			if(sdl.surface == NULL)
-			{
-				SDL_QuitSubSystem(SDL_INIT_VIDEO);
-				if(!sdl.using_windib)
-				{
-					LOG_MSG("Failed to create hardware surface.\nRestarting video subsystem with windib enabled.");
-					putenv("SDL_VIDEODRIVER=windib");
-					sdl.using_windib = true;
-				}
-				else
-				{
-					LOG_MSG("Failed to create hardware surface.\nRestarting video subsystem with directx enabled.");
-					putenv("SDL_VIDEODRIVER=directx");
-					sdl.using_windib = false;
-				}
-				SDL_InitSubSystem(SDL_INIT_VIDEO);
-				GFX_SetIcon(); //Set Icon again
-				sdl.surface = SDL_SetVideoMode_Wrap(width, height, bpp, 0);
-				if(sdl.surface) GFX_SetTitle(-1, -1, false); //refresh title.
-			}
-#endif
-			if(sdl.surface == NULL)
-				E_Exit("Could not set windowed video mode %ix%i-%i: %s", (int)width, (int)height, bpp, SDL_GetError());
-		}
-		if(sdl.surface)
-		{
-			//switch (sdl.surface->format->BitsPerPixel) {
-			//case 8:
-			//	retFlags = GFX_CAN_8;
-			//    break;
-			//case 15:
-			//	retFlags = GFX_CAN_15;
-			//	break;
-			//case 16:
-			//	retFlags = GFX_CAN_16;
-			//    break;
-			//case 32:
-			retFlags = GFX_CAN_32;
-			// break;
-			//}
-			//if (retFlags && (sdl.surface->flags & SDL_HWSURFACE))
-			retFlags |= GFX_HARDWARE;
-			//if (retFlags && (sdl.surface->flags & SDL_DOUBLEBUF)) {
-
-			SDL_PixelFormat* fmt = SDL_AllocFormat(SDL_GetWindowPixelFormat(sdl.surface));
-
-			if(sdl.blit.surface)
-			{
-				SDL_FreeSurface(sdl.blit.surface);
-			}
-
-			sdl.blit.surface = SDL_CreateRGBSurface(0, sdl.draw.width, sdl.draw.height,
-													fmt->BitsPerPixel,
-													fmt->Rmask,
-													fmt->Gmask,
-													fmt->Bmask, 0);
-
-			SDL_FreeFormat(fmt);
-			/* If this one fails be ready for some flickering... */
-			//}
-		}
-		break;
-#if C_DDRAW
-	case SCREEN_SURFACE_DDRAW:
-		if(flags & GFX_CAN_15) bpp = 15;
-		if(flags & GFX_CAN_16) bpp = 16;
-		if(flags & GFX_CAN_32) bpp = 32;
-		if(!GFX_SetupSurfaceScaled((sdl.desktop.doublebuf && sdl.desktop.fullscreen) ? SDL_DOUBLEBUF : 0, bpp)) goto dosurface;
-		sdl.blit.rect.top = sdl.clip.y;
-		sdl.blit.rect.left = sdl.clip.x;
-		sdl.blit.rect.right = sdl.clip.x + sdl.clip.w;
-		sdl.blit.rect.bottom = sdl.clip.y + sdl.clip.h;
-		sdl.blit.surface = SDL_CreateRGBSurface(SDL_HWSURFACE, sdl.draw.width, sdl.draw.height,
-												sdl.surface->format->BitsPerPixel,
-												sdl.surface->format->Rmask,
-												sdl.surface->format->Gmask,
-												sdl.surface->format->Bmask,
-												0);
-		if(!sdl.blit.surface || (!sdl.blit.surface->flags&SDL_HWSURFACE))
-		{
-			if(sdl.blit.surface)
-			{
-				SDL_FreeSurface(sdl.blit.surface);
-				sdl.blit.surface = 0;
-			}
-			LOG_MSG("Failed to create ddraw surface, back to normal surface.");
-			goto dosurface;
-		}
-		switch(sdl.surface->format->BitsPerPixel)
-		{
-		case 15:
-			retFlags = GFX_CAN_15 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		case 16:
-			retFlags = GFX_CAN_16 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		case 32:
-			retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		}
-		sdl.desktop.type = SCREEN_SURFACE_DDRAW;
-		break;
-#endif
-		//case SCREEN_OVERLAY:
-		//	if (sdl.overlay) {
-		//		SDL_FreeYUVOverlay(sdl.overlay);
-		//		sdl.overlay=0;
-		//	}
-		//	if (!(flags&GFX_CAN_32) || (flags & GFX_RGBONLY)) goto dosurface;
-		//	if (!GFX_SetupSurfaceScaled(0,0)) goto dosurface;
-		//	sdl.overlay=SDL_CreateYUVOverlay(width*2,height,SDL_UYVY_OVERLAY,sdl.surface);
-		//	if (!sdl.overlay) {
-		//		LOG_MSG("SDL: Failed to create overlay, switching back to surface");
-		//		goto dosurface;
-		//	}
-		//	sdl.desktop.type=SCREEN_OVERLAY;
-		//	retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
-		//	break;
-#if C_OPENGL
-	case SCREEN_OPENGL:
-	{
-		if(sdl.opengl.pixel_buffer_object)
-		{
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, 0);
-			if(sdl.opengl.buffer) glDeleteBuffersARB(1, &sdl.opengl.buffer);
-		}
-		else if(sdl.opengl.framebuf)
-		{
-			free(sdl.opengl.framebuf);
-		}
-		sdl.opengl.framebuf = 0;
-		if(!(flags&GFX_CAN_32) || (flags & GFX_RGBONLY)) goto dosurface;
-		int texsize = 2 << int_log2(width > height ? width : height);
-		if(texsize > sdl.opengl.max_texsize)
-		{
-			LOG_MSG("SDL:OPENGL: No support for texturesize of %d, falling back to surface", texsize);
-			goto dosurface;
-		}
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-		SDL_GL_SetSwapInterval(1);
-
-		GFX_SetupSurfaceScaled(SDL_WINDOW_OPENGL, 0);
-
-		SDL_Surface* s = SDL_GetWindowSurface(sdl.surface);
-
-		if(!sdl.surface || s->format->BitsPerPixel < 15)
-		{
-			LOG_MSG("SDL:OPENGL: Can't open drawing surface, are you running in 16bpp (or higher) mode?");
-			goto dosurface;
-		}
-		/* Create the texture and display list */
-		if(sdl.opengl.pixel_buffer_object)
-		{
-			glGenBuffersARB(1, &sdl.opengl.buffer);
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, sdl.opengl.buffer);
-			glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_EXT, width*height * 4, NULL, GL_STREAM_DRAW_ARB);
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, 0);
-		}
-		else
-		{
-			sdl.opengl.framebuf = malloc(width*height * 4);		//32 bit color
-		}
-		sdl.opengl.pitch = width * 4;
-		glViewport(sdl.clip.x, sdl.clip.y, sdl.clip.w, sdl.clip.h);
-		glMatrixMode(GL_PROJECTION);
-		glDeleteTextures(1, &sdl.opengl.texture);
-		glGenTextures(1, &sdl.opengl.texture);
-		glBindTexture(GL_TEXTURE_2D, sdl.opengl.texture);
-		// No borders
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		if(sdl.opengl.bilinear)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		}
-		else
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texsize, texsize, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, 0);
-
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
-		SDL_GL_SwapWindow(sdl.surface);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glShadeModel(GL_FLAT);
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_TEXTURE_2D);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		GLfloat tex_width = ((GLfloat)(width) / (GLfloat)texsize);
-		GLfloat tex_height = ((GLfloat)(height) / (GLfloat)texsize);
-
-		//if (glIsBufferARB(sdl.opengl.vertexArray))
-		//{
-		//	glDeleteBuffersARB(1, &sdl.opengl.vertexArray);
-		//}
-		//
-		//glGenBuffersARB(1, &sdl.opengl.vertexArray);
-
-		screenTexCoords[0] = 0;
-		screenTexCoords[1] = tex_height;
-		screenTexCoords[2] = tex_width;
-		screenTexCoords[3] = tex_height;
-		screenTexCoords[4] = 0;
-		screenTexCoords[5] = 0;
-		screenTexCoords[6] = tex_width;
-		screenTexCoords[7] = 0;
-
-		sdl.desktop.type = SCREEN_OPENGL;
-		retFlags = GFX_CAN_32 | GFX_SCALING;
-		if(sdl.opengl.pixel_buffer_object)
-			retFlags |= GFX_HARDWARE;
-		break;
-	}//OPENGL
-#endif	//C_OPENGL
-	case SCREEN_SDL_RENDER:
-#endif
 	{
 		if(sdl.render.texture)
 		{
@@ -1075,7 +669,7 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
-		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
+		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, DEFAULT_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
 
 		if((double)sdl.curr_w / (double)sdl.curr_h < ((double)sdl.draw.width / (double)sdl.draw.height))
 		{
@@ -1095,8 +689,6 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 
 		sdl.render.screen_tex = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_TARGET, w, h);
 
-		sdl.desktop.type = SCREEN_SDL_RENDER;
-
 		Uint32 f;
 
 		SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
@@ -1115,13 +707,7 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 			break;
 		}
 	}
-#if 0
-	break;
-	default:
-		goto dosurface;
-		break;
-	}//CASE
-#endif
+
 	if(retFlags)
 	{
 		GFX_Start();
@@ -1277,258 +863,46 @@ bool GFX_StartUpdate(Bit8u * & pixels, Bitu & pitch)
 		return false;
 	}
 
-#if 0
-	switch(sdl.desktop.type)
-	{
-	case SCREEN_SURFACE:
-	{
-		SDL_Surface* s = SDL_GetWindowSurface(sdl.surface);
-		if(sdl.blit.surface)
-		{
-			if(SDL_MUSTLOCK(sdl.blit.surface) && SDL_LockSurface(sdl.blit.surface))
-				return false;
-			pixels = (Bit8u *)sdl.blit.surface->pixels;
-			pitch = sdl.blit.surface->pitch;
-		}
-		else
-		{
-			if(SDL_MUSTLOCK(s) && SDL_LockSurface(s))
-				return false;
-			pixels = (Bit8u *)s->pixels;
-			pixels += sdl.clip.y*s->pitch;
-			pixels += sdl.clip.x*s->format->BytesPerPixel;
-			pitch = s->pitch;
-		}
-		sdl.updating = true;
-		return true;
-	}
-#if C_DDRAW
-	case SCREEN_SURFACE_DDRAW:
-		if(SDL_LockSurface(sdl.blit.surface))
-		{
-			//			LOG_MSG("SDL Lock failed");
-			return false;
-		}
-		pixels = (Bit8u *)sdl.blit.surface->pixels;
-		pitch = sdl.blit.surface->pitch;
-		sdl.updating = true;
-		return true;
-#endif
-		//case SCREEN_OVERLAY:
-		//	if (SDL_LockYUVOverlay(sdl.overlay)) return false;
-		//	pixels=(Bit8u *)*(sdl.overlay->pixels);
-		//	pitch=*(sdl.overlay->pitches);
-		//	sdl.updating=true;
-		//	return true;
-#if C_OPENGL
-	case SCREEN_OPENGL:
-		if(sdl.opengl.pixel_buffer_object)
-		{
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, sdl.opengl.buffer);
-			pixels = (Bit8u *)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, GL_WRITE_ONLY);
-		}
-		else
-			pixels = (Bit8u *)sdl.opengl.framebuf;
-		pitch = sdl.opengl.pitch;
-		sdl.updating = true;
-		return true;
-#endif
-	case SCREEN_SDL_RENDER:
-#endif
-	{
-		int i_pitch;
-		void* i_pixels;
+	int i_pitch;
+	void* i_pixels;
 
-		if(SDL_LockTexture(sdl.render.texture, NULL, &i_pixels, &i_pitch) < 0)
-		{
-			return false;
-		}
-
-		pixels = (Bit8u *)i_pixels;
-		pitch = i_pitch;
-		sdl.updating = true;
+	if(SDL_LockTexture(sdl.render.texture, NULL, &i_pixels, &i_pitch) < 0)
+	{
+		return false;
 	}
+
+	pixels = (Bit8u *)i_pixels;
+	pitch = i_pitch;
+	sdl.updating = true;
+
 	return true;
-#if 0
-	default:
-		break;
-	}
-	return false;
-#endif
-}
-
-void drawGLRect()
-{
-#ifdef C_OPENGL
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, (void*)(screenvertices));
-	glTexCoordPointer(2, GL_FLOAT, 0, (void*)(screenTexCoords));
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-#endif
 }
 
 void GFX_EndUpdate(const Bit16u *changedLines)
 {
-#if C_DDRAW
-	int ret;
-#endif
-
 	if(!sdl.updating)
 	{
 		return;
 	}
 
 	sdl.updating = false;
-#if 0
-	switch(sdl.desktop.type)
-	{
-	case SCREEN_SURFACE:
-	{
-		SDL_Surface* sdl__surface = SDL_GetWindowSurface(sdl.surface);
-		if(SDL_MUSTLOCK(sdl__surface))
-		{
-			if(sdl.blit.surface)
-			{
-				SDL_UnlockSurface(sdl.blit.surface);
-				int Blit = SDL_BlitSurface(sdl.blit.surface, 0, sdl__surface, &sdl.clip);
-				LOG(LOG_MISC, LOG_WARN)("BlitSurface returned %d", Blit);
-			}
-			else
-			{
-				SDL_UnlockSurface(sdl__surface);
-			}
-			SDL_UpdateWindowSurface(sdl.surface);
-		}
-		else if(changedLines)
-		{
-			Bitu y = 0, index = 0, rectCount = 0;
-			while(y < sdl.draw.height)
-			{
-				if(!(index & 1))
-				{
-					y += changedLines[index];
-				}
-				else
-				{
-					SDL_Rect *rect = &sdl.updateRects[rectCount++];
-					rect->x = sdl.clip.x;
-					rect->y = sdl.clip.y + y;
-					rect->w = (Bit16u)sdl.draw.width;
-					rect->h = changedLines[index];
-#if 0
-					if(rect->h + rect->y > sdl.surface->h)
-					{
-						LOG_MSG("WTF %d +  %d  >%d", rect->h, rect->y, sdl.surface->h);
-					}
-#endif
-					y += changedLines[index];
-				}
-				index++;
-			}
-			if(rectCount)
-			{
-				SDL_UpdateWindowSurfaceRects(sdl.surface, sdl.updateRects, rectCount);
-			}
 
-		}
-	}
-	break;
-#if C_DDRAW
-	case SCREEN_SURFACE_DDRAW:
-		SDL_UnlockSurface(sdl.blit.surface);
-		ret = IDirectDrawSurface3_Blt(
-			sdl.surface->hwdata->dd_writebuf, &sdl.blit.rect,
-			sdl.blit.surface->hwdata->dd_surface, 0,
-			DDBLT_WAIT, NULL);
-		switch(ret)
-		{
-		case DD_OK:
-			break;
-		case DDERR_SURFACELOST:
-			IDirectDrawSurface3_Restore(sdl.blit.surface->hwdata->dd_surface);
-			IDirectDrawSurface3_Restore(sdl.surface->hwdata->dd_surface);
-			break;
-		default:
-			LOG_MSG("DDRAW: Failed to blit, error %X", ret);
-		}
-		SDL_Flip(sdl.surface);
-		break;
-#endif
-		//case SCREEN_OVERLAY:
-		//	SDL_UnlockYUVOverlay(sdl.overlay);
-		//	SDL_DisplayYUVOverlay(sdl.overlay,&sdl.clip);
-		//	break;
-#if C_OPENGL
-	case SCREEN_OPENGL:
-		if(sdl.opengl.pixel_buffer_object)
-		{
-			glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT);
-			glBindTexture(GL_TEXTURE_2D, sdl.opengl.texture);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-							sdl.draw.width, sdl.draw.height, GL_BGRA_EXT,
-							GL_UNSIGNED_INT_8_8_8_8_REV, 0);
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_EXT, 0);
-			//glCallList(sdl.opengl.displaylist);
+	SDL_UnlockTexture(sdl.render.texture);
 
-			drawGLRect();
+	SDL_SetRenderTarget(sdl.render.renderer, sdl.render.screen_tex);
 
-			SDL_GL_SwapWindow(sdl.surface);
-		}
-		else if(changedLines)
-		{
-			Bitu y = 0, index = 0;
-			glBindTexture(GL_TEXTURE_2D, sdl.opengl.texture);
-			while(y < sdl.draw.height)
-			{
-				if(!(index & 1))
-				{
-					y += changedLines[index];
-				}
-				else
-				{
-					Bit8u *pixels = (Bit8u *)sdl.opengl.framebuf + y * sdl.opengl.pitch;
-					Bitu height = changedLines[index];
-					glTexSubImage2D(GL_TEXTURE_2D, 0, 0, y,
-									sdl.draw.width, height, GL_BGRA_EXT,
-									GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
-					y += height;
-				}
-				index++;
-			}
-			drawGLRect();
-			SDL_GL_SwapWindow(sdl.surface);
-		}
-		break;
-#endif
-	case SCREEN_SDL_RENDER:
-	{
-#endif
-		SDL_UnlockTexture(sdl.render.texture);
+	SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0);
 
-		SDL_SetRenderTarget(sdl.render.renderer, sdl.render.screen_tex);
-
-		SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0);
-
-		SDL_SetRenderTarget(sdl.render.renderer, NULL);
+	SDL_SetRenderTarget(sdl.render.renderer, NULL);
 #ifdef USE_OVERLAY
-		//TODO
-		SDL_RenderClear(sdl.render.renderer);
+	//TODO
+	SDL_RenderClear(sdl.render.renderer);
 #endif
-		SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip);
+	SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip);
 #ifdef USE_OVERLAY
-		drawOverlay();
+	drawOverlay();
 #endif
-		SDL_RenderPresent(sdl.render.renderer);
-#if 0
-	}
-	break;
-	default:
-		break;
-	}
-#endif
+	SDL_RenderPresent(sdl.render.renderer);
 }
 
 void GFX_SetPalette(Bitu start, Bitu count, GFX_PalEntry * entries)
@@ -1547,50 +921,17 @@ void GFX_SetPalette(Bitu start, Bitu count, GFX_PalEntry * entries)
 
 Bitu GFX_GetRGB(Bit8u red, Bit8u green, Bit8u blue)
 {
-	switch(sdl.desktop.type)
-	{
-	case SCREEN_SURFACE:
-	case SCREEN_SURFACE_DDRAW:
-	{
-		SDL_PixelFormat* fmt = SDL_AllocFormat(SDL_GetWindowPixelFormat(sdl.surface));
+	Uint32 f;
 
-		Bitu c = SDL_MapRGB(fmt, red, green, blue);
+	SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
 
-		SDL_FreeFormat(fmt);
+	SDL_PixelFormat* fmt = SDL_AllocFormat(f);
 
-		return c;
-	}
-	case SCREEN_SDL_RENDER:
-	{
-		Uint32 f;
+	Bitu c = SDL_MapRGB(fmt, red, green, blue);
 
-		SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
+	SDL_FreeFormat(fmt);
 
-		SDL_PixelFormat* fmt = SDL_AllocFormat(f);
-
-		Bitu c = SDL_MapRGB(fmt, red, green, blue);
-
-		SDL_FreeFormat(fmt);
-
-		return c;
-	}
-	case SCREEN_OVERLAY:
-	{
-		Bit8u y = (9797 * (red)+19237 * (green)+3734 * (blue)) >> 15;
-		Bit8u u = (18492 * ((blue)-(y)) >> 15) + 128;
-		Bit8u v = (23372 * ((red)-(y)) >> 15) + 128;
-#ifdef WORDS_BIGENDIAN
-		return (y << 0) | (v << 8) | (y << 16) | (u << 24);
-#else
-		return (u << 0) | (y << 8) | (v << 16) | (y << 24);
-#endif
-	}
-	case SCREEN_OPENGL:
-		//		return ((red << 0) | (green << 8) | (blue << 16)) | (255 << 24);
-		//USE BGRA
-		return ((blue << 0) | (green << 8) | (red << 16)) | (255 << 24);
-	}
-	return 0;
+	return c;
 }
 
 void GFX_Stop()
@@ -1667,7 +1008,7 @@ static void SetPriority(PRIORITY_LEVELS level)
 #endif
 	default:
 		break;
-	}
+}
 }
 
 extern Bit8u int10_font_14[256 * 14];
@@ -1791,10 +1132,6 @@ static void GUI_StartUp(Section * sec)
 	}
 	sdl.desktop.doublebuf = section->Get_bool("fulldouble");
 
-#ifdef C_OPENGL
-	sdl.opengl.bilinear = true;
-#endif
-
 	if(!sdl.desktop.full.width || !sdl.desktop.full.height)
 	{
 		//Can only be done on the very first call! Not restartable.
@@ -1822,52 +1159,10 @@ static void GUI_StartUp(Section * sec)
 	if(!sdl.mouse.autoenable) SDL_ShowCursor(SDL_DISABLE);
 	sdl.mouse.autolock = false;
 	sdl.mouse.sensitivity = section->Get_int("sensitivity");
+
 	std::string output = section->Get_string("output");
 
-#if defined(__ANDROID__)|| defined(__IPHONEOS__)
-	output = "sdlrender";
-#endif
-
-#if 0
-	if(output == "surface")
-	{
-		sdl.desktop.want_type = SCREEN_SURFACE;
-#if C_DDRAW
-	}
-	else if(output == "ddraw")
-	{
-		sdl.desktop.want_type = SCREEN_SURFACE_DDRAW;
-#endif
-	}
-	else if(output == "overlay")
-	{
-		sdl.desktop.want_type = SCREEN_OVERLAY;
-#if C_OPENGL
-	}
-	else if(output == "opengl")
-	{
-		sdl.desktop.want_type = SCREEN_OPENGL;
-		//sdl.opengl.bilinear=true;
-	}
-	else if(output == "openglnb")
-	{
-		sdl.desktop.want_type = SCREEN_OPENGL;
-		//sdl.opengl.bilinear=false;
-#endif
-	}
-	else if(output == "sdlrender")
-	{
-#endif
-		sdl.desktop.want_type = SCREEN_SDL_RENDER;
-#if 0
-	}
-	else
-	{
-		LOG_MSG("SDL: Unsupported output device %s, switching back to surface", output.c_str());
-		sdl.desktop.want_type = SCREEN_SURFACE;//SHOULDN'T BE POSSIBLE anymore
-	}
-#endif
-	//sdl.overlay=0;
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, output.c_str());
 
 	int windowHeight = sdl.desktop.fullscreen ? sdl.desktop.full.height : sdl.desktop.window.height;
 	int windowWidth = sdl.desktop.fullscreen ? sdl.desktop.full.width : sdl.desktop.window.width;
@@ -1878,53 +1173,20 @@ static void GUI_StartUp(Section * sec)
 		windowWidth = DEFAULT_WIDTH;
 	}
 
-#if C_OPENGL
-	if(sdl.desktop.want_type == SCREEN_OPENGL)
-	{ /* OPENGL is requested */
-		sdl.surface = SDL_SetVideoMode_Wrap(windowWidth, windowHeight, 0, SDL_WINDOW_OPENGL);
-		if(sdl.surface == NULL)
-		{
-			LOG_MSG("Could not initialize OpenGL, switching back to surface");
-			sdl.desktop.want_type = SCREEN_SURFACE;
-		}
-		else
-		{
-			sdl.opengl.buffer = 0;
-			sdl.opengl.framebuf = 0;
-			sdl.opengl.texture = 0;
-			glGetIntegerv(GL_MAX_TEXTURE_SIZE, &sdl.opengl.max_texsize);
-			glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)SDL_GL_GetProcAddress("glGenBuffersARB");
-			glBindBufferARB = (PFNGLBINDBUFFERARBPROC)SDL_GL_GetProcAddress("glBindBufferARB");
-			glDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)SDL_GL_GetProcAddress("glDeleteBuffersARB");
-			glBufferDataARB = (PFNGLBUFFERDATAARBPROC)SDL_GL_GetProcAddress("glBufferDataARB");
-			glMapBufferARB = (PFNGLMAPBUFFERARBPROC)SDL_GL_GetProcAddress("glMapBufferARB");
-			glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)SDL_GL_GetProcAddress("glUnmapBufferARB");
-			const char * gl_ext = (const char *)glGetString(GL_EXTENSIONS);
-			if(gl_ext && *gl_ext)
-			{
-				sdl.opengl.packed_pixel = (strstr(gl_ext, "EXT_packed_pixels") != NULL);
-				sdl.opengl.paletted_texture = (strstr(gl_ext, "EXT_paletted_texture") != NULL);
-				sdl.opengl.pixel_buffer_object = (strstr(gl_ext, "GL_ARB_pixel_buffer_object") != NULL) &&
-					glGenBuffersARB && glBindBufferARB && glDeleteBuffersARB && glBufferDataARB &&
-					glMapBufferARB && glUnmapBufferARB;
-			}
-			else
-			{
-				sdl.opengl.packed_pixel = sdl.opengl.paletted_texture = false;
-			}
-		}
-	} /* OPENGL is requested end */
-
-#endif	//OPENGL
-	  /* Initialize screen for first time */
+	/* Initialize screen for first time */
 	sdl.surface = SDL_SetVideoMode_Wrap(windowWidth, windowHeight, 0, defaultFlags);
-	if(sdl.surface == NULL) E_Exit("Could not initialize video: %s", SDL_GetError());
-
-	sdl.desktop.bpp = SDL_BITSPERPIXEL(SDL_GetWindowPixelFormat(sdl.surface));
-
-	if(sdl.desktop.bpp == 24)
+	if(sdl.surface == NULL)
 	{
-		LOG_MSG("SDL: You are running in 24 bpp mode, this will slow down things!");
+		E_Exit("Could not initialize video: %s", SDL_GetError());
+	}
+
+	{
+		sdl.draw.bpp = SDL_BITSPERPIXEL(DEFAULT_PIXEL_FORMAT);
+
+		if(sdl.draw.bpp == 24)
+		{
+			LOG_MSG("SDL: You are running in 24 bpp mode, this will slow down things!");
+		}
 	}
 
 	GFX_Stop();
@@ -2049,7 +1311,7 @@ static void GUI_StartUp(Section * sec)
 	SDL_Keymod keystate = SDL_GetModState();
 	if(keystate&KMOD_NUM) startup_state_numlock = true;
 	if(keystate&KMOD_CAPS) startup_state_capslock = true;
-}
+	}
 
 void Mouse_AutoLock(bool enable)
 {
@@ -2484,18 +1746,23 @@ void Config_Add_SDL()
 
 	Pstring = sdl_sec->Add_string("windowresolution", Property::Changeable::Always, "original");
 	Pstring->Set_help("Scale the window to this size IF the output device supports hardware scaling.\n"
-					  "  (output=surface does not!)");
+					  "  (output=software does not!)");
 
-	const char* outputs[] = {
-		"surface", "overlay", "sdlrender",
-#if C_OPENGL
-		"opengl", "openglnb",
+	const char* outputs[] = 
+	{
+		"software",
+		"opengl",
+		"opengles",
+		"opengles2",
+#if defined (MACOSX) || defined(__IPHONEOS__)
+		"metal",
 #endif
-#if C_DDRAW
-		"ddraw",
+#if _WIN32
+		"direct3d",
 #endif
 		0};
-	Pstring = sdl_sec->Add_string("output", Property::Changeable::Always, "surface");
+
+	Pstring = sdl_sec->Add_string("output", Property::Changeable::Always, "direct3d");
 	Pstring->Set_help("What video system to use for output.");
 	Pstring->Set_values(outputs);
 
@@ -2763,13 +2030,14 @@ int main(int argc, char* argv[])
 		//	setbuf(stderr, NULL);					/* No buffering */
 		//} else {
 #ifdef _DEBUG
-		if (AllocConsole()) {
+		if(AllocConsole())
+		{
 			fclose(stdin);
 			fclose(stdout);
 			fclose(stderr);
-			freopen("CONIN$","r",stdin);
-			freopen("CONOUT$","w",stdout);
-			freopen("CONOUT$","w",stderr);
+			freopen("CONIN$", "r", stdin);
+			freopen("CONOUT$", "w", stdout);
+			freopen("CONOUT$", "w", stderr);
 		}
 		SetConsoleTitle("DOSBox Status Window");
 #else
@@ -2812,13 +2080,8 @@ int main(int argc, char* argv[])
 		LOG_MSG("---");
 
 		/* Init SDL */
-#if SDL_VERSION_ATLEAST(1, 2, 14)
-		/* Or debian/ubuntu with older libsdl version as they have done this themselves, but then differently.
-		* with this variable they will work correctly. I've only tested the 1.2.14 behaviour against the windows version
-		* of libsdl
-		*/
 		putenv(const_cast<char*>("SDL_DISABLE_LOCK_KEYS=1"));
-#endif
+
 #ifdef _WIN32
 		putenv("SDL_AUDIODRIVER=directsound");
 #endif
@@ -2844,35 +2107,6 @@ int main(int argc, char* argv[])
 		sdl.laltstate = SDL_KEYUP;
 		sdl.raltstate = SDL_KEYUP;
 
-#if defined (WIN32)
-#if SDL_VERSION_ATLEAST(1, 2, 10)
-		//sdl.using_windib = true;
-#else
-		sdl.using_windib = false;
-#endif
-		//char sdl_drv_name[128];
-		//if (getenv("SDL_VIDEODRIVER")==NULL) {
-		//	if (SDL_VideoDriverName(sdl_drv_name,128)!=NULL) {
-		//		sdl.using_windib=false;
-		//		if (strcmp(sdl_drv_name,"directx")!=0) {
-		//			SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		//			putenv("SDL_VIDEODRIVER=directx");
-		//			if (SDL_InitSubSystem(SDL_INIT_VIDEO)<0) {
-		//				putenv("SDL_VIDEODRIVER=windib");
-		//				if (SDL_InitSubSystem(SDL_INIT_VIDEO)<0) E_Exit("Can't init SDL Video %s",SDL_GetError());
-		//				sdl.using_windib=true;
-		//			}
-		//		}
-		//	}
-		//} else {
-		//	char* sdl_videodrv = getenv("SDL_VIDEODRIVER");
-		//	if (strcmp(sdl_videodrv,"directx")==0) sdl.using_windib = false;
-		//	else if (strcmp(sdl_videodrv,"windib")==0) sdl.using_windib = true;
-		//}
-		//if (SDL_VideoDriverName(sdl_drv_name,128)!=NULL) {
-		//	if (strcmp(sdl_drv_name,"windib")==0) LOG_MSG("SDL_Init: Starting up with SDL windib video driver.\n          Try to update your video card and directx drivers!");
-		//}
-#endif
 		sdl.num_joysticks = SDL_NumJoysticks();
 
 		/* Parse configuration files */
@@ -2970,7 +2204,7 @@ int main(int argc, char* argv[])
 		/* Start up main machine */
 		control->StartUp();
 		/* Shutdown everything */
-	}
+		}
 	catch(char * error)
 	{
 #if defined (WIN32)
@@ -3007,7 +2241,7 @@ int main(int argc, char* argv[])
 
 	SDL_Quit();//Let's hope sdl will quit as well when it catches an exception
 	return 0;
-}
+	}
 
 void GFX_GetSize(int &width, int &height, bool &fullscreen)
 {

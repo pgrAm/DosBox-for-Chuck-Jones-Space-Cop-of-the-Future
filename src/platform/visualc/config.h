@@ -55,6 +55,10 @@
 /* Define to 1 if you want serial passthrough support. */
 //#define C_DIRECTSERIAL 1
 
+#ifdef __clang__
+	#define GCC_ATTRIBUTE(x) /* attribute not supported */
+#endif
+
 #define GCC_ATTRIBUTE(x) /* attribute not supported */
 #define GCC_UNLIKELY(x) (x)
 #define GCC_LIKELY(x) (x)

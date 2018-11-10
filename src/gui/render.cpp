@@ -188,11 +188,6 @@ bool RENDER_StartUpdate(void)
 	Scaler_ChangedLines[0] = 0;
 	Scaler_ChangedLineIndex = 0;
 
-#ifdef _WIN32
-	//TODO, a little sneaky fix for windows fullscreen not updating all the time
-	render.scale.clearCache = true;
-#endif
-
 	/* Clearing the cache will first process the line to make sure it's never the same */
 	if(GCC_UNLIKELY(render.scale.clearCache))
 	{
