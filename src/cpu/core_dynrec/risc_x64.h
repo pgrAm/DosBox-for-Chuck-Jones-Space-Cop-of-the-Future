@@ -408,16 +408,13 @@ static Bit64u INLINE gen_call_function_setup(void * func,Bitu paramcount,bool fa
 	cache_addb(0xf0);
 
 #if defined (_WIN64)
-	//restore our original stack pointer
+	//save our original stack pointer
 	cache_addd(0x24448948); //mov  [rsp+0x20], rax (==old rsp)
 	cache_addb(0x20);
 #else
-	cache_addb(0x48);
-	cache_addw(0xc483);		// add rsp,0x08
+	//save our original stack pointer
+	cache_addd(0x24448948); //mov  [rsp+0x08], rax (==old rsp)
 	cache_addb(0x08);
-
-	// stack is 16 byte aligned now
-	cache_addb(0x50);		// push rax (==old rsp)
 #endif 
 
 	// returned address relates to where the address is stored in gen_call_function_raw

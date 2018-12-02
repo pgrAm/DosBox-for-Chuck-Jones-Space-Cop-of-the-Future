@@ -9,42 +9,41 @@
 /* Define to 1 to enable internal debugger, requires libcurses */
 #define C_DEBUG 0
 
-/* Define to 1 to enable output=ddraw */
-//#define C_DDRAW 1
 
 /* Define to 1 to enable screenshots, requires libpng */
 #define C_SSHOT 1
 
-/* Define to 1 to use opengl display output support */
-//#define C_OPENGL 1
-
-/* Define to 1 to enable internal modem support, requires SDL_net */
-//#define C_MODEM 1
-
-/* Define to 1 to enable IPX networking support, requires SDL_net */
-//#define C_IPX 1
-
-/* Enable some heavy debugging options */
-#define C_HEAVY_DEBUG 0
-
 /* The type of cpu this host has */
+#if defined(__x86_64__)
+#define C_TARGETCPU X86_64
+
+/* Define to 1 to use x86 dynamic cpu core */
+#define C_DYNAMIC_X86 0
+
+/* Define to 1 to use recompiling cpu core. Can not be used together with the dynamic-x86 core */
+#define C_DYNREC 1
+#else
 #define C_TARGETCPU X86
-//#define C_TARGETCPU X86_64
+
+/* Define to 1 to use a x86 assembly fpu core */
+#define C_FPU_X86 1
 
 /* Define to 1 to use x86 dynamic cpu core */
 #define C_DYNAMIC_X86 1
 
 /* Define to 1 to use recompiling cpu core. Can not be used together with the dynamic-x86 core */
 #define C_DYNREC 0
+#endif
+
+/* Enable some heavy debugging options */
+#define C_HEAVY_DEBUG 0
+
 
 /* Enable memory function inlining in */
 #define C_CORE_INLINE 0
 
 /* Enable the FPU module, still only for beta testing */
 #define C_FPU 1
-
-/* Define to 1 to use a x86 assembly fpu core */
-#define C_FPU_X86 1
 
 /* Define to 1 to use a unaligned memory access */
 #define C_UNALIGNED_MEMORY 1
