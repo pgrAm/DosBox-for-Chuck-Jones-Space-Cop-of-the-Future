@@ -186,6 +186,8 @@ void setupFullscreenResolution(int displayindex = 0)
 
 }
 
+void GFX_UpdateSDLCaptureState(void);
+
 SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 {
 
@@ -262,6 +264,11 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 
 	sdl.curr_w = width;
 	sdl.curr_h = height;
+
+	if(sdl.mouse.locked)
+	{
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+	}
 
 	return s;
 }
@@ -552,12 +559,11 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp)
 
 	if(sdl.desktop.fullscreen)
 	{
-
 		setupFullscreenResolution(SDL_GetWindowDisplayIndex(sdl.surface));
 
 		fixedWidth = sdl.desktop.full.fixed ? sdl.desktop.full.width : 0;
 		fixedHeight = sdl.desktop.full.fixed ? sdl.desktop.full.height : 0;
-		sdl_flags |= SDL_WINDOW_FULLSCREEN;// | SDL_HWSURFACE;
+		sdl_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MOUSE_CAPTURE;// | SDL_HWSURFACE;
 	}
 	else
 	{
@@ -727,12 +733,10 @@ void GFX_CaptureMouse(void)
 	if(sdl.mouse.locked)
 	{
 		//SDL_WM_GrabInput(SDL_GRAB_ON);
-		//SDL_ShowCursor(SDL_DISABLE);
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 	else
 	{
-		//SDL_WM_GrabInput(SDL_GRAB_OFF);
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		if(sdl.mouse.autoenable || !sdl.mouse.autolock) SDL_ShowCursor(SDL_ENABLE);
 	}
@@ -744,8 +748,6 @@ void GFX_UpdateSDLCaptureState(void)
 	if(sdl.mouse.locked)
 	{
 		//SDL_WM_GrabInput(SDL_GRAB_ON);
-		//SDL_ShowCursor(SDL_DISABLE);
-
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 	else
@@ -1192,12 +1194,6 @@ static void GUI_StartUp(Section * sec)
 	GFX_Stop();
 	SDL_SetWindowTitle(sdl.surface, "DOSBox");
 
-	/* Setup Mouse correctly if fullscreen */
-	if(sdl.desktop.fullscreen)
-	{
-		GFX_CaptureMouse();
-	}
-
 	/* The endian part is intentionally disabled as somehow it produces correct results without according to rhoenie*/
 	//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	//    Bit32u rmask = 0xff000000;
@@ -1208,6 +1204,20 @@ static void GUI_StartUp(Section * sec)
 	Bit32u gmask = 0x0000ff00;
 	Bit32u bmask = 0x00ff0000;
 	//#endif
+
+	SDL_RenderClear(sdl.render.renderer);
+	SDL_RenderPresent(sdl.render.renderer);
+
+	SDL_RaiseWindow(sdl.surface);
+
+	/* Setup Mouse correctly if fullscreen */
+	if(sdl.desktop.fullscreen)
+	{
+		if(!sdl.mouse.locked)
+		{
+			GFX_CaptureMouse();
+		}
+	}
 
 	/* Please leave the Splash screen stuff in working order in DOSBox. We spend a lot of time making DOSBox. */
 	SDL_Surface* splash_surf = SDL_CreateRGBSurface(SDL_SWSURFACE, windowWidth, windowHeight, 32, rmask, gmask, bmask, 0);

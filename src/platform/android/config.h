@@ -52,6 +52,8 @@ prediction. */
 	#endif
 #endif
 
+#include <stdint.h>
+
 typedef double		Real64;
 /* The internal types */
 typedef uint8_t		Bit8u;

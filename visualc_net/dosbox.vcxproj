@@ -35,7 +35,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -117,7 +117,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../zlib-1.2.3-lib/include;../libpng-1.2.37-lib/include;../include;../src/platform/visualc;../SDL2-2.0.8/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../zlib-1.2.3-lib/include;../libpng-1.2.37-lib/include;../include;../src/platform/visualc;../SDL2-2.0.9/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -140,7 +140,7 @@
       <ProgramDatabaseFile>.\Debug/dosbox.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>../libpng-1.2.37-lib/lib;../zlib-1.2.3-lib/lib;../SDL2-2.0.7/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../libpng-1.2.37-lib/lib;../zlib-1.2.3-lib/lib;../SDL2-2.0.9/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <TypeLibraryName>.\Debug/dosbox.tlb</TypeLibraryName>
@@ -231,10 +231,10 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../zlib-1.2.3-lib/include;../libpng-1.2.37-lib/include;../include;../src/platform/visualc;../SDL2-2.0.8/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../zlib-1.2.3-lib/include;../libpng-1.2.37-lib/include;../include;../src/platform/visualc;../SDL2-2.0.9/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -261,7 +261,7 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <FixedBaseAddress>false</FixedBaseAddress>
-      <AdditionalLibraryDirectories>../libpng-1.2.37-lib/lib;../zlib-1.2.3-lib/lib;../SDL2-2.0.8/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../libpng-1.2.37-lib/lib;../zlib-1.2.3-lib/lib;../SDL2-2.0.9/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <TypeLibraryName>.\Release/dosbox.tlb</TypeLibraryName>

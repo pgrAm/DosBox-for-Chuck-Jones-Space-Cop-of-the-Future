@@ -1212,7 +1212,7 @@ att_text16:
 		att_data[0]=0x0;
 		att_data[1]=0x13;
 		att_data[2]=0x15;
-		att_data[3]=0x17;
+		att_data[3]=0x17; 
 		att_data[4]=0x02;
 		att_data[5]=0x04;
 		att_data[6]=0x06;
