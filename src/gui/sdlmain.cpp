@@ -1493,6 +1493,8 @@ bool GFX_IsFullscreen(void)
 	return sdl.desktop.fullscreen;
 }
 
+void MAPPER_CheckEvent(SDL_Event * event);
+
 void GFX_Events()
 {
 	SDL_Event event;
@@ -1638,7 +1640,7 @@ void GFX_Events()
 					sdlevent.type = SDL_KEYDOWN;
 					sdlevent.key.keysym.scancode = SDL_SCANCODE_LSHIFT;
 
-					SDL_PushEvent(&sdlevent);
+					MAPPER_CheckEvent(&sdlevent);
 				}
 
 				if(character[0] >= 97 && character[0] <= 122)
@@ -1650,13 +1652,13 @@ void GFX_Events()
 				sdlevent.type = SDL_KEYDOWN;
 				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName(character);
 
-				SDL_PushEvent(&sdlevent);
+				MAPPER_CheckEvent(&sdlevent);
 
 				SDL_Event sdlevent1;
 				sdlevent1.type = SDL_KEYUP;
 				sdlevent1.key.keysym.scancode = sdlevent.key.keysym.scancode;
 
-				SDL_PushEvent(&sdlevent1);
+				MAPPER_CheckEvent(&sdlevent1);
 
 				if(character[0] >= 65 && character[0] <= 90)
 				{
@@ -1664,14 +1666,14 @@ void GFX_Events()
 					sdlevent.type = SDL_KEYUP;
 					sdlevent.key.keysym.scancode = SDL_SCANCODE_LSHIFT;
 
-					SDL_PushEvent(&sdlevent);
+					MAPPER_CheckEvent(&sdlevent);
 				}
 			}
 		}
 		break;
-#ifdef WIN32
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
+#ifdef WIN32
 			// ignore event alt+tab
 			if(event.key.keysym.sym == SDL_SCANCODE_LALT) sdl.laltstate = event.key.type;
 			if(event.key.keysym.sym == SDL_SCANCODE_RALT) sdl.raltstate = event.key.type;
@@ -1681,9 +1683,16 @@ void GFX_Events()
 			// ignore tab events that arrive just after regaining focus. (likely the result of alt-tab)
 			if((event.key.keysym.sym == SDL_SCANCODE_TAB) && (GetTicks() - sdl.focus_ticks < 2)) break;
 #endif
+#if defined (__ANDROID__) && defined(__IPHONEOS__)
+			if(SDL_IsTextInputActive()) 
+			{
+				if(event.key.keysym.scancode != SDL_SCANCODE_BACKSPACE && event.key.keysym.scancode != SDL_SCANCODE_RETURN)
+				{
+					break;
+				}
+			}
+#endif
 #if defined (MACOSX) && !defined(__IPHONEOS__)
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
 			/* On macs CMD-Q is the default key to close an application */
 			if(event.key.keysym.sym == SDL_SCANCODE_q && (event.key.keysym.mod == KMOD_RALT || event.key.keysym.mod == KMOD_LALT))
 			{
@@ -1692,7 +1701,6 @@ void GFX_Events()
 			}
 #endif
 		default:
-			void MAPPER_CheckEvent(SDL_Event * event);
 			MAPPER_CheckEvent(&event);
 		}
 	}
