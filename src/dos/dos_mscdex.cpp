@@ -15,7 +15,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
+#ifdef CDROM_ENABLED
 
 #include <string.h>
 #include <ctype.h>
@@ -1357,3 +1357,4 @@ void MSCDEX_Init(Section* sec) {
 	/* Create MSCDEX */
 	mscdex = new CMscdex;
 }
+#endif

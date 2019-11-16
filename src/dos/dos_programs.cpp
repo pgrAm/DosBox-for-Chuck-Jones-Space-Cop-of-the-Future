@@ -29,7 +29,9 @@
 #include "cross.h"
 #include "regs.h"
 #include "callback.h"
+#ifdef CDROM_ENABLED
 #include "cdrom.h"
+#endif
 #include "dos_system.h"
 #include "dos_inc.h"
 #include "bios.h"
@@ -203,6 +205,7 @@ public:
 			return;
 		}
 
+#ifdef CDROM_ENABLED
 		/* Show list of cdroms */
 		if (cmd->FindExist("-cd",false)) {
 			int num = SDL_CDNumDrives();
@@ -212,6 +215,7 @@ public:
 			};
 			return;
 		}
+#endif
 
 		std::string type="dir";
 		cmd->FindString("-t",type,true);
@@ -352,7 +356,9 @@ public:
 
 			if (temp_line[temp_line.size()-1]!=CROSS_FILESPLIT) temp_line+=CROSS_FILESPLIT;
 			Bit8u bit8size=(Bit8u) sizes[1];
+
 			if (type=="cdrom") {
+#ifdef CDROM_ENABLED
 				int num = -1;
 				cmd->FindInt("-usecd",num,true);
 				int error = 0;
@@ -399,6 +405,7 @@ public:
 					delete newdrive;
 					return;
 				}
+#endif
 			} else {
 				/* Give a warning when mount c:\ or the / */
 #if defined (WIN32) || defined(OS2)
@@ -415,8 +422,12 @@ public:
 						return;
 					}
 					localDrive* ldp = dynamic_cast<localDrive*>(Drives[drive-'A']);
+#ifdef CDROM_ENABLED
 					cdromDrive* cdp = dynamic_cast<cdromDrive*>(Drives[drive-'A']);
 					if (!ldp || cdp) {
+#else
+					if (!ldp) {
+#endif
 						WriteOut("Basedrive not compatible");
 						return;
 					}
@@ -1465,7 +1476,7 @@ public:
 				}
 			}
 		} else if (fstype=="iso") {
-
+#ifdef CDROM_ENABLED
 			if (Drives[drive-'A']) {
 				WriteOut(MSG_Get("PROGRAM_IMGMOUNT_ALREADY_MOUNTED"));
 				return;
@@ -1498,6 +1509,7 @@ public:
 					return;
 				}
 			}
+
 			// Update DriveManager
 			for(ct = 0; ct < isoDisks.size(); ct++) {
 				DriveManager::AppendDisk(drive - 'A', isoDisks[ct]);
@@ -1514,7 +1526,7 @@ public:
 				tmp += "; " + paths[i];
 			}
 			WriteOut(MSG_Get("PROGRAM_MOUNT_STATUS_2"), drive, tmp.c_str());
-
+#endif
 		} else if (fstype == "none") {
 			FILE *newDisk = fopen_wrap(temp_line.c_str(), "rb+");
 			if (!newDisk) {

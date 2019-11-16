@@ -19,6 +19,7 @@
 
 #ifndef __CDROM_INTERFACE__
 #define __CDROM_INTERFACE__
+#ifdef CDROM_ENABLED
 
 #define MAX_ASPI_CDROM	5
 
@@ -426,5 +427,6 @@ private:
 };
 
 #endif /* LINUX */
+#endif
 
 #endif /* __CDROM_INTERFACE__ */
