@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -52,7 +52,7 @@ Bit8u DOS_GetDefaultDrive(void) {
 
 void DOS_SetDefaultDrive(Bit8u drive) {
 //	if (drive<=DOS_DRIVES && ((drive<2) || Drives[drive])) DOS_SDA(DOS_SDA_SEG,DOS_SDA_OFS).SetDrive(drive);
-	if (drive<=DOS_DRIVES && ((drive<2) || Drives[drive])) {dos.current_drive = drive; DOS_SDA(DOS_SDA_SEG,DOS_SDA_OFS).SetDrive(drive);}
+	if (drive<DOS_DRIVES && ((drive<2) || Drives[drive])) {dos.current_drive = drive; DOS_SDA(DOS_SDA_SEG,DOS_SDA_OFS).SetDrive(drive);}
 }
 
 bool DOS_MakeName(char const * const name,char * const fullname,Bit8u * drive) {
@@ -971,6 +971,20 @@ bool DOS_FCBOpen(Bit16u seg,Bit16u offset) {
 	char shortname[DOS_FCBNAME];Bit16u handle;
 	fcb.GetName(shortname);
 
+	/* Search for file if name has wildcards */
+	if (strpbrk(shortname,"*?")) {
+		LOG(LOG_FCB,LOG_WARN)("Wildcards in filename");
+		if (!DOS_FCBFindFirst(seg,offset)) return false;
+		DOS_DTA find_dta(dos.tables.tempdta);
+		DOS_FCB find_fcb(RealSeg(dos.tables.tempdta),RealOff(dos.tables.tempdta));
+		char name[DOS_NAMELENGTH_ASCII],file_name[9],ext[4];
+		Bit32u size;Bit16u date,time;Bit8u attr;
+		find_dta.GetResult(name,size,date,time,attr);
+		DTAExtendName(name,file_name,ext);
+		find_fcb.SetName(fcb.GetDrive()+1,file_name,ext);
+		find_fcb.GetName(shortname);
+	}
+
 	/* First check if the name is correct */
 	Bit8u drive;
 	char fullname[DOS_PATHLENGTH];
@@ -1274,7 +1288,7 @@ bool DOS_GetAllocationInfo(Bit8u drive,Bit16u * _bytes_sector,Bit8u * _sectors_c
 	Bit16u _free_clusters;
 	Drives[drive]->AllocationInfo(_bytes_sector,_sectors_cluster,_total_clusters,&_free_clusters);
 	SegSet16(ds,RealSeg(dos.tables.mediaid));
-	reg_bx=RealOff(dos.tables.mediaid+drive*2);
+	reg_bx=RealOff(dos.tables.mediaid+drive*9);
 	return true;
 }
 

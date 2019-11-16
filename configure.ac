@@ -1,5 +1,5 @@
 dnl Init.
-AC_INIT(dosbox,SVN)
+AC_INIT(dosbox,git)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(README)
 
@@ -62,6 +62,9 @@ AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(unsigned long long)
 AC_CHECK_SIZEOF(int *)
+
+dnl Require compiler with C++11 support, do not use GNU extensions.
+AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
 
 dnl some semi complex check for sys/socket so it works on darwin as well
 AC_CHECK_HEADERS([stdlib.h sys/types.h])
@@ -189,6 +192,33 @@ CXXFLAGS="$CXXFLAGS -mno-ms-bitfields"
 ],[AC_MSG_RESULT([no])])
 CFLAGS="$BACKUP_CFLAGS"
 
+dnl When on macOS, enable support for Apple's Core MIDI and/or Core Audio if our compiler can #include their headers
+case "$host" in
+  *-*-darwin*)
+   AC_MSG_CHECKING(if compiler supports Apple's Core MIDI headers)
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+   #include <CoreMIDI/MIDIServices.h>
+   int blah() { return 0; }
+   ]])], [AC_MSG_RESULT(yes);LIBS="$LIBS -framework CoreMIDI";AC_DEFINE([C_SUPPORTS_COREMIDI], [],
+   [Compiler supports Core MIDI headers])],
+   AC_MSG_RESULT(no);AC_MSG_WARN([Compiler can't compile Apple headers. CoreMIDI functionality disabled. Please use the Apple compiler!]))
+
+   AC_MSG_CHECKING(if compiler supports Apple's Core Audio headers)
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+   #include <AudioToolbox/AUGraph.h>
+   #include <CoreServices/CoreServices.h>
+   int blah() { return 0; }
+   ]])], [AC_MSG_RESULT(yes);LIBS="$LIBS -framework AudioUnit -framework AudioToolbox";AC_DEFINE([C_SUPPORTS_COREAUDIO], [],
+   [Compiler supports Core Audio headers])], 
+   AC_MSG_RESULT(no);AC_MSG_WARN([Compiler can't compile Apple headers. CoreAudio functionality disabled. Please use the Apple compiler!]))
+   ;;
+
+  *)
+   AC_MSG_CHECKING(if compiler supports Apple's MIDI headers)
+   AC_MSG_RESULT([no, not on Apple])
+   ;;
+esac
+
 dnl enable disable alsa and pass it's cflags to CXXFLAGS
 AC_ARG_ENABLE(alsa-midi,
 AC_HELP_STRING([--enable-alsa-midi],[compile with alsa midi support (default yes)]),
@@ -216,14 +246,14 @@ AC_ARG_ENABLE(debug,AC_HELP_STRING([--enable-debug],[Enable debug mode]),[
 
    if test x$enable_debug = xno; then
      AC_MSG_RESULT([Debugger not enabled])
-   elif test x$have_curses_lib = xyes -a x$have_curses_h = xyes ; then
-     LIBS="$LIBS -lcurses"
+   elif test x$have_ncurses_lib = xyes -a x$have_curses_h = xyes ; then
+     LIBS="$LIBS -lncurses"
      AC_DEFINE(C_DEBUG,1)
      if test x$enable_debug = xheavy ; then 
        AC_DEFINE(C_HEAVY_DEBUG,1)
      fi
-   elif test x$have_ncurses_lib = xyes -a x$have_curses_h = xyes ; then
-     LIBS="$LIBS -lncurses"
+   elif test x$have_curses_lib = xyes -a x$have_curses_h = xyes ; then
+     LIBS="$LIBS -lcurses"
      AC_DEFINE(C_DEBUG,1)
      if test x$enable_debug = xheavy ; then 
        AC_DEFINE(C_HEAVY_DEBUG,1)
@@ -240,13 +270,14 @@ AC_ARG_ENABLE(debug,AC_HELP_STRING([--enable-debug],[Enable debug mode]),[
 ],)
 
 AH_TEMPLATE(C_CORE_INLINE,[Define to 1 to use inlined memory functions in cpu core])
-AC_ARG_ENABLE(core-inline,AC_HELP_STRING([--enable-core-inline],[Enable inlined memory handling in CPU Core]),[
-  if test x$enable_core_inline = xyes ; then 
-    AC_MSG_RESULT([enabling inlined memory handling in CPU Core])
+AC_ARG_ENABLE(core-inline,AC_HELP_STRING([--disable-core-inline],[Disable inlined memory handling in CPU Core]),,enable_core_inline=yes)
+AC_MSG_CHECKING(whether memory handling in the CPU Core will be inlined)
+if test x$enable_core_inline = xyes ; then
+    AC_MSG_RESULT(yes)
     AC_DEFINE(C_CORE_INLINE,1)
-  fi
-],)
-
+else
+    AC_MSG_RESULT(no)
+fi
 
 dnl The target cpu checks for dynamic cores
 AH_TEMPLATE(C_TARGETCPU,[The type of cpu this target has])
@@ -276,6 +307,24 @@ case "$host_cpu" in
     c_targetcpu="m68k"
     c_unalignedmemory=yes
     ;;
+   armv7l)
+    AC_DEFINE(C_TARGETCPU,ARMV7LE)
+    AC_MSG_RESULT(ARMv7 Little Endian)
+    c_targetcpu="arm"
+    c_unalignedmemory=yes
+    ;;
+   armv6l)
+    AC_DEFINE(C_TARGETCPU,ARMV4LE)
+    AC_MSG_RESULT(ARMv6 Little Endian)
+    c_targetcpu="arm"
+    dnl c_unalignedmemory=yes
+    ;;
+   aarch64)
+    AC_DEFINE(C_TARGETCPU,ARMV8LE)
+    AC_MSG_RESULT(ARMv8 Little Endian 64-bit)
+    c_targetcpu="arm"
+    c_unalignedmemory=yes
+    ;;
    *)
     AC_DEFINE(C_TARGETCPU,UNKNOWN)
     AC_MSG_RESULT(unknown)
@@ -283,15 +332,45 @@ case "$host_cpu" in
     ;;
 esac
 
+dnl check for size of pointer being 4 
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+#if SIZEOF_INT_P != 4
+#error size intp is not 4, this not something to worry about
+#endif
+void blah() {
+;
+}
+])],[c_sizep=4],[c_sizep=0])
+
+
+dnl automake 1.14 and upwards rewrite the host to have always 64 bit unless i386 as host is passed
+dnl this can make building a 32 bit executable a bit tricky, as dosbox relies on the host to select the
+dnl dynamic/dynrec core
+AC_MSG_CHECKING([whether Apple user wants to override the build process to produce a 32 bit binary])
+case "$host" in 
+  *-*-darwin*)
+   if test x$c_targetcpu = xx86_64 -a x$c_sizep = x4 ; then
+     AC_MSG_RESULT(yes)
+     AC_DEFINE(C_TARGETCPU,X86)
+     c_targetcpu="x86"
+   else
+     AC_MSG_RESULT(no)
+   fi
+   ;;
+  *)
+   AC_MSG_RESULT([no, not on Apple])
+   ;;
+esac
+
 AC_ARG_ENABLE(dynamic-core,AC_HELP_STRING([--disable-dynamic-core],[Disable all dynamic cores]),,enable_dynamic_core=yes)
 
-AH_TEMPLATE(C_DYNAMIC_X86,[Define to 1 to use x86 dynamic cpu core])
-AC_ARG_ENABLE(dynamic-x86,AC_HELP_STRING([--disable-dynamic-x86],[Disable x86 dynamic cpu core]),,enable_dynamic_x86=yes)
+AH_TEMPLATE(C_DYNAMIC_X86,[Define to 1 to use x86/x64 dynamic cpu core])
+AC_ARG_ENABLE(dynamic-x86,AC_HELP_STRING([--disable-dynamic-x86],[Disable x86/x64 dynamic cpu core]),,enable_dynamic_x86=yes)
 AC_MSG_CHECKING(whether x86 dynamic cpu core will be enabled) 
 if test x$enable_dynamic_x86 = xno -o x$enable_dynamic_core = xno; then 
    AC_MSG_RESULT(no)
 else
-  if test x$c_targetcpu = xx86 ; then
+  if test x$c_targetcpu = xx86 -o x$c_targetcpu = xx86_64; then
       AC_DEFINE(C_DYNAMIC_X86,1)
       AC_MSG_RESULT(yes)
   else
@@ -306,7 +385,7 @@ if test x$enable_dynrec = xno -o x$enable_dynamic_core = xno; then
    AC_MSG_RESULT(no)
 else
 dnl x86 only enable it if dynamic-x86 is disabled.
-  if test x$c_targetcpu = xx86 ; then
+  if test x$c_targetcpu = xx86 -o x$c_targetcpu = xx86_64; then
     if test x$enable_dynamic_x86 = xno ; then
         AC_DEFINE(C_DYNREC,1)
         AC_MSG_RESULT(yes)
@@ -314,10 +393,10 @@ dnl x86 only enable it if dynamic-x86 is disabled.
         AC_MSG_RESULT([no, using dynamic-x86])
     fi
   else 
-    if test x$c_targetcpu = xx86_64 ; then
-        AC_DEFINE(C_DYNREC,1)
-        AC_MSG_RESULT(yes)
-    else      
+    if test x$c_targetcpu = xarm ; then
+      AC_DEFINE(C_DYNREC,1)
+      AC_MSG_RESULT(yes)
+    else 
       AC_MSG_RESULT(no)
     fi
   fi
@@ -363,13 +442,20 @@ else
 fi
 
 AH_TEMPLATE(C_SSHOT,[Define to 1 to enable screenshots, requires libpng])
+AC_ARG_ENABLE(screenshots,AC_HELP_STRING([--disable-screenshots],[Disable screenshots and movie recording]),,enable_screenshots=yes)
 AC_CHECK_HEADER(png.h,have_png_h=yes,)
 AC_CHECK_LIB(png, png_get_io_ptr, have_png_lib=yes, ,-lz)
-if test x$have_png_lib = xyes -a x$have_png_h = xyes ; then
-  LIBS="$LIBS -lpng -lz"
-  AC_DEFINE(C_SSHOT,1)
+AC_MSG_CHECKING([whether screenshots will be enabled])
+if test x$enable_screenshots = xyes; then 
+    if test x$have_png_lib = xyes -a x$have_png_h = xyes ; then
+    LIBS="$LIBS -lpng -lz"
+    AC_DEFINE(C_SSHOT,1)
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no, can't find libpng.])
+  fi
 else
-  AC_MSG_WARN([Can't find libpng, screenshot support disabled])
+  AC_MSG_RESULT([no])
 fi
 
 AH_TEMPLATE(C_MODEM,[Define to 1 to enable internal modem support, requires SDL_net])
@@ -394,6 +480,11 @@ if test x$have_sdl_net_lib = xyes -a x$have_sdl_net_h = xyes ; then
 else 
    AC_MSG_WARN([Can't find SDL_net, internal modem and ipx disabled])
 fi
+
+# Check for the Opus file-handling library
+PKG_CHECK_MODULES([OPUSFILE], [opusfile],
+  [ LIBS="$LIBS ${OPUSFILE_LIBS}"
+    CPPFLAGS="$CPPFLAGS ${OPUSFILE_CFLAGS}" ], [])
 
 AH_TEMPLATE(C_X11_XKB,[define to 1 if you have XKBlib.h and X11 lib])
 AC_CHECK_LIB(X11, main, have_x11_lib=yes, have_x11_lib=no, )
@@ -434,6 +525,8 @@ case "$host" in
        fi
        ;;
 esac
+else
+   AC_MSG_RESULT(no)
 fi
 
 AH_TEMPLATE(C_DDRAW,[Define to 1 to enable output=ddraw (Win32)])
@@ -456,26 +549,14 @@ case "$host" in
 esac
 fi
 
-AH_TEMPLATE(C_SDL_SOUND,[Define to 1 to enable SDL_sound support])
-AC_CHECK_HEADER(SDL_sound.h,have_SDL_sound_h=yes,)
-AC_CHECK_LIB(SDL_sound, Sound_Init, have_SDL_sound_init=yes,,)
-AC_CHECK_LIB(SDL_sound, Sound_Seek, have_SDL_sound_seek=yes,,)
-if test x$have_SDL_sound_h = xyes -a x$have_SDL_sound_init = xyes ; then
-  if test x$have_SDL_sound_seek = xyes ; then
-    LIBS="-lSDL_sound $LIBS"
-    AC_DEFINE(C_SDL_SOUND,1)
-   else 
-     AC_MSG_WARN([Can't find SoundSeek in libSDL_Sound, libSDL_sound support disabled])
-   fi
-else
-  AC_MSG_WARN([Can't find libSDL_sound, libSDL_sound support disabled])
-fi
-
-dnl Check for mprotect. Needed for 64 bits linux 
+dnl Check for mprotect. Needed for 64 bits linux
 AH_TEMPLATE(C_HAVE_MPROTECT,[Define to 1 if you have the mprotect function])
 AC_CHECK_HEADER([sys/mman.h], [
 AC_CHECK_FUNC([mprotect],[AC_DEFINE(C_HAVE_MPROTECT,1)])
 ])
+
+dnl Check for realpath. Used on Linux
+AC_CHECK_FUNCS([realpath])
 
 dnl Setpriority
 AH_TEMPLATE(C_SET_PRIORITY,[Define to 1 if you have setpriority support])
@@ -490,8 +571,9 @@ int main(int argc,char * argv[]) {
 
 dnl Some target detection and actions for them
 case "$host" in
-    *-*-cygwin* | *-*-mingw32*)
+    *-*-cygwin* | *-*-mingw* | *-*-msys*)
        LIBS="$LIBS -lwinmm"
+       AC_DEFINE(WIN32, 1, [Compiling on Windows])
        AC_DEFINE(C_DIRECTSERIAL, 1, [ Define to 1 if you want serial passthrough support (Win32, Posix and OS/2 only).])
        if test x$have_sdl_net_lib = xyes -a x$have_sdl_net_h = xyes ; then
          LIBS="$LIBS -lws2_32"
@@ -503,7 +585,6 @@ case "$host" in
        dnl to do more to distinguish them.
        dnl For now I am lazy and do not add proper detection code.
        AC_DEFINE(MACOSX, 1, [Compiling on Mac OS X])
-       LIBS="$LIBS -framework CoreMIDI -framework AudioUnit -framework AudioToolbox"
        AC_DEFINE(C_DIRECTSERIAL, 1, [ Define to 1 if you want serial passthrough support (Win32, Posix and OS/2).])
        ;;
     *-*-linux*)
@@ -552,11 +633,13 @@ src/dos/Makefile
 src/fpu/Makefile
 src/gui/Makefile
 src/hardware/Makefile
+src/hardware/mame/Makefile
 src/hardware/serialport/Makefile
 src/ints/Makefile
 src/libs/Makefile
 src/libs/zmbv/Makefile
 src/libs/gui_tk/Makefile
+src/libs/decoders/Makefile
 src/misc/Makefile
 src/shell/Makefile
 src/platform/Makefile

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -104,7 +104,6 @@ void DEBUG_Init(Section*);
 void CMOS_Init(Section*);
 
 #ifdef CDROM_ENABLED
-
 void MSCDEX_Init(Section*);
 void DRIVES_Init(Section*);
 void CDROM_Image_Init(Section*);
@@ -436,9 +435,9 @@ void DOSBOX_Init(void) {
 	Pint->SetMinMax(1,63);
 	Pint->Set_help(
 		"Amount of memory DOSBox has in megabytes.\n"
-		"  This value is best left at its default to avoid problems with some games,\n"
-		"  though few games might require a higher value.\n"
-		"  There is generally no speed advantage when raising this value.");
+		"This value is best left at its default to avoid problems with some games,\n"
+		"though few games might require a higher value.\n"
+		"There is generally no speed advantage when raising this value.");
 	secprop->AddInitFunction(&CALLBACK_Init);
 	secprop->AddInitFunction(&PIC_Init);//done
 	secprop->AddInitFunction(&PROGRAMS_Init);
@@ -451,15 +450,17 @@ void DOSBOX_Init(void) {
 	Pint->Set_help("How many frames DOSBox skips before drawing one.");
 
 	Pbool = secprop->Add_bool("aspect",Property::Changeable::Always,false);
-	Pbool->Set_help("Do aspect correction, if your output method doesn't support scaling this can slow things down!.");
+	Pbool->Set_help("Do aspect correction, if your output method doesn't support scaling this can slow things down!");
 
 	Pmulti = secprop->Add_multi("scaler",Property::Changeable::Always," ");
 	Pmulti->SetValue("normal2x");
 	Pmulti->Set_help("Scaler used to enlarge/enhance low resolution modes. If 'forced' is appended,\n"
-	                 "then the scaler will be used even if the result might not be desired.");
+	                 "then the scaler will be used even if the result might not be desired.\n"
+					 "To fit a scaler in the resolution used at full screen may require a border or side bars,\n"
+					 "to fill the screen entirely, depending on your hardware, a different scaler/fullresolution might work.");
 	Pstring = Pmulti->GetSection()->Add_string("type",Property::Changeable::Always,"normal2x");
 
-	const char *scalers[] = {
+	const char* scalers[] = {
 		"none", "normal2x", "normal3x", "normal4x", "normal5x",
 #if RENDER_USE_ADVANCED_SCALERS>2
 		"advmame2x", "advmame3x", "advinterp2x", "advinterp3x", "hq2x", "hq3x", "2xsai", "super2xsai", "supereagle",
@@ -565,10 +566,10 @@ void DOSBOX_Init(void) {
 
 	Pstring = secprop->Add_string("midiconfig",Property::Changeable::WhenIdle,"");
 	Pstring->Set_help("Special configuration options for the device driver. This is usually the id or part of the name of the device you want to use (find the id/name with mixer/listmidi).\n"
-	                  "  Or in the case of coreaudio, you can specify a soundfont here.\n"
-	                  "  When using a Roland MT-32 rev. 0 as midi output device, some games may require a delay in order to prevent 'buffer overflow' issues.\n"
-	                  "  In that case, add 'delaysysex', for example: midiconfig=2 delaysysex\n"
-	                  "  See the README/Manual for more details.");
+	                  "Or in the case of coreaudio, you can specify a soundfont here.\n"
+	                  "When using a Roland MT-32 rev. 0 as midi output device, some games may require a delay in order to prevent 'buffer overflow' issues.\n"
+	                  "In that case, add 'delaysysex', for example: midiconfig=2 delaysysex\n"
+	                  "See the README/Manual for more details.");
 
 #if C_DEBUG
 	secprop=control->AddSection_prop("debug",&DEBUG_Init);
@@ -605,7 +606,7 @@ void DOSBOX_Init(void) {
 	Pstring->Set_values(oplmodes);
 	Pstring->Set_help("Type of OPL emulation. On 'auto' the mode is determined by sblaster type. All OPL modes are Adlib-compatible, except for 'cms'.");
 
-	const char* oplemus[]={ "default", "compat", "fast", 0};
+	const char* oplemus[]={ "default", "compat", "fast", "mame", 0};
 	Pstring = secprop->Add_string("oplemu",Property::Changeable::WhenIdle,"default");
 	Pstring->Set_values(oplemus);
 	Pstring->Set_help("Provider for the OPL emulation. compat might provide better quality (see oplrate as well).");
@@ -668,7 +669,7 @@ void DOSBOX_Init(void) {
 	secprop=control->AddSection_prop("joystick",&BIOS_Init,false);//done
 	secprop->AddInitFunction(&INT10_Init);
 	secprop->AddInitFunction(&MOUSE_Init); //Must be after int10 as it uses CurMode
-	secprop->AddInitFunction(&JOYSTICK_Init);
+	secprop->AddInitFunction(&JOYSTICK_Init,true);
 	const char* joytypes[] = { "auto", "2axis", "4axis", "4axis_2", "fcs", "ch", "none",0};
 	Pstring = secprop->Add_string("joysticktype",Property::Changeable::WhenIdle,"auto");
 	Pstring->Set_values(joytypes);
@@ -689,10 +690,18 @@ void DOSBOX_Init(void) {
 	Pbool->Set_help("continuously fires as long as you keep the button pressed.");
 
 	Pbool = secprop->Add_bool("swap34",Property::Changeable::WhenIdle,false);
-	Pbool->Set_help("swap the 3rd and the 4th axis. can be useful for certain joysticks.");
+	Pbool->Set_help("swap the 3rd and the 4th axis. Can be useful for certain joysticks.");
 
 	Pbool = secprop->Add_bool("buttonwrap",Property::Changeable::WhenIdle,false);
 	Pbool->Set_help("enable button wrapping at the number of emulated buttons.");
+	
+	Pbool = secprop->Add_bool("circularinput",Property::Changeable::WhenIdle,false);
+	Pbool->Set_help("enable translation of circular input to square output.\n"
+	                "Try enabling this if your left analog stick can only move in a circle.");
+
+	Pint = secprop->Add_int("deadzone",Property::Changeable::WhenIdle,10);
+	Pint->SetMinMax(0,100);
+	Pint->Set_help("the percentage of motion to ignore. 100 turns the stick into a digital one.");
 
 	secprop=control->AddSection_prop("serial",&SERIAL_Init,true);
 	const char* serials[] = { "dummy", "disabled", "modem", "nullmodem",

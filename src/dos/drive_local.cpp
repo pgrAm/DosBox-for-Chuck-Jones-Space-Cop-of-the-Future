@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -22,7 +22,6 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
-#include <sys/stat.h>
 
 #include "dosbox.h"
 #include "dos_inc.h"
@@ -40,16 +39,16 @@ bool localDrive::FileCreate(DOS_File * * file,char * name,Bit16u /*attributes*/)
 	CROSS_FILENAME(newname);
 	char* temp_name = dirCache.GetExpandName(newname); //Can only be used in till a new drive_cache action is preformed */
 	/* Test if file exists (so we need to truncate it). don't add to dirCache then */
-	bool existing_file=false;
+	bool existing_file = false;
 	
-	FILE * test=fopen(temp_name,"rb+");
+	FILE * test = fopen_wrap(temp_name,"rb+");
 	if(test) {
 		fclose(test);
 		existing_file=true;
 
 	}
 	
-	FILE * hand=fopen(temp_name,"wb+");
+	FILE * hand = fopen_wrap(temp_name,"wb+");
 	if (!hand){
 		LOG_MSG("Warning: file creation failed: %s",newname);
 		return false;
@@ -96,11 +95,11 @@ bool localDrive::FileOpen(DOS_File * * file,char * name,Bit32u flags) {
 		}
 	}
 
-	FILE * hand=fopen(newname,type);
+	FILE * hand = fopen_wrap(newname,type);
 //	Bit32u err=errno;
 	if (!hand) { 
 		if((flags&0xf) != OPEN_READ) {
-			FILE * hmm=fopen(newname,"rb");
+			FILE * hmm = fopen_wrap(newname,"rb");
 			if (hmm) {
 				fclose(hmm);
 				LOG_MSG("Warning: file %s exists and failed to open in write mode.\nPlease Remove write-protection",newname);
@@ -123,7 +122,7 @@ FILE * localDrive::GetSystemFilePtr(char const * const name, char const * const 
 	CROSS_FILENAME(newname);
 	dirCache.ExpandName(newname);
 
-	return fopen(newname,type);
+	return fopen_wrap(newname,type);
 }
 
 bool localDrive::GetSystemFilename(char *sysName, char const * const dosName) {
@@ -146,7 +145,7 @@ bool localDrive::FileUnlink(char * name) {
 		struct stat buffer;
 		if(stat(fullname,&buffer)) return false; // File not found.
 
-		FILE* file_writable = fopen(fullname,"rb+");
+		FILE* file_writable = fopen_wrap(fullname,"rb+");
 		if(!file_writable) return false; //No acces ? ERROR MESSAGE NOT SET. FIXME ?
 		fclose(file_writable);
 
@@ -274,7 +273,7 @@ again:
 
 	find_size=(Bit32u) stat_block.st_size;
 	struct tm *time;
-	if((time=localtime((const time_t *)&stat_block.st_mtime))!=0){
+	if((time=localtime(&stat_block.st_mtime))!=0){
 		find_date=DOS_PackDate((Bit16u)(time->tm_year+1900),(Bit16u)(time->tm_mon+1),(Bit16u)time->tm_mday);
 		find_time=DOS_PackTime((Bit16u)time->tm_hour,(Bit16u)time->tm_min,(Bit16u)time->tm_sec);
 	} else {
@@ -392,12 +391,7 @@ bool localDrive::FileStat(const char* name, FileStat_Block * const stat_block) {
 	if(stat(newname,&temp_stat)!=0) return false;
 	/* Convert the stat to a FileStat */
 	struct tm *time;
-
-	#ifdef __CDROM_INTERFACE__
-	INX D
-	#endif
-
-	if((time=localtime((const time_t *)&temp_stat.st_mtime))!=0) {
+	if((time=localtime(&temp_stat.st_mtime))!=0) {
 		stat_block->time=DOS_PackTime((Bit16u)time->tm_hour,(Bit16u)time->tm_min,(Bit16u)time->tm_sec);
 		stat_block->date=DOS_PackDate((Bit16u)(time->tm_year+1900),(Bit16u)(time->tm_mon+1),(Bit16u)time->tm_mday);
 	} else {
@@ -427,7 +421,7 @@ Bits localDrive::UnMount(void) {
 
 localDrive::localDrive(const char * startdir,Bit16u _bytes_sector,Bit8u _sectors_cluster,Bit16u _total_clusters,Bit16u _free_clusters,Bit8u _mediaid) {
 	strcpy(basedir,startdir);
-	//sprintf(info,"local directory %s",startdir);
+	sprintf(info,"local directory %s",startdir);
 	allocation.bytes_sector=_bytes_sector;
 	allocation.sectors_cluster=_sectors_cluster;
 	allocation.total_clusters=_total_clusters;
@@ -456,7 +450,8 @@ bool localFile::Read(Bit8u * data,Bit16u * size) {
 }
 
 bool localFile::Write(Bit8u * data,Bit16u * size) {
-	if ((this->flags & 0xf) == OPEN_READ) {	// check if file opened in read-only mode
+	Bit32u lastflags = this->flags & 0xf;
+	if (lastflags == OPEN_READ || lastflags == OPEN_READ_NO_MOD) {	// check if file opened in read-only mode
 		DOS_SetError(DOSERR_ACCESS_DENIED);
 		return false;
 	}
@@ -536,7 +531,7 @@ bool localFile::UpdateDateTimeFromHost(void) {
 	struct stat temp_stat;
 	fstat(fileno(fhandle),&temp_stat);
 	struct tm * ltime;
-	if((ltime=localtime((const time_t *)&temp_stat.st_mtime))!=0) {
+	if((ltime=localtime(&temp_stat.st_mtime))!=0) {
 		time=DOS_PackTime((Bit16u)ltime->tm_hour,(Bit16u)ltime->tm_min,(Bit16u)ltime->tm_sec);
 		date=DOS_PackDate((Bit16u)(ltime->tm_year+1900),(Bit16u)(ltime->tm_mon+1),(Bit16u)ltime->tm_mday);
 	} else {
@@ -552,7 +547,6 @@ void localFile::Flush(void) {
 	}
 }
 
-#ifdef CDROM_ENABLED
 
 // ********************************************
 // CDROM DRIVE
@@ -565,7 +559,10 @@ bool MSCDEX_GetVolumeName(Bit8u subUnit, char* name);
 
 
 cdromDrive::cdromDrive(const char driveLetter, const char * startdir,Bit16u _bytes_sector,Bit8u _sectors_cluster,Bit16u _total_clusters,Bit16u _free_clusters,Bit8u _mediaid, int& error)
-		   :localDrive(startdir,_bytes_sector,_sectors_cluster,_total_clusters,_free_clusters,_mediaid) {
+		   :localDrive(startdir,_bytes_sector,_sectors_cluster,_total_clusters,_free_clusters,_mediaid),
+		    subUnit(0),
+		    driveLetter('\0')
+{
 	// Init mscdex
 	error = MSCDEX_AddDrive(driveLetter,startdir,subUnit);
 	strcpy(info, "CDRom ");
@@ -656,4 +653,3 @@ Bits cdromDrive::UnMount(void) {
 	}
 	return 2;
 }
-#endif
