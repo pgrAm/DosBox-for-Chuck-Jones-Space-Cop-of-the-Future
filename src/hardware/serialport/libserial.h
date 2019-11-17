@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+#include <string.h>
+
 typedef struct _COMPORT *COMPORT;
 
 bool SERIAL_open(const char* portname, COMPORT* port);
