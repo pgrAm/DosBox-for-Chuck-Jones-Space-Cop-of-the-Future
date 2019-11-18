@@ -279,7 +279,7 @@ extern bool CPU_CycleAutoAdjust;
 bool startup_state_numlock = false;
 bool startup_state_capslock = false;
 
-void GFX_SetTitle(Bit32s cycles, Bits frameskip, bool paused)
+void GFX_SetTitle(int cycles, int frameskip, bool paused)
 {
 	char title[200] = {0};
 	static Bit32s internal_cycles = 0;

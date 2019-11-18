@@ -435,7 +435,7 @@
       <Filter>Source Files\hardware\mame</Filter>
     </ClCompile>
     <ClCompile Include="..\src\dos\drive_overlay.cpp">
-      <Filter>Source Files\dos</Filter>
+      <Filter>Source Files\dos\drives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

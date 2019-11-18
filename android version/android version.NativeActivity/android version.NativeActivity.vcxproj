@@ -68,7 +68,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -144,6 +144,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
     </ClCompile>
     <Link>
       <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;</LibraryDependencies>
@@ -159,6 +160,7 @@
       <EnableNeonCodegen>true</EnableNeonCodegen>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <CLanguageStandard>Default</CLanguageStandard>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
     </ClCompile>
     <Link>
       <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
@@ -311,6 +313,12 @@
     <ClInclude Include="..\..\src\gui\render_scalers.h" />
     <ClInclude Include="..\..\src\gui\render_templates.h" />
     <ClInclude Include="..\..\src\hardware\font-switch.h" />
+    <ClInclude Include="..\..\src\hardware\mame\emu.h" />
+    <ClInclude Include="..\..\src\hardware\mame\fmopl.h" />
+    <ClInclude Include="..\..\src\hardware\mame\saa1099.h" />
+    <ClInclude Include="..\..\src\hardware\mame\sn76496.h" />
+    <ClInclude Include="..\..\src\hardware\mame\ymdeltat.h" />
+    <ClInclude Include="..\..\src\hardware\mame\ymf262.h" />
     <ClInclude Include="..\..\src\hardware\serialport\serialdummy.h" />
     <ClInclude Include="..\..\src\ints\int10.h" />
     <ClInclude Include="..\..\src\ints\xms.h" />
@@ -344,6 +352,7 @@
     <ClCompile Include="..\..\src\dos\drive_cache.cpp" />
     <ClCompile Include="..\..\src\dos\drive_fat.cpp" />
     <ClCompile Include="..\..\src\dos\drive_local.cpp" />
+    <ClCompile Include="..\..\src\dos\drive_overlay.cpp" />
     <ClCompile Include="..\..\src\dos\drive_virtual.cpp" />
     <ClCompile Include="..\..\src\gui\midi.cpp" />
     <ClCompile Include="..\..\src\gui\render.cpp" />
@@ -364,6 +373,11 @@
     <ClCompile Include="..\..\src\hardware\ipxserver.cpp" />
     <ClCompile Include="..\..\src\hardware\joystick.cpp" />
     <ClCompile Include="..\..\src\hardware\keyboard.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\fmopl.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\saa1099.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\sn76496.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\ymdeltat.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\ymf262.cpp" />
     <ClCompile Include="..\..\src\hardware\memory.cpp" />
     <ClCompile Include="..\..\src\hardware\mixer.cpp" />
     <ClCompile Include="..\..\src\hardware\mpu401.cpp" />
