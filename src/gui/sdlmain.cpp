@@ -32,7 +32,7 @@
 #include <sys/types.h>
 
 #include <algorithm>
-
+#include <assert.h>
 #ifdef WIN32
 #include <signal.h>
 #include <process.h>
@@ -90,6 +90,10 @@ extern char** environ;
 #include <os2.h>
 #endif
 
+//#if defined(__ANDROID__)|| defined(__IPHONEOS__)
+#define USE_OVERLAY
+//#endif
+
 enum PRIORITY_LEVELS
 {
 	PRIORITY_LEVEL_PAUSE,
@@ -134,9 +138,9 @@ struct SDL_Block
 	} desktop;
 	struct
 	{
-		SDL_Renderer* renderer;
-		SDL_Texture* texture;
-		SDL_Texture* screen_tex;
+		SDL_Renderer* renderer = nullptr;
+		SDL_Texture* texture = nullptr;
+		SDL_Texture* screen_tex = nullptr;
 		double scaleFactor;
 	} render;
 	struct
@@ -187,6 +191,12 @@ void setupFullscreenResolution(int displayindex = 0)
 }
 
 void GFX_UpdateSDLCaptureState(void);
+void GFX_RestoreMode();
+
+#ifdef USE_OVERLAY
+	void reallocateOverlayTextures();
+	void resizeOverlay();
+#endif
 
 SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 {
@@ -235,15 +245,19 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			}
 
 			sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
+#ifdef USE_OVERLAY
+			reallocateOverlayTextures();
+#endif
 
 			fullscreen = true;
 		}
 	}
 	else
 	{
-		if(sdl.render.renderer)
+		if(fullscreen && sdl.render.renderer)
 		{
 			SDL_DestroyRenderer(sdl.render.renderer);
+			sdl.render.renderer = nullptr;
 		}
 
 		if(SDL_SetWindowFullscreen(sdl.surface, 0))
@@ -257,13 +271,23 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			SDL_SetWindowPosition(sdl.surface, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 
-		sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
+		if (!sdl.render.renderer)
+		{
+			sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
+#ifdef USE_OVERLAY
+			reallocateOverlayTextures();
+#endif
+		}
 
 		fullscreen = false;
 	}
 
-	sdl.curr_w = width;
-	sdl.curr_h = height;
+	if(sdl.curr_w != width || sdl.curr_h != height)
+	{
+		sdl.curr_w = width;
+		sdl.curr_h = height;
+		GFX_RestoreMode();
+	}
 
 	if(sdl.mouse.locked)
 	{
@@ -445,24 +469,36 @@ static int int_log2(int val)
 
 #include "SDL_system.h"
 
-#if defined(__ANDROID__)|| defined(__IPHONEOS__)
-#define USE_OVERLAY
-#endif
-
 #ifdef USE_OVERLAY
 
 #define NUM_ACTIONS 6
 
 class overlayButton
 {
-	SDL_Surface* imagedata;
-	SDL_Texture* texture;
-
+	SDL_Surface* imagedata = nullptr;
+	SDL_Texture* texture = nullptr;
+	SDL_Surface* scaledSurface = nullptr;
 	SDL_Rect rect;
 
 public:
 
 	SDL_Scancode key;
+
+	void reallocateTexture()
+	{
+		if (scaledSurface)
+		{
+			if (texture) 
+			{
+				SDL_DestroyTexture(texture);
+			};
+
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+			assert(sdl.render.renderer);
+			texture = SDL_CreateTextureFromSurface(sdl.render.renderer, scaledSurface);
+			assert(texture);
+		}
+	}
 
 	overlayButton(std::string path, SDL_Scancode k)
 	{
@@ -471,7 +507,7 @@ public:
 #endif
 		imagedata = SDL_LoadBMP(path.c_str());
 
-		texture = SDL_CreateTextureFromSurface(sdl.render.renderer, imagedata);
+		reallocateTexture();
 
 		rect.x = 0;
 		rect.y = 0;
@@ -483,6 +519,27 @@ public:
 
 	void changeRect(int x, int y, int w, int h)
 	{
+		if (w != rect.w || h != rect.h)
+		{
+			if (scaledSurface) { SDL_FreeSurface(scaledSurface); };
+
+			int scaledW = (int)ceil(w / (double)imagedata->w) * imagedata->w;
+			int scaledH = (int)ceil(h / (double)imagedata->h) * imagedata->h;
+
+			scaledSurface = SDL_CreateRGBSurface(0, scaledW, scaledH, 32, 0, 0, 0, 0);
+
+			//SDL_SetSurfaceBlendMode(imagedata, SDL_BLENDMODE_NONE);
+			//SDL_SetSurfaceBlendMode(scaledSurface, SDL_BLENDMODE_NONE);
+			if (SDL_BlitScaled(imagedata, NULL, scaledSurface, NULL))
+			{
+				puts(SDL_GetError());
+			}
+
+			//SDL_FillRect(scaledSurface, NULL, 0xFFFFFFFF);
+
+			reallocateTexture();
+		}
+
 		rect.x = x;
 		rect.y = y;
 		rect.w = w;
@@ -496,7 +553,10 @@ public:
 			SDL_SetTextureColorMod(texture, 0, 255, 0);
 		}
 
-		SDL_RenderCopy(sdl.render.renderer, texture, &imagedata->clip_rect, &rect);
+		if (SDL_RenderCopy(sdl.render.renderer, texture, &scaledSurface->clip_rect, &rect))
+		{
+			puts(SDL_GetError());
+		}
 
 		if(color)
 		{
@@ -514,19 +574,35 @@ int cursorSelected = 0;
 
 overlayButton* actions[NUM_ACTIONS];
 
+bool overlayIsSetup = false;
+
 void resizeOverlay()
 {
-	int buttonSize = (sdl.curr_h / 5);
+	if (!overlayIsSetup) { return; };
 
-	int x_offset = std::max(sdl.clip.x - buttonSize, 0) / 2;
+	float ddpi, hdpi, vdpi;
 
-	actions[0]->changeRect(x_offset, 0 * buttonSize + 0.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[1]->changeRect(x_offset, 1 * buttonSize + 1.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[2]->changeRect(x_offset, 2 * buttonSize + 2.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[3]->changeRect(x_offset, 3 * buttonSize + 3.5 * (buttonSize / 4), buttonSize, buttonSize);
+	SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(sdl.surface), &ddpi, &hdpi, &vdpi);
 
-	actions[4]->changeRect(sdl.curr_w - buttonSize - x_offset, 0 * buttonSize + 0.5 * (buttonSize / 4), buttonSize, sdl.curr_h / 5);
-	actions[5]->changeRect(sdl.curr_w - buttonSize - x_offset, 3 * buttonSize + 3.5 * (buttonSize / 4), buttonSize, sdl.curr_h / 5);
+	float scaleRatio = (vdpi / 426.0f);
+
+	int buttonSize = (sdl.curr_h * scaleRatio) / 5;
+
+	float left = std::max(sdl.clip.x - buttonSize, 0) / 2;
+
+	float buttonSpacing = (buttonSize / 4);
+
+	float blockHeight = buttonSize * 4 + buttonSpacing * 3;
+	float top = (sdl.curr_h - blockHeight) / 2;
+	float farLeft = sdl.curr_w - buttonSize - left;
+
+	actions[0]->changeRect(left, top + 0 * buttonSize + 0 * buttonSpacing, buttonSize, buttonSize);
+	actions[1]->changeRect(left, top + 1 * buttonSize + 1 * buttonSpacing, buttonSize, buttonSize);
+	actions[2]->changeRect(left, top + 2 * buttonSize + 2 * buttonSpacing, buttonSize, buttonSize);
+	actions[3]->changeRect(left, top + 3 * buttonSize + 3 * buttonSpacing, buttonSize, buttonSize);
+
+	actions[4]->changeRect(farLeft, top + 0 * buttonSize + 0 * buttonSpacing, buttonSize, buttonSize);
+	actions[5]->changeRect(farLeft, top + 3 * buttonSize + 3 * buttonSpacing, buttonSize, buttonSize);
 }
 
 void setupOverlay()
@@ -536,17 +612,31 @@ void setupOverlay()
 	actions[2] = new overlayButton("icons/look.bmp", SDL_SCANCODE_3);
 	actions[3] = new overlayButton("icons/talk.bmp", SDL_SCANCODE_4);
 
-	actions[4] = new overlayButton("icons/default.bmp", SDL_SCANCODE_ESCAPE);
+	actions[4] = new overlayButton("icons/menu.bmp", SDL_SCANCODE_ESCAPE);
 	actions[5] = new overlayButton("icons/bag.bmp", SDL_SCANCODE_I);
+
+	overlayIsSetup = true;
 
 	resizeOverlay();
 }
 
 void drawOverlay()
 {
+	if (!overlayIsSetup) { return; };
+
 	for(int i = 0; i < NUM_ACTIONS; i++)
 	{
 		actions[i]->draw(cursorSelected == i);
+	}
+}
+
+void reallocateOverlayTextures()
+{
+	if (!overlayIsSetup) { return; };
+
+	for (int i = 0; i < NUM_ACTIONS; i++)
+	{
+		actions[i]->reallocateTexture();
 	}
 }
 
@@ -563,13 +653,12 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp)
 
 		fixedWidth = sdl.desktop.full.fixed ? sdl.desktop.full.width : 0;
 		fixedHeight = sdl.desktop.full.fixed ? sdl.desktop.full.height : 0;
-		sdl_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MOUSE_CAPTURE;// | SDL_HWSURFACE;
+		sdl_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MOUSE_CAPTURE;
 	}
 	else
 	{
 		fixedWidth = sdl.desktop.window.width;
 		fixedHeight = sdl.desktop.window.height;
-		//sdl_flags |= SDL_HWSURFACE;
 	}
 
 	if(fixedWidth && fixedHeight)
@@ -893,14 +982,20 @@ void GFX_EndUpdate(const Bit16u *changedLines)
 
 	SDL_SetRenderTarget(sdl.render.renderer, sdl.render.screen_tex);
 
-	SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0);
+	if (SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0))
+	{
+		puts(SDL_GetError());
+	}
 
 	SDL_SetRenderTarget(sdl.render.renderer, NULL);
-#ifdef USE_OVERLAY
+//#ifdef USE_OVERLAY
 	//TODO
 	SDL_RenderClear(sdl.render.renderer);
-#endif
-	SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip);
+//#endif
+	if(SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip))
+	{
+		puts(SDL_GetError());
+	}
 #ifdef USE_OVERLAY
 	drawOverlay();
 #endif
@@ -1334,20 +1429,43 @@ void Mouse_AutoLock(bool enable)
 	}
 }
 
+float lastposx = 0.5, lastposy = 0.5;
+
 static void HandleMouseMotion(SDL_MouseMotionEvent * motion)
 {
+	if (motion->which == SDL_TOUCH_MOUSEID) { return; }
+
 	if(sdl.mouse.locked || !sdl.mouse.autoenable)
 	{
-		Mouse_CursorMoved((float)motion->xrel*sdl.mouse.sensitivity / 100.0f,
-			(float)motion->yrel*sdl.mouse.sensitivity / 100.0f,
-						  (float)(motion->x - sdl.clip.x) / (sdl.clip.w - 1)*sdl.mouse.sensitivity / 100.0f,
-						  (float)(motion->y - sdl.clip.y) / (sdl.clip.h - 1)*sdl.mouse.sensitivity / 100.0f,
-						  sdl.mouse.locked);
+		float deltaX = (float)motion->xrel * sdl.mouse.sensitivity / 100.0f;
+		float deltaY = (float)motion->yrel * sdl.mouse.sensitivity / 100.0f;
+
+		Mouse_CursorMoved(	deltaX, deltaY,
+							(float)(motion->x - sdl.clip.x) / (sdl.clip.w - 1)*sdl.mouse.sensitivity / 100.0f,
+							(float)(motion->y - sdl.clip.y) / (sdl.clip.h - 1)*sdl.mouse.sensitivity / 100.0f,
+							sdl.mouse.locked);
+
+		//if (sdl.mouse.locked)
+		{
+			double xscale = (sdl.curr_w / sdl.render.scaleFactor);
+			double yscale = (sdl.curr_h / sdl.render.scaleFactor);
+
+			double xdiff = deltaX / xscale;
+			double ydiff = deltaY / yscale;
+
+			double left_offset = (xscale - sdl.draw.width) / (xscale * 2);
+			double top_offset = (yscale - sdl.draw.height) / (yscale * 2);
+
+			lastposx = std::min(std::max(lastposx + xdiff, left_offset), 1.0 - left_offset);
+			lastposy = std::min(std::max(lastposy + ydiff, top_offset), 1.0 - top_offset);
+		}
 	}
 }
 
 static void HandleMouseButton(SDL_MouseButtonEvent * button)
 {
+	if (button->which == SDL_TOUCH_MOUSEID) { return; }
+
 	switch(button->state)
 	{
 	case SDL_PRESSED:
@@ -1391,8 +1509,6 @@ static void HandleMouseButton(SDL_MouseButtonEvent * button)
 		break;
 	}
 }
-
-float lastposx = 0.5, lastposy = 0.5;
 
 #ifdef USE_OVERLAY
 bool checkOverlayTap(SDL_TouchFingerEvent * finger)
@@ -1461,17 +1577,18 @@ static void HandleTouch(SDL_TouchFingerEvent * finger)
 		double xscale = (sdl.curr_w / sdl.render.scaleFactor);
 		double yscale = (sdl.curr_h / sdl.render.scaleFactor);
 
-		double x = (finger->x - lastposx) * xscale;
-		double y = (finger->y - lastposy) * yscale;
+		double x = ((double)finger->x - lastposx) * xscale;
+		double y = ((double)finger->y - lastposy) * yscale;
 
 		Mouse_CursorMoved(x, y, 0, 0, true);
 
-		double xdiff = (xscale - sdl.draw.width) / (xscale * 2);
-		double ydiff = (yscale - sdl.draw.height) / (yscale * 2);
+		double left_offset = (xscale - sdl.draw.width) / (xscale * 2);
+		double top_offset = (yscale - sdl.draw.height) / (yscale * 2);
 
-		lastposx = std::min(std::max((double)finger->x, xdiff), 1.0 - xdiff);
-		lastposy = std::min(std::max((double)finger->y, ydiff), 1.0 - ydiff);
-
+		lastposx = std::min(std::max((double)finger->x, left_offset), 1.0 - left_offset);
+		lastposy = std::min(std::max((double)finger->y, top_offset), 1.0 - top_offset);
+		//lastposx = std::min(std::max(lastposx + xdiff, 0.0), 1.0);
+		//lastposy = std::min(std::max(lastposy + ydiff, 0.0), 1.0);
 		Mouse_ButtonPressed(0);
 	}
 	break;
@@ -2254,9 +2371,9 @@ int main(int argc, char* argv[])
 #if defined (WIN32)
 	sticky_keys(true); //Might not be needed if the shutdown function switches to windowed mode, but it doesn't hurt
 #endif
-					   //Force visible mouse to end user. Somehow this sometimes doesn't happen
+	//Force visible mouse to end user. Somehow this sometimes doesn't happen
 	SDL_SetRelativeMouseMode(SDL_FALSE);
-
+	
 	SDL_Quit();//Let's hope sdl will quit as well when it catches an exception
 	return 0;
 	}
