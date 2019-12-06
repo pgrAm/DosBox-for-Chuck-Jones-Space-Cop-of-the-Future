@@ -180,7 +180,6 @@ void GFX_UpdateSDLCaptureState(void);
 void GFX_RestoreMode();
 
 #ifdef USE_OVERLAY
-	void reallocateOverlayTextures();
 	void resizeOverlay();
 #endif
 
@@ -586,17 +585,6 @@ void drawOverlay()
 		actions[i]->draw(cursorSelected == i);
 	}
 }
-
-void reallocateOverlayTextures()
-{
-	if (!overlayIsSetup) { return; };
-
-	for (int i = 0; i < NUM_ACTIONS; i++)
-	{
-		actions[i]->reallocateTexture();
-	}
-}
-
 #endif
 
 static void GFX_SetupSurfaceScaled()
@@ -660,7 +648,9 @@ static void GFX_SetupSurfaceScaled()
 	}
 	else
 	{
-		sdl.clip.x = 0; sdl.clip.y = 0;
+		//just set the mode directly and let the hardware deal with it
+		sdl.clip.x = 0;
+		sdl.clip.y = 0;
 		sdl.clip.w = (int)(sdl.draw.width * sdl.draw.scalex);
 		sdl.clip.h = (int)(sdl.draw.height * sdl.draw.scaley);
 		sdl.window = SDL_SetVideoMode_Wrap(sdl.clip.w, sdl.clip.h, 32, sdl_flags);
@@ -1314,7 +1304,6 @@ static void GUI_StartUp(Section * sec)
 		}
 		SDL_FreeSurface(splash_surf);
 		delete[] tmpbufp;
-
 	}
 
 #ifdef USE_OVERLAY
@@ -1350,7 +1339,11 @@ void Mouse_AutoLock(bool enable)
 	}
 }
 
-float lastposx = 0.5, lastposy = 0.5;
+struct
+{
+	float lastX = 0.5, lastY = 0.5;
+	int lastPixX = 160, lastPixY = 120;
+} mouseInfo;
 
 static void HandleMouseMotion(SDL_MouseMotionEvent * motion)
 {
@@ -1368,17 +1361,8 @@ static void HandleMouseMotion(SDL_MouseMotionEvent * motion)
 
 		//if (sdl.mouse.locked)
 		{
-			double xscale = (sdl.curr_w / sdl.render.scaleFactor);
-			double yscale = (sdl.curr_h / sdl.render.scaleFactor);
-
-			double xdiff = deltaX / xscale;
-			double ydiff = deltaY / yscale;
-
-			double left_offset = (xscale - sdl.draw.width) / (xscale * 2);
-			double top_offset = (yscale - sdl.draw.height) / (yscale * 2);
-
-			lastposx = std::min(std::max(lastposx + xdiff, left_offset), 1.0 - left_offset);
-			lastposy = std::min(std::max(lastposy + ydiff, top_offset), 1.0 - top_offset);
+			mouseInfo.lastPixX = std::clamp((int)(mouseInfo.lastPixX + deltaX), 0, sdl.draw.width);
+			mouseInfo.lastPixY = std::clamp((int)(mouseInfo.lastPixY + deltaY), 0, sdl.draw.height);
 		}
 	}
 }
@@ -1483,6 +1467,23 @@ bool checkOverlayTap(SDL_TouchFingerEvent * finger)
 }
 #endif
 
+void moveFinger(SDL_TouchFingerEvent* finger)
+{
+	double xscale = (sdl.curr_w / sdl.render.scaleFactor);
+	double yscale = (sdl.curr_h / sdl.render.scaleFactor);
+
+	int pixX = std::clamp((int)((finger->x * xscale) - (xscale - sdl.draw.width) / 2.0), 0, sdl.draw.width);
+	int pixY = std::clamp((int)((finger->y * yscale) - (yscale - sdl.draw.height) / 2.0), 0, sdl.draw.height);
+
+	int x = pixX - mouseInfo.lastPixX;
+	int y = pixY - mouseInfo.lastPixY;
+
+	Mouse_CursorMoved(x, y, 0, 0, true);
+
+	mouseInfo.lastPixX = pixX;
+	mouseInfo.lastPixY = pixY;
+}
+
 static void HandleTouch(SDL_TouchFingerEvent * finger)
 {
 #ifdef USE_OVERLAY
@@ -1493,26 +1494,16 @@ static void HandleTouch(SDL_TouchFingerEvent * finger)
 #endif
 	switch(finger->type)
 	{
+
 	case SDL_FINGERDOWN:
 	{
-		double xscale = (sdl.curr_w / sdl.render.scaleFactor);
-		double yscale = (sdl.curr_h / sdl.render.scaleFactor);
-
-		double x = ((double)finger->x - lastposx) * xscale;
-		double y = ((double)finger->y - lastposy) * yscale;
-
-		Mouse_CursorMoved(x, y, 0, 0, true);
-
-		double left_offset = (xscale - sdl.draw.width) / (xscale * 2);
-		double top_offset = (yscale - sdl.draw.height) / (yscale * 2);
-
-		lastposx = std::min(std::max((double)finger->x, left_offset), 1.0 - left_offset);
-		lastposy = std::min(std::max((double)finger->y, top_offset), 1.0 - top_offset);
-		//lastposx = std::min(std::max(lastposx + xdiff, 0.0), 1.0);
-		//lastposy = std::min(std::max(lastposy + ydiff, 0.0), 1.0);
+		moveFinger(finger);
 		Mouse_ButtonPressed(0);
 	}
 	break;
+	case SDL_FINGERMOTION:
+		moveFinger(finger);
+		break;
 	case SDL_FINGERUP:
 		Mouse_ButtonReleased(0);
 		break;
@@ -1647,6 +1638,7 @@ void GFX_Events()
 			break;
 		case SDL_FINGERDOWN:
 		case SDL_FINGERUP:
+		case SDL_FINGERMOTION:
 			HandleTouch(&event.tfinger);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -2054,7 +2046,6 @@ static void erasemapperfile()
 //extern void UI_Init(void);
 int main(int argc, char* argv[])
 {
-
 	try
 	{
 		CommandLine com_line(argc, argv);
@@ -2149,7 +2140,7 @@ int main(int argc, char* argv[])
 		sdl.inited = true;
 
 #if defined(__ANDROID__)|| defined(__IPHONEOS__)
-		sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
+		sdl.window = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
 #endif
 
 		SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
@@ -2297,11 +2288,4 @@ int main(int argc, char* argv[])
 	
 	SDL_Quit();//Let's hope sdl will quit as well when it catches an exception
 	return 0;
-	}
-
-void GFX_GetSize(int &width, int &height, bool &fullscreen)
-{
-	width = sdl.draw.width;
-	height = sdl.draw.height;
-	fullscreen = sdl.desktop.fullscreen;
 }
