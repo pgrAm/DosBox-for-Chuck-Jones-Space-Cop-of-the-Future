@@ -1368,11 +1368,9 @@ void GFX_Events()
 				SDL_RenderClear(sdl.render.renderer);
 				break;
 			case SDL_WINDOWEVENT_MOVED:
-				SDL_PauseAudio(1);
-				SDL_PauseAudio(0);
 				break;
 			}
-#ifndef __ANDROID__
+
 			/* Non-focus priority is set to pause; check to see if we've lost window or input focus
 			*/
 			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
@@ -1419,7 +1417,6 @@ void GFX_Events()
 					}
 				}
 			}
-#endif
 			break;
 		case SDL_APP_DIDENTERFOREGROUND:
 			GFX_ResetScreen();
@@ -1440,24 +1437,18 @@ void GFX_Events()
 			HandleMouseButton(&event.button);
 #endif
 			break;
-			//		case SDL_VIDEORESIZE:
-			////			HandleVideoResize(&event.resize);
-			//			break;
 		case SDL_QUIT:
 			throw(0);
 			break;
-			//		case SDL_VIDEOEXPOSE:
-			//			if (sdl.draw.callback) sdl.draw.callback( GFX_CallBackRedraw );
-			//			break;
 		case SDL_TEXTINPUT:
 		{
 			int len = strlen(event.text.text);
 
-			for(int i = 0; i < len; i++)
+			for (int i = 0; i < len; i++)
 			{
-				char character[] = {event.text.text[i], 0};
+				char character = event.text.text[i];
 
-				if(character[0] >= 65 && character[0] <= 90)
+				if (character >= 'A' && character <= 'Z')
 				{
 					SDL_Event sdlevent;
 					sdlevent.type = SDL_KEYDOWN;
@@ -1466,14 +1457,14 @@ void GFX_Events()
 					MAPPER_CheckEvent(&sdlevent);
 				}
 
-				if(character[0] >= 97 && character[0] <= 122)
+				if (character >= 'a' && character <= 'z')
 				{
-					character[0] -= 32;
+					character -= ' ';
 				}
 
 				SDL_Event sdlevent;
 				sdlevent.type = SDL_KEYDOWN;
-				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName(character);
+				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName((char[2]) { character, 0 });
 
 				MAPPER_CheckEvent(&sdlevent);
 
@@ -1483,7 +1474,7 @@ void GFX_Events()
 
 				MAPPER_CheckEvent(&sdlevent1);
 
-				if(character[0] >= 65 && character[0] <= 90)
+				if(character >= 'A' && character <= 'Z')
 				{
 					SDL_Event sdlevent;
 					sdlevent.type = SDL_KEYUP;
@@ -1506,7 +1497,7 @@ void GFX_Events()
 			// ignore tab events that arrive just after regaining focus. (likely the result of alt-tab)
 			if((event.key.keysym.sym == SDL_SCANCODE_TAB) && (GetTicks() - sdl.focus_ticks < 2)) break;
 #endif
-#if defined (__ANDROID__) && defined(__IPHONEOS__)
+#if defined (__ANDROID__) || defined(__IPHONEOS__)
 			if(SDL_IsTextInputActive()) 
 			{
 				if(event.key.keysym.scancode != SDL_SCANCODE_BACKSPACE && event.key.keysym.scancode != SDL_SCANCODE_RETURN)
