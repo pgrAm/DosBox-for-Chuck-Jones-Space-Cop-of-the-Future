@@ -875,6 +875,104 @@ static void OutputString(Bitu x, Bitu y, const char * text, Bit32u color, Bit32u
 //extern void UI_Run(bool);
 void Restart(bool pressed);
 
+static void GUI_DrawSplash(int windowWidth, int windowHeight)
+{
+/* The endian part is intentionally disabled as somehow it produces correct results without according to rhoenie*/
+//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+//    Bit32u rmask = 0xff000000;
+//    Bit32u gmask = 0x00ff0000;
+//    Bit32u bmask = 0x0000ff00;
+//#else
+	Bit32u rmask = 0x000000ff;
+	Bit32u gmask = 0x0000ff00;
+	Bit32u bmask = 0x00ff0000;
+//#endif
+
+	/* Please leave the Splash screen stuff in working order in DOSBox. We spend a lot of time making DOSBox. */
+	SDL_Surface* splash_surf = SDL_CreateRGBSurface(SDL_SWSURFACE, windowWidth, windowHeight, 32, rmask, gmask, bmask, 0);
+
+	SDL_SetSurfaceBlendMode(splash_surf, SDL_BLENDMODE_BLEND);
+
+	if (splash_surf)
+	{
+		SDL_FillRect(splash_surf, NULL, SDL_MapRGB(splash_surf->format, 0xba, 0x3d, 0x00));
+
+		int yoffset = (windowHeight - 400) / 2;
+
+		Bit8u* tmpbufp = new Bit8u[640 * 400 * 3];
+		GIMP_IMAGE_RUN_LENGTH_DECODE(tmpbufp, gimp_image.rle_pixel_data, 640 * 400, 3);
+		for (Bitu y = 0; y < 400; y++)
+		{
+
+			int offset = (windowWidth - 640) / 2;
+
+			Bit8u* tmpbuf = tmpbufp + y * 640 * 3;
+			Bit32u* draw = (Bit32u*)(((Bit8u*)splash_surf->pixels) + ((y + yoffset) * splash_surf->pitch)) + offset;
+
+			for (Bitu x = 0; x < 640; x++)
+			{
+				//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+				//				*draw++ = tmpbuf[x*3+2]+tmpbuf[x*3+1]*0x100+tmpbuf[x*3+0]*0x10000+0x00000000;
+				//#else
+				*draw++ = tmpbuf[x * 3 + 0] + tmpbuf[x * 3 + 1] * 0x100 + tmpbuf[x * 3 + 2] * 0x10000 + 0x00000000;
+				//#endif
+			}
+		}
+
+		bool exit_splash = false;
+
+		static Bitu max_splash_loop = 2400;
+		static Bitu splash_fade = 400;
+		static bool use_fadeout = true;
+
+		SDL_Texture* splash_tex = SDL_CreateTextureFromSurface(sdl.render.renderer, splash_surf);
+		SDL_SetRenderDrawColor(sdl.render.renderer, 0, 0, 0, 255);
+
+		SDL_RenderClear(sdl.render.renderer);
+		SDL_RenderPresent(sdl.render.renderer);
+
+		for (Bit32u ct = 0, startticks = GetTicks(); ct < max_splash_loop; ct = GetTicks() - startticks)
+		{
+			SDL_Event evt;
+			while (SDL_PollEvent(&evt))
+			{
+				if (evt.type == SDL_QUIT)
+				{
+					exit_splash = true;
+					break;
+				}
+			}
+			if (exit_splash) break;
+
+			if (ct < 1)
+			{
+				SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
+				SDL_RenderPresent(sdl.render.renderer);
+			}
+			else if (ct >= max_splash_loop - splash_fade)
+			{
+				if (use_fadeout)
+				{
+					SDL_RenderClear(sdl.render.renderer);
+					SDL_SetTextureAlphaMod(splash_tex, (Bit8u)((max_splash_loop - 1 - ct) * 255 / (splash_fade - 1)));
+					SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
+					SDL_RenderPresent(sdl.render.renderer);
+				}
+			}
+		}
+
+		if (use_fadeout)
+		{
+			SDL_RenderClear(sdl.render.renderer);
+			SDL_RenderPresent(sdl.render.renderer);
+			//this second one clears in case of double buffer
+			SDL_RenderClear(sdl.render.renderer);
+		}
+		SDL_FreeSurface(splash_surf);
+		delete[] tmpbufp;
+	}
+}
+
 static void GUI_StartUp(Section * sec)
 {
 	sec->AddDestroyFunction(&GUI_ShutDown);
@@ -1027,17 +1125,6 @@ static void GUI_StartUp(Section * sec)
 	GFX_Stop();
 	SDL_SetWindowTitle(sdl.window, "DOSBox");
 
-	/* The endian part is intentionally disabled as somehow it produces correct results without according to rhoenie*/
-	//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	//    Bit32u rmask = 0xff000000;
-	//    Bit32u gmask = 0x00ff0000;
-	//    Bit32u bmask = 0x0000ff00;
-	//#else
-	Bit32u rmask = 0x000000ff;
-	Bit32u gmask = 0x0000ff00;
-	Bit32u bmask = 0x00ff0000;
-	//#endif
-
 	SDL_RenderClear(sdl.render.renderer);
 	SDL_RenderPresent(sdl.render.renderer);
 
@@ -1052,90 +1139,11 @@ static void GUI_StartUp(Section * sec)
 		}
 	}
 
-	/* Please leave the Splash screen stuff in working order in DOSBox. We spend a lot of time making DOSBox. */
-	SDL_Surface* splash_surf = SDL_CreateRGBSurface(SDL_SWSURFACE, windowWidth, windowHeight, 32, rmask, gmask, bmask, 0);
-
-	SDL_SetSurfaceBlendMode(splash_surf, SDL_BLENDMODE_BLEND);
-
-	if(splash_surf)
-	{
-		SDL_FillRect(splash_surf, NULL, SDL_MapRGB(splash_surf->format, 0xba, 0x3d, 0x00));
-
-		int yoffset = (windowHeight - 400) / 2;
-
-		Bit8u* tmpbufp = new Bit8u[640 * 400 * 3];
-		GIMP_IMAGE_RUN_LENGTH_DECODE(tmpbufp, gimp_image.rle_pixel_data, 640 * 400, 3);
-		for(Bitu y = 0; y < 400; y++)
-		{
-
-			int offset = (windowWidth - 640) / 2;
-
-			Bit8u* tmpbuf = tmpbufp + y * 640 * 3;
-			Bit32u * draw = (Bit32u*)(((Bit8u *)splash_surf->pixels) + ((y + yoffset)*splash_surf->pitch)) + offset;
-
-			for(Bitu x = 0; x < 640; x++)
-			{
-				//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-				//				*draw++ = tmpbuf[x*3+2]+tmpbuf[x*3+1]*0x100+tmpbuf[x*3+0]*0x10000+0x00000000;
-				//#else
-				*draw++ = tmpbuf[x * 3 + 0] + tmpbuf[x * 3 + 1] * 0x100 + tmpbuf[x * 3 + 2] * 0x10000 + 0x00000000;
-				//#endif
-			}
-		}
-
-		bool exit_splash = false;
-
-		static Bitu max_splash_loop = 2400;
-		static Bitu splash_fade = 400;
-		static bool use_fadeout = true;
-
-		SDL_Texture* splash_tex = SDL_CreateTextureFromSurface(sdl.render.renderer, splash_surf);
-		SDL_SetRenderDrawColor(sdl.render.renderer, 0, 0, 0, 255);
-
-		for(Bit32u ct = 0, startticks = GetTicks(); ct < max_splash_loop; ct = GetTicks() - startticks)
-		{
-			SDL_Event evt;
-			while(SDL_PollEvent(&evt))
-			{
-				if(evt.type == SDL_QUIT)
-				{
-					exit_splash = true;
-					break;
-				}
-			}
-			if(exit_splash) break;
-
-			if(ct < 1)
-			{
-				SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
-				SDL_RenderPresent(sdl.render.renderer);
-			}
-			else if(ct >= max_splash_loop - splash_fade)
-			{
-				if(use_fadeout)
-				{
-					SDL_RenderClear(sdl.render.renderer);
-					SDL_SetTextureAlphaMod(splash_tex, (Bit8u)((max_splash_loop - 1 - ct) * 255 / (splash_fade - 1)));
-					SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
-					SDL_RenderPresent(sdl.render.renderer);
-				}
-			}
-		}
-
-		if(use_fadeout)
-		{
-			SDL_RenderClear(sdl.render.renderer);
-			SDL_RenderPresent(sdl.render.renderer);
-			//this second one clears in case of double buffer
-			SDL_RenderClear(sdl.render.renderer);
-		}
-		SDL_FreeSurface(splash_surf);
-		delete[] tmpbufp;
-	}
+	GUI_DrawSplash(sdl.curr_w, sdl.curr_h);
 
 	if (sdl.touch.use_overlay)
 	{
-		touchOverlay::setup(sdl.window, sdl.curr_w, sdl.curr_w, sdl.clip);
+		touchOverlay::setup(sdl.window, sdl.curr_w, sdl.curr_h, sdl.clip);
 	}
 
 	/* Get some Event handlers */
