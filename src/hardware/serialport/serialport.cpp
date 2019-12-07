@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -1130,7 +1130,7 @@ CSerial::CSerial(Bitu id, CommandLine* cmd) {
 	txOverrunErrors=0;
 	overrunIF0=0;
 	breakErrors=0;
-	
+
 	for (Bitu i = 0; i <= 7; i++) {
 		WriteHandler[i].Install (i + base, SERIAL_Write, IO_MB);
 		ReadHandler[i].Install (i + base, SERIAL_Read, IO_MB);
@@ -1140,8 +1140,10 @@ CSerial::CSerial(Bitu id, CommandLine* cmd) {
 bool CSerial::getBituSubstring(const char* name,Bitu* data, CommandLine* cmd) {
 	std::string tmpstring;
 	if(!(cmd->FindStringBegin(name,tmpstring,false))) return false;
-	const char* tmpchar=tmpstring.c_str();
-	if(sscanf(tmpchar,"%u",data)!=1) return false;
+	const char* tmpchar = tmpstring.c_str();
+	unsigned int d = 0;
+	if(sscanf(tmpchar,"%u",&d) != 1) return false;
+	*data = static_cast<Bitu>(d);
 	return true;
 }
 

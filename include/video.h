@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -66,12 +66,7 @@ void GFX_Stop(void);
 void GFX_SwitchFullScreen(void);
 bool GFX_StartUpdate(Bit8u * & pixels,Bitu & pitch);
 void GFX_EndUpdate( const Bit16u *changedLines );
-void GFX_GetSize(int &width, int &height, bool &fullscreen);
 void GFX_LosingFocus(void);
-
-#if defined (WIN32)
-bool GFX_SDLUsingWinDIB(void);
-#endif
 
 #if defined (REDUCE_JOYSTICK_POLLING)
 void MAPPER_UpdateJoysticks(void);

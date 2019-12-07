@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,18 +11,15 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef IOS_TARGET
+
 #include <AudioToolbox/AUGraph.h>
 #include <CoreServices/CoreServices.h>
-#else
-#include <AudioToolbox/AudioToolbox.h>
-#include <CoreMIDI/MIDIServices.h>
-#endif
+
 // A macro to simplify error handling a bit.
 #define RequireNoErr(error)                                         \
 do {                                                                \
@@ -83,7 +80,7 @@ public:
 
 		// The default output device
 		desc.componentType = kAudioUnitType_Output;
-        desc.componentSubType = kAudioUnitSubType_GenericOutput;
+		desc.componentSubType = kAudioUnitSubType_DefaultOutput;
 		desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 		desc.componentFlags = 0;
 		desc.componentFlagsMask = 0;
@@ -95,7 +92,7 @@ public:
 
 		// The built-in default (softsynth) music device
 		desc.componentType = kAudioUnitType_MusicDevice;
-        desc.componentSubType = kAudioUnitSubType_MIDISynth;
+		desc.componentSubType = kAudioUnitSubType_DLSSynth;
 		desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 #if USE_DEPRECATED_COREAUDIO_API
 		RequireNoErr(AUGraphNewNode(m_auGraph, &desc, 0, NULL, &synthNode));

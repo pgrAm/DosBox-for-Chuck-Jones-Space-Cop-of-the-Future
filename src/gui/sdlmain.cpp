@@ -32,7 +32,7 @@
 #include <sys/types.h>
 
 #include <algorithm>
-
+#include <assert.h>
 #ifdef WIN32
 #include <signal.h>
 #include <process.h>
@@ -90,6 +90,8 @@ extern char** environ;
 #include <os2.h>
 #endif
 
+#include "touch_overlay.h"
+
 enum PRIORITY_LEVELS
 {
 	PRIORITY_LEVEL_PAUSE,
@@ -100,97 +102,87 @@ enum PRIORITY_LEVELS
 	PRIORITY_LEVEL_HIGHEST
 };
 
-
 struct SDL_Block
 {
-	bool inited;
-	bool active;							//If this isn't set don't draw
-	bool updating;
+	bool inited = false;
+	bool active = false;							//If this isn't set don't draw
+	bool updating = false;
 	struct
 	{
-		Bit32u width;
-		Bit32u height;
-		Bit32u bpp;
-		Bitu flags;
-		double scalex, scaley;
-		GFX_CallBack_t callback;
+		int width = 0;
+		int height = 0;
+		Bit32u bpp = 0;
+		Bitu flags = 0;
+		double scalex = 0, scaley = 0;
+		GFX_CallBack_t callback = nullptr;
 	} draw;
-	bool wait_on_error;
+	bool wait_on_error = false;
 	struct
 	{
 		struct
 		{
-			Bit16u width, height;
-			bool fixed;
+			int width = 0, height = 0;
+			bool fixed = false;
 		} full;
 		struct
 		{
-			Bit16u width, height;
+			int width = 0, height = 0;
 		} window;
-		bool fullscreen;
-		bool lazy_fullscreen;
-		bool lazy_fullscreen_req;
-		bool doublebuf;
+		bool fullscreen = false;
 	} desktop;
 	struct
 	{
-		SDL_Renderer* renderer;
-		SDL_Texture* texture;
-		SDL_Texture* screen_tex;
-		double scaleFactor;
+		SDL_Renderer* renderer = nullptr;
+		SDL_Texture* texture = nullptr;
+		SDL_Texture* screen_tex = nullptr;
+		double scaleFactor = 0;
 	} render;
 	struct
 	{
-		SDL_Surface * surface;
-	} blit;
-	struct
-	{
-		PRIORITY_LEVELS focus;
-		PRIORITY_LEVELS nofocus;
+		PRIORITY_LEVELS focus = PRIORITY_LEVEL_HIGHEST;
+		PRIORITY_LEVELS nofocus = PRIORITY_LEVEL_HIGHEST;
 	} priority;
-	SDL_Rect clip;
-	SDL_Window * surface;
-	//SDL_Overlay * overlay;
-	SDL_cond *cond;
+	SDL_Rect clip{ 0, 0, 0, 0 };
+	SDL_Window * window = nullptr;
 	struct
 	{
-		bool autolock;
-		bool autoenable;
-		bool requestlock;
-		bool locked;
-		Bitu sensitivity;
+		bool autolock = false;
+		bool autoenable = false;
+		bool requestlock = false;
+		bool locked = false;
+		Bitu sensitivity = 0;
 	} mouse;
-	SDL_Rect updateRects[1024];
-	Bitu num_joysticks;
+	Bitu num_joysticks = 0;
 #if defined (WIN32)
 	//bool using_windib;
 	// Time when sdl regains focus (alt-tab) in windowed mode
-	Bit32u focus_ticks;
+	Bit32u focus_ticks = 0;
 #endif
 	// state of alt-keys for certain special handlings
-	Bit32u laltstate;
-	Bit32u raltstate;
-	int curr_w, curr_h;
+	Bit32u laltstate = 0;
+	Bit32u raltstate = 0;
+	int curr_w = 0, curr_h = 0;
+	struct
+	{
+		bool use_overlay = false;
+	} touch;
 };
 
 static SDL_Block sdl;
 
-void setupFullscreenResolution(int displayindex = 0)
+void getFullscreenResolution(int displayindex, int* width, int* height)
 {
 	SDL_DisplayMode vidinfo;
-
 	SDL_GetCurrentDisplayMode(displayindex, &vidinfo);
-
-	sdl.desktop.full.width = vidinfo.w;
-	sdl.desktop.full.height = vidinfo.h;
-
+	*width = vidinfo.w;
+	*height = vidinfo.h;
 }
 
 void GFX_UpdateSDLCaptureState(void);
+void GFX_RestoreMode();
 
 SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 {
-
 	static SDL_Window* s = NULL;
 	static bool fullscreen = false;
 
@@ -203,14 +195,14 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 		}
 
-		sdl.surface = s;
+		sdl.window = s;
 	}
 
 	if(flags & SDL_WINDOW_FULLSCREEN)
 	{
 		SDL_DisplayMode mode;
 
-		SDL_GetWindowDisplayMode(sdl.surface, &mode);
+		SDL_GetWindowDisplayMode(sdl.window, &mode);
 
 		if(mode.h != height || mode.w != width || mode.refresh_rate != 60)
 		{
@@ -219,47 +211,38 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 			mode.refresh_rate = 60;
 			mode.driverdata = NULL;
 
-			SDL_SetWindowDisplayMode(sdl.surface, &mode);
+			SDL_SetWindowDisplayMode(sdl.window, &mode);
 		}
 
 		if(!fullscreen)
 		{
-			if(sdl.render.renderer)
-			{
-				SDL_DestroyRenderer(sdl.render.renderer);
-			}
-
-			if(SDL_SetWindowFullscreen(sdl.surface, SDL_WINDOW_FULLSCREEN))
+			if(SDL_SetWindowFullscreen(sdl.window, SDL_WINDOW_FULLSCREEN))
 			{
 				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 			}
-
-			sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 
 			fullscreen = true;
 		}
 	}
 	else
 	{
-		if(sdl.render.renderer)
-		{
-			SDL_DestroyRenderer(sdl.render.renderer);
-		}
-
-		if(SDL_SetWindowFullscreen(sdl.surface, 0))
+		if(SDL_SetWindowFullscreen(sdl.window, 0))
 		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", SDL_GetError(), NULL);
 		}
 
 		if(sdl.curr_w != width || sdl.curr_h != height)
 		{
-			SDL_SetWindowSize(sdl.surface, width, height);
-			SDL_SetWindowPosition(sdl.surface, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+			SDL_SetWindowSize(sdl.window, width, height);
+			SDL_SetWindowPosition(sdl.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 
-		sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
-
 		fullscreen = false;
+	}
+
+	if (!sdl.render.renderer)
+	{
+		sdl.render.renderer = SDL_CreateRenderer(s, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 	}
 
 	sdl.curr_w = width;
@@ -279,7 +262,7 @@ extern bool CPU_CycleAutoAdjust;
 bool startup_state_numlock = false;
 bool startup_state_capslock = false;
 
-void GFX_SetTitle(Bit32s cycles, Bits frameskip, bool paused)
+void GFX_SetTitle(int cycles, int frameskip, bool paused)
 {
 	char title[200] = {0};
 	static Bit32s internal_cycles = 0;
@@ -298,7 +281,7 @@ void GFX_SetTitle(Bit32s cycles, Bits frameskip, bool paused)
 	if(paused) strcat(title, " PAUSED");
 	//SDL_WM_SetCaption(title,VERSION);
 
-	SDL_SetWindowTitle(sdl.surface, "Chuck Jones: Space Cop of the Future");
+	SDL_SetWindowTitle(sdl.window, "Chuck Jones: Space Cop of the Future");
 }
 
 static unsigned char logo[32 * 32 * 4] = {
@@ -315,7 +298,7 @@ static void GFX_SetIcon()
 #else
 	SDL_Surface* logos = SDL_CreateRGBSurfaceFrom((void*)logo, 32, 32, 32, 128, 0x000000ff, 0x0000ff00, 0x00ff0000, 0);
 #endif
-	SDL_SetWindowIcon(sdl.surface, logos);
+	SDL_SetWindowIcon(sdl.window, logos);
 #endif
 }
 
@@ -371,14 +354,6 @@ static void PauseDOSBox(bool pressed)
 	}
 }
 
-#if defined (WIN32)
-bool GFX_SDLUsingWinDIB(void)
-{
-	//return sdl.using_windib;
-	return false;
-}
-#endif
-
 /* Reset the screen with current values in the sdl structure */
 Bitu GFX_GetBestMode(Bitu flags)
 {
@@ -422,16 +397,8 @@ void GFX_ResetScreen(void)
 
 void GFX_ForceFullscreenExit(void)
 {
-	if(sdl.desktop.lazy_fullscreen)
-	{
-		//		sdl.desktop.lazy_fullscreen_req=true;
-		LOG_MSG("GFX LF: invalid screen change");
-	}
-	else
-	{
-		sdl.desktop.fullscreen = false;
-		GFX_ResetScreen();
-	}
+	sdl.desktop.fullscreen = false;
+	GFX_ResetScreen();
 }
 
 static int int_log2(int val)
@@ -442,147 +409,42 @@ static int int_log2(int val)
 	return log;
 }
 
-
-#include "SDL_system.h"
-
-#if defined(__ANDROID__)|| defined(__IPHONEOS__)
-#define USE_OVERLAY
-#endif
-
-#ifdef USE_OVERLAY
-
-#define NUM_ACTIONS 6
-
-class overlayButton
+static void GFX_SetupSurfaceScaled()
 {
-	SDL_Surface* imagedata;
-	SDL_Texture* texture;
+	Bit32u sdl_flags = 0;
 
-	SDL_Rect rect;
-
-public:
-
-	SDL_Scancode key;
-
-	overlayButton(std::string path, SDL_Scancode k)
+	if (sdl.desktop.fullscreen)
 	{
-#if defined (__ANDROID__)
-		path = SDL_AndroidGetInternalStoragePath() + std::string("/") + path;
-#endif
-		imagedata = SDL_LoadBMP(path.c_str());
-
-		texture = SDL_CreateTextureFromSurface(sdl.render.renderer, imagedata);
-
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = 0;
-		rect.h = 0;
-
-		key = k;
+		sdl_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MOUSE_CAPTURE;
 	}
 
-	void changeRect(int x, int y, int w, int h)
+	if(sdl.desktop.full.fixed || !sdl.desktop.fullscreen)
 	{
-		rect.x = x;
-		rect.y = y;
-		rect.w = w;
-		rect.h = h;
-	}
+		int fixedWidth;
+		int fixedHeight;
 
-	void draw(bool color)
-	{
-		if(color)
+		if (sdl.desktop.fullscreen)
 		{
-			SDL_SetTextureColorMod(texture, 0, 255, 0);
+			getFullscreenResolution(SDL_GetWindowDisplayIndex(sdl.window),
+									&sdl.desktop.full.width,
+									&sdl.desktop.full.height);
+
+			fixedWidth = sdl.desktop.full.width;
+			fixedHeight = sdl.desktop.full.height;
+		}
+		else
+		{
+			fixedWidth = sdl.desktop.window.width;
+			fixedHeight = sdl.desktop.window.height;
 		}
 
-		SDL_RenderCopy(sdl.render.renderer, texture, &imagedata->clip_rect, &rect);
-
-		if(color)
-		{
-			SDL_SetTextureColorMod(texture, 255, 255, 255);
-		}
-	}
-
-	bool checkBounds(int x_Check, int y_Check)
-	{
-		return (x_Check < rect.x + rect.w) && (y_Check < rect.y + rect.h) && (x_Check > rect.x) && (y_Check > rect.y);
-	}
-};
-
-int cursorSelected = 0;
-
-overlayButton* actions[NUM_ACTIONS];
-
-void resizeOverlay()
-{
-	int buttonSize = (sdl.curr_h / 5);
-
-	int x_offset = std::max(sdl.clip.x - buttonSize, 0) / 2;
-
-	actions[0]->changeRect(x_offset, 0 * buttonSize + 0.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[1]->changeRect(x_offset, 1 * buttonSize + 1.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[2]->changeRect(x_offset, 2 * buttonSize + 2.5 * (buttonSize / 4), buttonSize, buttonSize);
-	actions[3]->changeRect(x_offset, 3 * buttonSize + 3.5 * (buttonSize / 4), buttonSize, buttonSize);
-
-	actions[4]->changeRect(sdl.curr_w - buttonSize - x_offset, 0 * buttonSize + 0.5 * (buttonSize / 4), buttonSize, sdl.curr_h / 5);
-	actions[5]->changeRect(sdl.curr_w - buttonSize - x_offset, 3 * buttonSize + 3.5 * (buttonSize / 4), buttonSize, sdl.curr_h / 5);
-}
-
-void setupOverlay()
-{
-	actions[0] = new overlayButton("icons/default.bmp", SDL_SCANCODE_1);
-	actions[1] = new overlayButton("icons/hand.bmp", SDL_SCANCODE_2);
-	actions[2] = new overlayButton("icons/look.bmp", SDL_SCANCODE_3);
-	actions[3] = new overlayButton("icons/talk.bmp", SDL_SCANCODE_4);
-
-	actions[4] = new overlayButton("icons/default.bmp", SDL_SCANCODE_ESCAPE);
-	actions[5] = new overlayButton("icons/bag.bmp", SDL_SCANCODE_I);
-
-	resizeOverlay();
-}
-
-void drawOverlay()
-{
-	for(int i = 0; i < NUM_ACTIONS; i++)
-	{
-		actions[i]->draw(cursorSelected == i);
-	}
-}
-
-#endif
-
-static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp)
-{
-	Bit16u fixedWidth;
-	Bit16u fixedHeight;
-
-	if(sdl.desktop.fullscreen)
-	{
-		setupFullscreenResolution(SDL_GetWindowDisplayIndex(sdl.surface));
-
-		fixedWidth = sdl.desktop.full.fixed ? sdl.desktop.full.width : 0;
-		fixedHeight = sdl.desktop.full.fixed ? sdl.desktop.full.height : 0;
-		sdl_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MOUSE_CAPTURE;// | SDL_HWSURFACE;
-	}
-	else
-	{
-		fixedWidth = sdl.desktop.window.width;
-		fixedHeight = sdl.desktop.window.height;
-		//sdl_flags |= SDL_HWSURFACE;
-	}
-
-	if(fixedWidth && fixedHeight)
-	{
-		double ratio_w = (double)fixedWidth / (sdl.draw.width*sdl.draw.scalex);
-		double ratio_h = (double)fixedHeight / (sdl.draw.height*sdl.draw.scaley);
-
-		//SDL_Surface *s = SDL_GetWindowSurface(sdl.surface);
+		double ratio_w = (double)fixedWidth / (sdl.draw.width * sdl.draw.scalex);
+		double ratio_h = (double)fixedHeight / (sdl.draw.height * sdl.draw.scaley);
 
 		if(ratio_w < ratio_h)
 		{
 			sdl.clip.w = fixedWidth;
-			sdl.clip.h = (Bit16u)(sdl.draw.height*sdl.draw.scaley*ratio_w + 0.1); //possible rounding issues
+			sdl.clip.h = (int)(sdl.draw.height * sdl.draw.scaley * ratio_w + 0.1); //possible rounding issues
 		}
 		else
 		{
@@ -590,42 +452,31 @@ static SDL_Window * GFX_SetupSurfaceScaled(Bit32u sdl_flags, Bit32u bpp)
 			* The 0.4 is there to correct for rounding issues.
 			* (partly caused by the rounding issues fix in RENDER_SetSize)
 			*/
-			sdl.clip.w = (Bit16u)(sdl.draw.width*sdl.draw.scalex*ratio_h + 0.4);
-			sdl.clip.h = (Bit16u)fixedHeight;
-		}
-		if(sdl.desktop.fullscreen)
-		{
-			sdl.surface = SDL_SetVideoMode_Wrap(fixedWidth, fixedHeight, bpp, sdl_flags);
-		}
-		else
-		{
-			sdl.surface = SDL_SetVideoMode_Wrap(sdl.clip.w, sdl.clip.h, bpp, sdl_flags);
+			sdl.clip.w = (int)(sdl.draw.width*sdl.draw.scalex*ratio_h + 0.4);
+			sdl.clip.h = (int)fixedHeight;
 		}
 
-		if(sdl.surface && SDL_GetWindowFlags(sdl.surface) & SDL_WINDOW_FULLSCREEN)
+		if(sdl.desktop.fullscreen)
 		{
-			sdl.clip.x = (Sint16)((sdl.curr_w - sdl.clip.w) / 2);
-			sdl.clip.y = (Sint16)((sdl.curr_h - sdl.clip.h) / 2);
+			sdl.window = SDL_SetVideoMode_Wrap(fixedWidth, fixedHeight, 32, sdl_flags);
 		}
 		else
 		{
-			sdl.clip.x = 0;
-			sdl.clip.y = 0;
+			sdl.window = SDL_SetVideoMode_Wrap(sdl.clip.w, sdl.clip.h, 32, sdl_flags);
 		}
+
+		sdl.clip.x = (int)((sdl.curr_w - sdl.clip.w) / 2);
+		sdl.clip.y = (int)((sdl.curr_h - sdl.clip.h) / 2);
 	}
 	else
 	{
-		sdl.clip.x = 0; sdl.clip.y = 0;
-		sdl.clip.w = (Bit16u)(sdl.draw.width*sdl.draw.scalex);
-		sdl.clip.h = (Bit16u)(sdl.draw.height*sdl.draw.scaley);
-		sdl.surface = SDL_SetVideoMode_Wrap(sdl.clip.w, sdl.clip.h, bpp, sdl_flags);
+		//just set the mode directly and let the hardware deal with it
+		sdl.clip.x = 0;
+		sdl.clip.y = 0;
+		sdl.clip.w = (int)(sdl.draw.width * sdl.draw.scalex);
+		sdl.clip.h = (int)(sdl.draw.height * sdl.draw.scaley);
+		sdl.window = SDL_SetVideoMode_Wrap(sdl.clip.w, sdl.clip.h, 32, sdl_flags);
 	}
-
-#ifdef USE_OVERLAY
-	resizeOverlay();
-#endif
-
-	return sdl.surface;
 }
 
 void GFX_TearDown(void)
@@ -633,12 +484,6 @@ void GFX_TearDown(void)
 	if(sdl.updating)
 	{
 		GFX_EndUpdate(0);
-	}
-
-	if(sdl.blit.surface)
-	{
-		SDL_FreeSurface(sdl.blit.surface);
-		sdl.blit.surface = 0;
 	}
 }
 
@@ -651,7 +496,6 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 
 	sdl.draw.width = width;
 	sdl.draw.height = height;
-
 	sdl.draw.callback = callback;
 	sdl.draw.scalex = scalex;
 	sdl.draw.scaley = scaley;
@@ -659,59 +503,63 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 	int bpp = 0;
 	Bitu retFlags = 0;
 
-	if(sdl.blit.surface)
+	if(sdl.render.texture)
 	{
-		SDL_FreeSurface(sdl.blit.surface);
-		sdl.blit.surface = 0;
+		SDL_DestroyTexture(sdl.render.texture);
+		SDL_DestroyTexture(sdl.render.screen_tex);
+		sdl.render.texture = sdl.render.screen_tex = nullptr;
 	}
+	
+	GFX_SetupSurfaceScaled();
+	
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	
+	sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, DEFAULT_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
+	assert(sdl.render.texture);
+	
+	if((double)sdl.curr_w / (double)sdl.curr_h < ((double)sdl.draw.width / (double)sdl.draw.height))
 	{
-		if(sdl.render.texture)
-		{
-			SDL_DestroyTexture(sdl.render.texture);
-			SDL_DestroyTexture(sdl.render.screen_tex);
-		}
+		//contrary popular belief 5:4 monitors do exist
+		//I like them quite a bit
+		sdl.render.scaleFactor = sdl.curr_w / (double)sdl.draw.width;
+	}
+	else
+	{
+		sdl.render.scaleFactor = sdl.curr_h / (double)sdl.draw.height;
+	}
+	
+	int w = sdl.draw.width * int(sdl.render.scaleFactor);
+	int h = sdl.draw.height * int(sdl.render.scaleFactor);
+	
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	
+	sdl.render.screen_tex = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.window), SDL_TEXTUREACCESS_TARGET, w, h);
+	assert(sdl.render.screen_tex);
 
-		GFX_SetupSurfaceScaled(0, 0);
+	if (sdl.touch.use_overlay)
+	{
+		touchOverlay::resize(sdl.curr_w, sdl.curr_h, sdl.clip);
+	}
 
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-
-		sdl.render.texture = SDL_CreateTexture(sdl.render.renderer, DEFAULT_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, sdl.draw.width, sdl.draw.height);
-
-		if((double)sdl.curr_w / (double)sdl.curr_h < ((double)sdl.draw.width / (double)sdl.draw.height))
-		{
-			//contrary popular belief 5:4 monitors do exist
-			//I like them quite a bit
-			sdl.render.scaleFactor = sdl.curr_w / (double)sdl.draw.width;
-		}
-		else
-		{
-			sdl.render.scaleFactor = sdl.curr_h / (double)sdl.draw.height;
-		}
-
-		int w = sdl.draw.width * int(sdl.render.scaleFactor);
-		int h = sdl.draw.height * int(sdl.render.scaleFactor);
-
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-
-		sdl.render.screen_tex = SDL_CreateTexture(sdl.render.renderer, SDL_GetWindowPixelFormat(sdl.surface), SDL_TEXTUREACCESS_TARGET, w, h);
-
-		Uint32 f;
-
-		SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL);
-
-		switch(SDL_BITSPERPIXEL(f))
-		{
-		case 15:
-			retFlags = GFX_CAN_15 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		case 16:
-			retFlags = GFX_CAN_16 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		case 24:
-		case 32:
-			retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
-			break;
-		}
+	Uint32 f;
+	if (SDL_QueryTexture(sdl.render.texture, &f, NULL, NULL, NULL) != 0)
+	{
+		puts(SDL_GetError());
+		assert(false);
+	}
+	
+	switch(SDL_BITSPERPIXEL(f))
+	{
+	case 15:
+		retFlags = GFX_CAN_15 | GFX_SCALING | GFX_HARDWARE;
+		break;
+	case 16:
+		retFlags = GFX_CAN_16 | GFX_SCALING | GFX_HARDWARE;
+		break;
+	case 24:
+	case 32:
+		retFlags = GFX_CAN_32 | GFX_SCALING | GFX_HARDWARE;
+		break;
 	}
 
 	if(retFlags)
@@ -819,36 +667,12 @@ static void SwitchFullScreen(bool pressed)
 	if(!pressed)
 		return;
 
-	if(sdl.desktop.lazy_fullscreen)
-	{
-		//		sdl.desktop.lazy_fullscreen_req=true;
-		LOG_MSG("GFX LF: fullscreen switching not supported");
-	}
-	else
-	{
-		GFX_SwitchFullScreen();
-	}
-}
-
-void GFX_SwitchLazyFullscreen(bool lazy)
-{
-	sdl.desktop.lazy_fullscreen = lazy;
-	sdl.desktop.lazy_fullscreen_req = false;
+	GFX_SwitchFullScreen();
 }
 
 void GFX_SwitchFullscreenNoReset(void)
 {
 	sdl.desktop.fullscreen = !sdl.desktop.fullscreen;
-}
-
-bool GFX_LazyFullscreenRequested(void)
-{
-	if(sdl.desktop.lazy_fullscreen)
-	{
-		return sdl.desktop.lazy_fullscreen_req;
-	}
-
-	return false;
 }
 
 void GFX_RestoreMode(void)
@@ -880,9 +704,9 @@ bool GFX_StartUpdate(Bit8u * & pixels, Bitu & pitch)
 	return true;
 }
 
-void GFX_EndUpdate(const Bit16u *changedLines)
+void GFX_EndUpdate(const Bit16u* changedLines)
 {
-	if(!sdl.updating)
+	if (!sdl.updating)
 	{
 		return;
 	}
@@ -893,17 +717,26 @@ void GFX_EndUpdate(const Bit16u *changedLines)
 
 	SDL_SetRenderTarget(sdl.render.renderer, sdl.render.screen_tex);
 
-	SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0);
+	if (SDL_RenderCopy(sdl.render.renderer, sdl.render.texture, 0, 0))
+	{
+		puts(SDL_GetError());
+	}
 
 	SDL_SetRenderTarget(sdl.render.renderer, NULL);
-#ifdef USE_OVERLAY
-	//TODO
+
+	//TODO, make sure we only clear when we need to
 	SDL_RenderClear(sdl.render.renderer);
-#endif
-	SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip);
-#ifdef USE_OVERLAY
-	drawOverlay();
-#endif
+
+	if (SDL_RenderCopy(sdl.render.renderer, sdl.render.screen_tex, 0, &sdl.clip))
+	{
+		puts(SDL_GetError());
+	}
+
+	if (sdl.touch.use_overlay)
+	{
+		touchOverlay::draw();
+	}
+
 	SDL_RenderPresent(sdl.render.renderer);
 }
 
@@ -955,7 +788,7 @@ static void GUI_ShutDown(Section * /*sec*/)
 	GFX_Stop();
 	if(sdl.draw.callback) { (sdl.draw.callback)(GFX_CallBackStop); }
 	if(sdl.mouse.locked) { GFX_CaptureMouse(); }
-	if(sdl.desktop.fullscreen) { GFX_SwitchFullScreen(); }
+	//if(sdl.desktop.fullscreen) { GFX_SwitchFullScreen(); }
 }
 
 
@@ -1042,6 +875,104 @@ static void OutputString(Bitu x, Bitu y, const char * text, Bit32u color, Bit32u
 //extern void UI_Run(bool);
 void Restart(bool pressed);
 
+static void GUI_DrawSplash(int windowWidth, int windowHeight)
+{
+/* The endian part is intentionally disabled as somehow it produces correct results without according to rhoenie*/
+//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+//    Bit32u rmask = 0xff000000;
+//    Bit32u gmask = 0x00ff0000;
+//    Bit32u bmask = 0x0000ff00;
+//#else
+	Bit32u rmask = 0x000000ff;
+	Bit32u gmask = 0x0000ff00;
+	Bit32u bmask = 0x00ff0000;
+//#endif
+
+	/* Please leave the Splash screen stuff in working order in DOSBox. We spend a lot of time making DOSBox. */
+	SDL_Surface* splash_surf = SDL_CreateRGBSurface(SDL_SWSURFACE, windowWidth, windowHeight, 32, rmask, gmask, bmask, 0);
+
+	SDL_SetSurfaceBlendMode(splash_surf, SDL_BLENDMODE_BLEND);
+
+	if (splash_surf)
+	{
+		SDL_FillRect(splash_surf, NULL, SDL_MapRGB(splash_surf->format, 0xba, 0x3d, 0x00));
+
+		int yoffset = (windowHeight - 400) / 2;
+
+		Bit8u* tmpbufp = new Bit8u[640 * 400 * 3];
+		GIMP_IMAGE_RUN_LENGTH_DECODE(tmpbufp, gimp_image.rle_pixel_data, 640 * 400, 3);
+		for (Bitu y = 0; y < 400; y++)
+		{
+
+			int offset = (windowWidth - 640) / 2;
+
+			Bit8u* tmpbuf = tmpbufp + y * 640 * 3;
+			Bit32u* draw = (Bit32u*)(((Bit8u*)splash_surf->pixels) + ((y + yoffset) * splash_surf->pitch)) + offset;
+
+			for (Bitu x = 0; x < 640; x++)
+			{
+				//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+				//				*draw++ = tmpbuf[x*3+2]+tmpbuf[x*3+1]*0x100+tmpbuf[x*3+0]*0x10000+0x00000000;
+				//#else
+				*draw++ = tmpbuf[x * 3 + 0] + tmpbuf[x * 3 + 1] * 0x100 + tmpbuf[x * 3 + 2] * 0x10000 + 0x00000000;
+				//#endif
+			}
+		}
+
+		bool exit_splash = false;
+
+		static Bitu max_splash_loop = 2400;
+		static Bitu splash_fade = 400;
+		static bool use_fadeout = true;
+
+		SDL_Texture* splash_tex = SDL_CreateTextureFromSurface(sdl.render.renderer, splash_surf);
+		SDL_SetRenderDrawColor(sdl.render.renderer, 0, 0, 0, 255);
+
+		SDL_RenderClear(sdl.render.renderer);
+		SDL_RenderPresent(sdl.render.renderer);
+
+		for (Bit32u ct = 0, startticks = GetTicks(); ct < max_splash_loop; ct = GetTicks() - startticks)
+		{
+			SDL_Event evt;
+			while (SDL_PollEvent(&evt))
+			{
+				if (evt.type == SDL_QUIT)
+				{
+					exit_splash = true;
+					break;
+				}
+			}
+			if (exit_splash) break;
+
+			if (ct < 1)
+			{
+				SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
+				SDL_RenderPresent(sdl.render.renderer);
+			}
+			else if (ct >= max_splash_loop - splash_fade)
+			{
+				if (use_fadeout)
+				{
+					SDL_RenderClear(sdl.render.renderer);
+					SDL_SetTextureAlphaMod(splash_tex, (Bit8u)((max_splash_loop - 1 - ct) * 255 / (splash_fade - 1)));
+					SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
+					SDL_RenderPresent(sdl.render.renderer);
+				}
+			}
+		}
+
+		if (use_fadeout)
+		{
+			SDL_RenderClear(sdl.render.renderer);
+			SDL_RenderPresent(sdl.render.renderer);
+			//this second one clears in case of double buffer
+			SDL_RenderClear(sdl.render.renderer);
+		}
+		SDL_FreeSurface(splash_surf);
+		delete[] tmpbufp;
+	}
+}
+
 static void GUI_StartUp(Section * sec)
 {
 	sec->AddDestroyFunction(&GUI_ShutDown);
@@ -1050,9 +981,6 @@ static void GUI_StartUp(Section * sec)
 	sdl.updating = false;
 
 	GFX_SetIcon();
-
-	sdl.desktop.lazy_fullscreen = false;
-	sdl.desktop.lazy_fullscreen_req = false;
 
 	sdl.desktop.fullscreen = section->Get_bool("fullscreen");
 	sdl.wait_on_error = section->Get_bool("waitonerror");
@@ -1132,12 +1060,14 @@ static void GUI_StartUp(Section * sec)
 			}
 		}
 	}
-	sdl.desktop.doublebuf = section->Get_bool("fulldouble");
+	//sdl.desktop.doublebuf = section->Get_bool("fulldouble");
 
 	if(!sdl.desktop.full.width || !sdl.desktop.full.height)
 	{
 		//Can only be done on the very first call! Not restartable.
-		setupFullscreenResolution();
+		getFullscreenResolution(0,
+								&sdl.desktop.full.width,
+								&sdl.desktop.full.height);
 	}
 
 	if(!sdl.desktop.full.width)
@@ -1162,8 +1092,9 @@ static void GUI_StartUp(Section * sec)
 	sdl.mouse.autolock = false;
 	sdl.mouse.sensitivity = section->Get_int("sensitivity");
 
-	std::string output = section->Get_string("output");
+	sdl.touch.use_overlay = section->Get_bool("touchoverlay");
 
+	std::string output = section->Get_string("output");
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, output.c_str());
 
 	int windowHeight = sdl.desktop.fullscreen ? sdl.desktop.full.height : sdl.desktop.window.height;
@@ -1176,8 +1107,8 @@ static void GUI_StartUp(Section * sec)
 	}
 
 	/* Initialize screen for first time */
-	sdl.surface = SDL_SetVideoMode_Wrap(windowWidth, windowHeight, 0, defaultFlags);
-	if(sdl.surface == NULL)
+	sdl.window = SDL_SetVideoMode_Wrap(windowWidth, windowHeight, 0, defaultFlags);
+	if(sdl.window == NULL)
 	{
 		E_Exit("Could not initialize video: %s", SDL_GetError());
 	}
@@ -1192,23 +1123,12 @@ static void GUI_StartUp(Section * sec)
 	}
 
 	GFX_Stop();
-	SDL_SetWindowTitle(sdl.surface, "DOSBox");
-
-	/* The endian part is intentionally disabled as somehow it produces correct results without according to rhoenie*/
-	//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	//    Bit32u rmask = 0xff000000;
-	//    Bit32u gmask = 0x00ff0000;
-	//    Bit32u bmask = 0x0000ff00;
-	//#else
-	Bit32u rmask = 0x000000ff;
-	Bit32u gmask = 0x0000ff00;
-	Bit32u bmask = 0x00ff0000;
-	//#endif
+	SDL_SetWindowTitle(sdl.window, "DOSBox");
 
 	SDL_RenderClear(sdl.render.renderer);
 	SDL_RenderPresent(sdl.render.renderer);
 
-	SDL_RaiseWindow(sdl.surface);
+	SDL_RaiseWindow(sdl.window);
 
 	/* Setup Mouse correctly if fullscreen */
 	if(sdl.desktop.fullscreen)
@@ -1219,91 +1139,12 @@ static void GUI_StartUp(Section * sec)
 		}
 	}
 
-	/* Please leave the Splash screen stuff in working order in DOSBox. We spend a lot of time making DOSBox. */
-	SDL_Surface* splash_surf = SDL_CreateRGBSurface(SDL_SWSURFACE, windowWidth, windowHeight, 32, rmask, gmask, bmask, 0);
+	GUI_DrawSplash(sdl.curr_w, sdl.curr_h);
 
-	SDL_SetSurfaceBlendMode(splash_surf, SDL_BLENDMODE_BLEND);
-
-	if(splash_surf)
+	if (sdl.touch.use_overlay)
 	{
-		SDL_FillRect(splash_surf, NULL, SDL_MapRGB(splash_surf->format, 0xba, 0x3d, 0x00));
-
-		int yoffset = (windowHeight - 400) / 2;
-
-		Bit8u* tmpbufp = new Bit8u[640 * 400 * 3];
-		GIMP_IMAGE_RUN_LENGTH_DECODE(tmpbufp, gimp_image.rle_pixel_data, 640 * 400, 3);
-		for(Bitu y = 0; y < 400; y++)
-		{
-
-			int offset = (windowWidth - 640) / 2;
-
-			Bit8u* tmpbuf = tmpbufp + y * 640 * 3;
-			Bit32u * draw = (Bit32u*)(((Bit8u *)splash_surf->pixels) + ((y + yoffset)*splash_surf->pitch)) + offset;
-
-			for(Bitu x = 0; x < 640; x++)
-			{
-				//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-				//				*draw++ = tmpbuf[x*3+2]+tmpbuf[x*3+1]*0x100+tmpbuf[x*3+0]*0x10000+0x00000000;
-				//#else
-				*draw++ = tmpbuf[x * 3 + 0] + tmpbuf[x * 3 + 1] * 0x100 + tmpbuf[x * 3 + 2] * 0x10000 + 0x00000000;
-				//#endif
-			}
-		}
-
-		bool exit_splash = false;
-
-		static Bitu max_splash_loop = 2400;
-		static Bitu splash_fade = 400;
-		static bool use_fadeout = true;
-
-		SDL_Texture* splash_tex = SDL_CreateTextureFromSurface(sdl.render.renderer, splash_surf);
-		SDL_SetRenderDrawColor(sdl.render.renderer, 0, 0, 0, 255);
-
-		for(Bit32u ct = 0, startticks = GetTicks(); ct < max_splash_loop; ct = GetTicks() - startticks)
-		{
-			SDL_Event evt;
-			while(SDL_PollEvent(&evt))
-			{
-				if(evt.type == SDL_QUIT)
-				{
-					exit_splash = true;
-					break;
-				}
-			}
-			if(exit_splash) break;
-
-			if(ct < 1)
-			{
-				SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
-				SDL_RenderPresent(sdl.render.renderer);
-			}
-			else if(ct >= max_splash_loop - splash_fade)
-			{
-				if(use_fadeout)
-				{
-					SDL_RenderClear(sdl.render.renderer);
-					SDL_SetTextureAlphaMod(splash_tex, (Bit8u)((max_splash_loop - 1 - ct) * 255 / (splash_fade - 1)));
-					SDL_RenderCopy(sdl.render.renderer, splash_tex, NULL, NULL);
-					SDL_RenderPresent(sdl.render.renderer);
-				}
-			}
-		}
-
-		if(use_fadeout)
-		{
-			SDL_RenderClear(sdl.render.renderer);
-			SDL_RenderPresent(sdl.render.renderer);
-			//this second one clears in case of double buffer
-			SDL_RenderClear(sdl.render.renderer);
-		}
-		SDL_FreeSurface(splash_surf);
-		delete[] tmpbufp;
-
+		touchOverlay::setup(sdl.window, sdl.curr_w, sdl.curr_h, sdl.clip);
 	}
-
-#ifdef USE_OVERLAY
-	setupOverlay();
-#endif
 
 	/* Get some Event handlers */
 	//MAPPER_AddHandler(KillSwitch,MK_f9,MMOD1,"shutdown","ShutDown");
@@ -1334,20 +1175,42 @@ void Mouse_AutoLock(bool enable)
 	}
 }
 
+struct
+{
+	int lastPixX = 160, lastPixY = 120;
+} mouseInfo;
+
 static void HandleMouseMotion(SDL_MouseMotionEvent * motion)
 {
+	if (motion->which == SDL_TOUCH_MOUSEID) { return; }
+
 	if(sdl.mouse.locked || !sdl.mouse.autoenable)
 	{
-		Mouse_CursorMoved((float)motion->xrel*sdl.mouse.sensitivity / 100.0f,
-			(float)motion->yrel*sdl.mouse.sensitivity / 100.0f,
-						  (float)(motion->x - sdl.clip.x) / (sdl.clip.w - 1)*sdl.mouse.sensitivity / 100.0f,
-						  (float)(motion->y - sdl.clip.y) / (sdl.clip.h - 1)*sdl.mouse.sensitivity / 100.0f,
-						  sdl.mouse.locked);
+		float deltaX = (float)motion->xrel * sdl.mouse.sensitivity / 100.0f;
+		float deltaY = (float)motion->yrel * sdl.mouse.sensitivity / 100.0f;
+
+		if (!sdl.mouse.locked)
+		{
+			int pixX = std::clamp((int)((motion->x - sdl.clip.x) / sdl.render.scaleFactor), 0, sdl.draw.width);
+			int pixY = std::clamp((int)((motion->y - sdl.clip.y) / sdl.render.scaleFactor), 0, sdl.draw.height);
+			deltaX = pixX - mouseInfo.lastPixX;
+			deltaY = pixY - mouseInfo.lastPixY;
+		}
+
+		Mouse_CursorMoved(	deltaX, deltaY,
+							(float)(motion->x - sdl.clip.x) / (sdl.clip.w - 1)*sdl.mouse.sensitivity / 100.0f,
+							(float)(motion->y - sdl.clip.y) / (sdl.clip.h - 1)*sdl.mouse.sensitivity / 100.0f,
+							sdl.mouse.locked);
+
+		mouseInfo.lastPixX = std::clamp((int)(mouseInfo.lastPixX + deltaX), 0, sdl.draw.width);
+		mouseInfo.lastPixY = std::clamp((int)(mouseInfo.lastPixY + deltaY), 0, sdl.draw.height);
 	}
 }
 
 static void HandleMouseButton(SDL_MouseButtonEvent * button)
 {
+	if (button->which == SDL_TOUCH_MOUSEID) { return; }
+
 	switch(button->state)
 	{
 	case SDL_PRESSED:
@@ -1392,89 +1255,41 @@ static void HandleMouseButton(SDL_MouseButtonEvent * button)
 	}
 }
 
-float lastposx = 0.5, lastposy = 0.5;
-
-#ifdef USE_OVERLAY
-bool checkOverlayTap(SDL_TouchFingerEvent * finger)
+void moveFinger(SDL_TouchFingerEvent* finger)
 {
-	int xcoord = finger->x * sdl.curr_w;
-	int ycoord = finger->y * sdl.curr_h;
+	int pixX = std::clamp((int)(((double)finger->x * sdl.curr_w - sdl.clip.x) / sdl.render.scaleFactor), 0, sdl.draw.width);
+	int pixY = std::clamp((int)(((double)finger->y * sdl.curr_h - sdl.clip.y) / sdl.render.scaleFactor), 0, sdl.draw.height);
 
-	static SDL_Scancode key = SDL_NUM_SCANCODES;
+	int x = pixX - mouseInfo.lastPixX;
+	int y = pixY - mouseInfo.lastPixY;
 
-	if(finger->type == SDL_FINGERDOWN)
-	{
-		for(int i = 0; i < NUM_ACTIONS; i++)
-		{
-			if(actions[i]->checkBounds(xcoord, ycoord))
-			{
-				if(i < 4)
-				{
-					GFX_ResetScreen();
-					cursorSelected = i;
-				}
+	Mouse_CursorMoved(x, y, 0, 0, true);
 
-				SDL_Event sdlevent;
-				sdlevent.type = SDL_KEYDOWN;
-				sdlevent.key.keysym.scancode = actions[i]->key;
-
-				SDL_PushEvent(&sdlevent);
-
-				key = actions[i]->key;
-
-				return true;
-			}
-		}
-	}
-	else if(finger->type == SDL_FINGERUP)
-	{
-		if(key != SDL_NUM_SCANCODES)
-		{
-			SDL_Event sdlevent;
-			sdlevent.type = SDL_KEYUP;
-			sdlevent.key.keysym.scancode = key;
-
-			SDL_PushEvent(&sdlevent);
-
-			key = SDL_NUM_SCANCODES;
-
-			return true;
-		}
-	}
-
-	return false;
+	mouseInfo.lastPixX = pixX;
+	mouseInfo.lastPixY = pixY;
 }
-#endif
 
 static void HandleTouch(SDL_TouchFingerEvent * finger)
 {
-#ifdef USE_OVERLAY
-	if(checkOverlayTap(finger))
+	if (sdl.touch.use_overlay)
 	{
-		return;
+		if (touchOverlay::checkTap(finger))
+		{
+			return;
+		}
 	}
-#endif
 	switch(finger->type)
 	{
+
 	case SDL_FINGERDOWN:
 	{
-		double xscale = (sdl.curr_w / sdl.render.scaleFactor);
-		double yscale = (sdl.curr_h / sdl.render.scaleFactor);
-
-		double x = (finger->x - lastposx) * xscale;
-		double y = (finger->y - lastposy) * yscale;
-
-		Mouse_CursorMoved(x, y, 0, 0, true);
-
-		double xdiff = (xscale - sdl.draw.width) / (xscale * 2);
-		double ydiff = (yscale - sdl.draw.height) / (yscale * 2);
-
-		lastposx = std::min(std::max((double)finger->x, xdiff), 1.0 - xdiff);
-		lastposy = std::min(std::max((double)finger->y, ydiff), 1.0 - ydiff);
-
+		moveFinger(finger);
 		Mouse_ButtonPressed(0);
 	}
 	break;
+	case SDL_FINGERMOTION:
+		moveFinger(finger);
+		break;
 	case SDL_FINGERUP:
 		Mouse_ButtonReleased(0);
 		break;
@@ -1513,8 +1328,7 @@ void GFX_Events()
 		switch(event.type)
 		{
 		case SDL_WINDOWEVENT:
-
-			switch(event.window.type)
+			switch(event.window.event)
 			{
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 #ifdef WIN32
@@ -1547,57 +1361,62 @@ void GFX_Events()
 				GFX_LosingFocus();
 				CPU_Enable_SkipAutoAdjust();
 				break;
+			case SDL_WINDOWEVENT_EXPOSED:
+				if (sdl.draw.callback) sdl.draw.callback(GFX_CallBackRedraw);
+				break;
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				SDL_RenderClear(sdl.render.renderer);
 				break;
+			case SDL_WINDOWEVENT_MOVED:
+				break;
 			}
-#ifndef __ANDROID__
+
 			/* Non-focus priority is set to pause; check to see if we've lost window or input focus
 			*/
 			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
 			{
-				/* Window has lost focus, pause the emulator.
-				* This is similar to what PauseDOSBox() does, but the exit criteria is different.
-				* Instead of waiting for the user to hit Alt-Break, we wait for the window to
-				* regain window or input focus.
-				*/
-				bool paused = true;
-				SDL_Event ev;
-
-				GFX_SetTitle(-1, -1, true);
-				KEYBOARD_ClrBuffer();
-				//					SDL_Delay(500);
-				//					while (SDL_PollEvent(&ev)) {
-				// flush event queue.
-				//					}
-
-				while(paused)
+				if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) 
 				{
-					// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
-					SDL_WaitEvent(&ev);
+					/* Window has lost focus, pause the emulator.
+					* This is similar to what PauseDOSBox() does, but the exit criteria is different.
+					* Instead of waiting for the user to hit Alt-Break, we wait for the window to
+					* regain window or input focus.
+					*/
+					SDL_PauseAudio(1);
+					bool paused = true;
+					SDL_Event ev;
 
-					switch(ev.type)
+					GFX_SetTitle(-1, -1, true);
+					KEYBOARD_ClrBuffer();
+
+					while (paused)
 					{
-					case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
-					case SDL_WINDOWEVENT:     // wait until we get window focus back
-						if(ev.window.type == SDL_WINDOWEVENT_FOCUS_GAINED)
-						{
-							// We've got focus back, so unpause and break out of the loop
-							paused = false;
-							GFX_SetTitle(-1, -1, false);
+						// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
+						SDL_WaitEvent(&ev);
 
-							/* Now poke a "release ALT" command into the keyboard buffer
-							* we have to do this, otherwise ALT will 'stick' and cause
-							* problems with the app running in the DOSBox.
-							*/
-							KEYBOARD_AddKey(KBD_leftalt, false);
-							KEYBOARD_AddKey(KBD_rightalt, false);
+						switch (ev.type)
+						{
+						case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
+						case SDL_WINDOWEVENT:     // wait until we get window focus back
+							if (ev.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+							{
+								SDL_PauseAudio(0);
+								// We've got focus back, so unpause and break out of the loop
+								paused = false;
+								GFX_SetTitle(-1, -1, false);
+
+								/* Now poke a "release ALT" command into the keyboard buffer
+								* we have to do this, otherwise ALT will 'stick' and cause
+								* problems with the app running in the DOSBox.
+								*/
+								KEYBOARD_AddKey(KBD_leftalt, false);
+								KEYBOARD_AddKey(KBD_rightalt, false);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
-#endif
 			break;
 		case SDL_APP_DIDENTERFOREGROUND:
 			GFX_ResetScreen();
@@ -1609,6 +1428,7 @@ void GFX_Events()
 			break;
 		case SDL_FINGERDOWN:
 		case SDL_FINGERUP:
+		case SDL_FINGERMOTION:
 			HandleTouch(&event.tfinger);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -1617,24 +1437,18 @@ void GFX_Events()
 			HandleMouseButton(&event.button);
 #endif
 			break;
-			//		case SDL_VIDEORESIZE:
-			////			HandleVideoResize(&event.resize);
-			//			break;
 		case SDL_QUIT:
 			throw(0);
 			break;
-			//		case SDL_VIDEOEXPOSE:
-			//			if (sdl.draw.callback) sdl.draw.callback( GFX_CallBackRedraw );
-			//			break;
 		case SDL_TEXTINPUT:
 		{
 			int len = strlen(event.text.text);
 
-			for(int i = 0; i < len; i++)
+			for (int i = 0; i < len; i++)
 			{
-				char character[] = {event.text.text[i], 0};
+				char character = event.text.text[i];
 
-				if(character[0] >= 65 && character[0] <= 90)
+				if (character >= 'A' && character <= 'Z')
 				{
 					SDL_Event sdlevent;
 					sdlevent.type = SDL_KEYDOWN;
@@ -1643,14 +1457,14 @@ void GFX_Events()
 					MAPPER_CheckEvent(&sdlevent);
 				}
 
-				if(character[0] >= 97 && character[0] <= 122)
+				if (character >= 'a' && character <= 'z')
 				{
-					character[0] -= 32;
+					character -= ' ';
 				}
 
 				SDL_Event sdlevent;
 				sdlevent.type = SDL_KEYDOWN;
-				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName(character);
+				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName((char[2]) { character, 0 });
 
 				MAPPER_CheckEvent(&sdlevent);
 
@@ -1660,7 +1474,7 @@ void GFX_Events()
 
 				MAPPER_CheckEvent(&sdlevent1);
 
-				if(character[0] >= 65 && character[0] <= 90)
+				if(character >= 'A' && character <= 'Z')
 				{
 					SDL_Event sdlevent;
 					sdlevent.type = SDL_KEYUP;
@@ -1683,7 +1497,7 @@ void GFX_Events()
 			// ignore tab events that arrive just after regaining focus. (likely the result of alt-tab)
 			if((event.key.keysym.sym == SDL_SCANCODE_TAB) && (GetTicks() - sdl.focus_ticks < 2)) break;
 #endif
-#if defined (__ANDROID__) && defined(__IPHONEOS__)
+#if defined (__ANDROID__) || defined(__IPHONEOS__)
 			if(SDL_IsTextInputActive()) 
 			{
 				if(event.key.keysym.scancode != SDL_SCANCODE_BACKSPACE && event.key.keysym.scancode != SDL_SCANCODE_RETURN)
@@ -1812,6 +1626,9 @@ void Config_Add_SDL()
 
 	Pbool = sdl_sec->Add_bool("usescancodes", Property::Changeable::Always, true);
 	Pbool->Set_help("Avoid usage of symkeys, might not work on all operating systems.");
+
+	Pbool = sdl_sec->Add_bool("touchoverlay", Property::Changeable::Always, false);
+	Pbool->Set_help("Use a touch optimized overlay on top of dosbox.");
 }
 
 static void show_warning(char const * const message)
@@ -1824,8 +1641,8 @@ static void show_warning(char const * const message)
 #endif
 	printf("%s", message);
 	if(textonly) return;
-	if(!sdl.surface) sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
-	if(!sdl.surface) return;
+	if(!sdl.window) sdl.window = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
+	if(!sdl.window) return;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	Bit32u rmask = 0xff000000;
 	Bit32u gmask = 0x00ff0000;
@@ -1904,7 +1721,7 @@ void restart_program(std::vector<std::string> & parameters)
 	// shutdown curses
 	DEBUG_ShutDown(NULL);
 #endif
-
+	assert(parameters.size() > 0);
 	if(execvp(newargs[0], newargs) == -1)
 	{
 #ifdef WIN32
@@ -1919,7 +1736,7 @@ void restart_program(std::vector<std::string> & parameters)
 #endif
 		E_Exit("Restarting failed");
 	}
-	free(newargs);
+	delete [] newargs;
 }
 void Restart(bool pressed)
 { // mapper handler
@@ -2016,7 +1833,6 @@ static void erasemapperfile()
 //extern void UI_Init(void);
 int main(int argc, char* argv[])
 {
-
 	try
 	{
 		CommandLine com_line(argc, argv);
@@ -2111,10 +1927,10 @@ int main(int argc, char* argv[])
 		sdl.inited = true;
 
 #if defined(__ANDROID__)|| defined(__IPHONEOS__)
-		sdl.surface = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
-
-		SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
+		sdl.window = SDL_SetVideoMode_Wrap(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
 #endif
+
+		SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
 #ifndef DISABLE_JOYSTICK
 		//Initialise Joystick separately. This way we can warn when it fails instead
@@ -2254,16 +2070,9 @@ int main(int argc, char* argv[])
 #if defined (WIN32)
 	sticky_keys(true); //Might not be needed if the shutdown function switches to windowed mode, but it doesn't hurt
 #endif
-					   //Force visible mouse to end user. Somehow this sometimes doesn't happen
+	//Force visible mouse to end user. Somehow this sometimes doesn't happen
 	SDL_SetRelativeMouseMode(SDL_FALSE);
-
+	
 	SDL_Quit();//Let's hope sdl will quit as well when it catches an exception
 	return 0;
-	}
-
-void GFX_GetSize(int &width, int &height, bool &fullscreen)
-{
-	width = sdl.draw.width;
-	height = sdl.draw.height;
-	fullscreen = sdl.desktop.fullscreen;
 }

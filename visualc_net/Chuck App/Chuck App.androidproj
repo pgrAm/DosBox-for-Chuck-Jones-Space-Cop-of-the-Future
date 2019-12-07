@@ -150,9 +150,17 @@
     <Content Include="assets\chuck\chuck.exe" />
     <Content Include="assets\chuck\FONT.FNT" />
     <Content Include="assets\chuck\game.gei" />
-    <Content Include="assets\chuck\saves\AUTOSAVE" />
-    <Content Include="assets\chuck\saves\D" />
-    <Content Include="assets\chuck\saves\T" />
+    <Content Include="assets\chuck\sound\camino.mid" />
+    <Content Include="assets\chuck\sound\chuck.mid" />
+    <Content Include="assets\chuck\sound\did.mid" />
+    <Content Include="assets\chuck\sound\icculus.mid" />
+    <Content Include="assets\chuck\sound\item.mid" />
+    <Content Include="assets\chuck\sound\la.mid" />
+    <Content Include="assets\chuck\sound\mt32.syx" />
+    <Content Include="assets\chuck\sound\opl.ibk" />
+    <Content Include="assets\chuck\sound\orlokis.mid" />
+    <Content Include="assets\chuck\sound\space.mid" />
+    <Content Include="assets\chuck\sound\test.bnk" />
     <Content Include="assets\dosbox.conf" />
     <Content Include="assets\icons\bag.bmp" />
     <Content Include="assets\icons\default.bmp">
@@ -164,6 +172,7 @@
     <Content Include="assets\icons\look.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\icons\menu.bmp" />
     <Content Include="assets\icons\talk.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -174,17 +183,18 @@
   </ItemGroup>
   <ItemGroup>
     <JavaCompile Include="src\com\Chuck App\Chuck_App.java" />
+    <JavaCompile Include="src\HIDDevice.java" />
+    <JavaCompile Include="src\HIDDeviceBLESteamController.java" />
+    <JavaCompile Include="src\HIDDeviceManager.java" />
+    <JavaCompile Include="src\HIDDeviceUSB.java" />
     <JavaCompile Include="src\SDL.java" />
     <JavaCompile Include="src\SDLActivity.java" />
     <JavaCompile Include="src\SDLAudioManager.java" />
     <JavaCompile Include="src\SDLControllerManager.java" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Visual Studio 2017\Projects\SDL2\SDL2\SDL2.vcxproj" />
     <ProjectReference Include="..\..\android version\android version.NativeActivity\android version.NativeActivity.vcxproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="assets\chuck\page\" />
+    <ProjectReference Include="..\..\SDL2\SDL2\SDL2.vcxproj" />
   </ItemGroup>
   <Import Project="$(AndroidTargetsPath)\Android.targets" />
   <ImportGroup Label="ExtensionTargets" />

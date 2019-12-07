@@ -68,14 +68,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-21</AndroidAPILevel>
-    <UseOfStl>gnustl_shared</UseOfStl>
+    <UseOfStl>c++_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -123,7 +125,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <TargetName>libmain</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <TargetName>libmain</TargetName>
   </PropertyGroup>
@@ -144,9 +148,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <AdditionalIncludeDirectories>../../include;../../SDL2-2.0.10/include;../../libpng-1.2.37-lib/include;../../zlib-1.2.3-lib/include;../../src/platform/android;$(Sysroot)\usr\include;$(Sysroot)\usr\include\$(AndroidHeaderTriple);$(VS_NdkRoot)\sources\android\support\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;</LibraryDependencies>
+      <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\ARM64\Debug;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -154,15 +163,17 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>../../include;../../SDL2-2.0.7/include;../../libpng-1.2.37-lib/include;../../zlib-1.2.3-lib/include;../../src/platform/android;$(Sysroot)\usr\include;$(StlIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../SDL2-2.0.10/include;../../libpng-1.2.37-lib/include;../../zlib-1.2.3-lib/include;../../src/platform/android;$(Sysroot)\usr\include;$(StlIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Enabled</ExceptionHandling>
       <EnableNeonCodegen>true</EnableNeonCodegen>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <CLanguageStandard>Default</CLanguageStandard>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <LibraryDependencies>%(LibraryDependencies);GLESv1_CM;EGL;m;z;SDL2;</LibraryDependencies>
-      <AdditionalLibraryDirectories>C:\Users\jaked\Documents\GitHub\DosBox-for-Chuck-Jones-Space-Cop-of-the-Future\visualc_net\ARM64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\ARM64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -310,7 +321,14 @@
     <ClInclude Include="..\..\src\dos\dev_con.h" />
     <ClInclude Include="..\..\src\gui\render_scalers.h" />
     <ClInclude Include="..\..\src\gui\render_templates.h" />
+    <ClInclude Include="..\..\src\gui\touch_overlay.h" />
     <ClInclude Include="..\..\src\hardware\font-switch.h" />
+    <ClInclude Include="..\..\src\hardware\mame\emu.h" />
+    <ClInclude Include="..\..\src\hardware\mame\fmopl.h" />
+    <ClInclude Include="..\..\src\hardware\mame\saa1099.h" />
+    <ClInclude Include="..\..\src\hardware\mame\sn76496.h" />
+    <ClInclude Include="..\..\src\hardware\mame\ymdeltat.h" />
+    <ClInclude Include="..\..\src\hardware\mame\ymf262.h" />
     <ClInclude Include="..\..\src\hardware\serialport\serialdummy.h" />
     <ClInclude Include="..\..\src\ints\int10.h" />
     <ClInclude Include="..\..\src\ints\xms.h" />
@@ -344,6 +362,7 @@
     <ClCompile Include="..\..\src\dos\drive_cache.cpp" />
     <ClCompile Include="..\..\src\dos\drive_fat.cpp" />
     <ClCompile Include="..\..\src\dos\drive_local.cpp" />
+    <ClCompile Include="..\..\src\dos\drive_overlay.cpp" />
     <ClCompile Include="..\..\src\dos\drive_virtual.cpp" />
     <ClCompile Include="..\..\src\gui\midi.cpp" />
     <ClCompile Include="..\..\src\gui\render.cpp" />
@@ -351,6 +370,7 @@
     <ClCompile Include="..\..\src\gui\sdlmain.cpp" />
     <ClCompile Include="..\..\src\gui\sdl_gui.cpp" />
     <ClCompile Include="..\..\src\gui\sdl_mapper.cpp" />
+    <ClCompile Include="..\..\src\gui\touch_overlay.cpp" />
     <ClCompile Include="..\..\src\hardware\adlib.cpp" />
     <ClCompile Include="..\..\src\hardware\cmos.cpp" />
     <ClCompile Include="..\..\src\hardware\dbopl.cpp" />
@@ -364,6 +384,11 @@
     <ClCompile Include="..\..\src\hardware\ipxserver.cpp" />
     <ClCompile Include="..\..\src\hardware\joystick.cpp" />
     <ClCompile Include="..\..\src\hardware\keyboard.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\fmopl.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\saa1099.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\sn76496.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\ymdeltat.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\ymf262.cpp" />
     <ClCompile Include="..\..\src\hardware\memory.cpp" />
     <ClCompile Include="..\..\src\hardware\mixer.cpp" />
     <ClCompile Include="..\..\src\hardware\mpu401.cpp" />

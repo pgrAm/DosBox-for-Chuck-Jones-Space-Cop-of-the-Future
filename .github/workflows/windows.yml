@@ -1,0 +1,132 @@
+name: Windows builds
+on: push
+jobs:
+
+  build_msys2_clang_32:
+    name: Clang 8 i686 (MSYS2)
+    runs-on: windows-latest
+    env:
+      CHERE_INVOKING: yes
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Install msys2 environment
+        run:   choco install msys2 --no-progress
+      - name:  Log environment
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/log-env.sh
+      - name:  Install dependencies
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/list-build-dependencies.sh -p msys2 --compiler clang --bit-depth 32 | xargs pacman -S --noconfirm
+      - name:  Build
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/build.sh --compiler clang --bit-depth 32 --bin-path /mingw32/bin
+      - name:  Summarize warnings
+        run:   .\scripts\count-warnings.py build.log
+
+  build_msys2_clang_64:
+    name: Clang 8 x86_64 (MSYS2)
+    runs-on: windows-latest
+    env:
+      CHERE_INVOKING: yes
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Install msys2 environment
+        run:   choco install msys2 --no-progress
+      - name:  Log environment
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/log-env.sh
+      - name:  Install dependencies
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/list-build-dependencies.sh -p msys2 --compiler clang | xargs pacman -S --noconfirm
+      - name:  Build
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/build.sh --compiler clang --bin-path /mingw64/bin
+      - name:  Summarize warnings
+        run:   .\scripts\count-warnings.py build.log
+
+  build_msys2_gcc_32:
+    name: GCC 9 i686 (MSYS2)
+    runs-on: windows-latest
+    env:
+      CHERE_INVOKING: yes
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Install msys2 environment
+        run:   choco install msys2 --no-progress
+      - name:  Log environment
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/log-env.sh
+      - name:  Install dependencies
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/list-build-dependencies.sh -p msys2 --bit-depth 32 | xargs pacman -S --noconfirm
+      - name:  Build
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/build.sh --bit-depth 32 --bin-path /mingw32/bin
+      - name:  Summarize warnings
+        run:   .\scripts\count-warnings.py build.log
+
+
+  build_msys2_gcc_64:
+    name: GCC 9 x86_64 (MSYS2)
+    runs-on: windows-latest
+    env:
+      CHERE_INVOKING: yes
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Install msys2 environment
+        run:   choco install msys2 --no-progress
+      - name:  Log environment
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/log-env.sh
+      - name:  Install dependencies
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/list-build-dependencies.sh -p msys2 | xargs pacman -S --noconfirm
+      - name:  Build
+        shell: python scripts\msys-bash.py {0}
+        run:   ./scripts/build.sh --bin-path /mingw64/bin
+      - name:  Summarize warnings
+        run:   .\scripts\count-warnings.py build.log
+
+  build_msvc_debug:
+    name: MSVC Debug x86
+    runs-on: windows-latest
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Log environment
+        shell: pwsh
+        run:   .\scripts\log-env.ps1
+      - name:  Install packages
+        shell: pwsh
+        run: |
+          vcpkg install libpng sdl1 sdl1-net opusfile
+          vcpkg integrate install
+      - name:  Build
+        shell: pwsh
+        env:
+          PATH: '${env:PATH};C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64'
+        run: |
+          # build steps
+          cd visualc_net
+          MSBuild -m dosbox.sln -p:Configuration=Debug
+
+  build_msvc_release:
+    name: MSVC Release x86
+    runs-on: windows-latest
+    steps:
+      - uses:  actions/checkout@v1
+      - name:  Log environment
+        shell: pwsh
+        run:   .\scripts\log-env.ps1
+      - name:  Install packages
+        shell: pwsh
+        run: |
+          vcpkg install libpng sdl1 sdl1-net opusfile
+          vcpkg integrate install
+      - name:  Build
+        shell: pwsh
+        env:
+          PATH: '${env:PATH};C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\amd64'
+        run: |
+          # build steps
+          cd visualc_net
+          MSBuild -m dosbox.sln -p:Configuration=Release

@@ -72,6 +72,9 @@
       <UniqueIdentifier>{d4322488-4887-4aae-9215-5f92702aee34}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
+    <Filter Include="Source Files\hardware\mame">
+      <UniqueIdentifier>{42d7d9e2-ce5a-4626-92dd-b6200d1b1759}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dosbox.cpp">
@@ -416,6 +419,27 @@
     <ClCompile Include="..\src\fpu\fpu.cpp">
       <Filter>Source Files\fpu</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\hardware\mame\saa1099.cpp">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hardware\mame\sn76496.cpp">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hardware\mame\fmopl.cpp">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hardware\mame\ymf262.cpp">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hardware\mame\ymdeltat.cpp">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dos\drive_overlay.cpp">
+      <Filter>Source Files\dos\drives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gui\touch_overlay.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc">
@@ -707,6 +731,27 @@
     </ClInclude>
     <ClInclude Include="..\include\video.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\saa1099.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\sn76496.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\emu.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\fmopl.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\ymf262.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hardware\mame\ymdeltat.h">
+      <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gui\touch_overlay.h">
+      <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "..\android version\
 EndProject
 Project("{39E2626F-3545-4960-A6E8-258AD8476CE5}") = "Chuck App", "Chuck App\Chuck App.androidproj", "{65D3013D-285E-496E-8317-6A819FDA29AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2", "..\..\..\Visual Studio 2017\Projects\SDL2\SDL2\SDL2.vcxproj", "{DD980803-F442-48AF-AC1B-545AFE564C36}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2", "..\SDL2\SDL2\SDL2.vcxproj", "{DD980803-F442-48AF-AC1B-545AFE564C36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

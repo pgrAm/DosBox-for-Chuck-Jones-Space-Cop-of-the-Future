@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -46,8 +46,11 @@ extern Bit8u MixTemp[MIXER_BUFSIZE];
 
 class MixerChannel {
 public:
+	MixerChannel(MIXER_Handler _handler, Bitu _freq, const char * _name);
 	void SetVolume(float _left,float _right);
-	void SetScale( float f );
+	void SetScale(float f);
+	void SetScale(float _left, float _right);
+	void MapChannels(Bit8u _left, Bit8u _right);
 	void UpdateVolume(void);
 	void SetFreq(Bitu _freq);
 	void Mix(Bitu _needed);
@@ -77,24 +80,25 @@ public:
 
 	void FillUp(void);
 	void Enable(bool _yesno);
-	MIXER_Handler handler;
-	float volmain[2];
-	float scale;
-	Bit32s volmul[2];
-	
-	//This gets added the frequency counter each mixer step
-	Bitu freq_add;
-	//When this flows over a new sample needs to be read from the device
-	Bitu freq_counter;
-	//Timing on how many samples have been done and were needed by th emixer
-	Bitu done, needed;
-	//Previous and next samples
-	Bits prevSample[2];
-	Bits nextSample[2];
-	const char * name;
-	bool interpolate;
-	bool enabled;
-	MixerChannel * next;
+
+	float          volmain[2];
+	MixerChannel*  next;
+	const char*    name;
+	Bitu           done;           //Timing on how many samples have been done by the mixer
+	bool           enabled;
+
+private:
+	MixerChannel();
+	MIXER_Handler  handler;
+	Bitu           freq_add;       //This gets added the frequency counter each mixer step
+	Bitu           freq_counter;   //When this flows over a new sample needs to be read from the device
+	Bitu           needed; 	       //Timing on how many samples were needed by the mixer
+	Bits           prev_sample[2]; //Previous and next samples
+	Bits           next_sample[2];
+	Bit32s         volmul[2];
+	float          scale[2];
+	Bit8u          channel_map[2]; //Output channel mapping
+	bool           interpolate;
 };
 
 MixerChannel * MIXER_AddChannel(MIXER_Handler handler,Bitu freq,const char * name);

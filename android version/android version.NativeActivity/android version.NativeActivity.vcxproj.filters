@@ -230,6 +230,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\platform\android\config.h" />
+    <ClInclude Include="..\..\src\hardware\mame\emu.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\hardware\mame\fmopl.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\hardware\mame\saa1099.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\hardware\mame\sn76496.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\hardware\mame\ymdeltat.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\hardware\mame\ymf262.h">
+      <Filter>hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gui\touch_overlay.h">
+      <Filter>gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cpu\callback.cpp">
@@ -524,6 +545,27 @@
       <Filter>shell</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\dosbox.cpp" />
+    <ClCompile Include="..\..\src\hardware\mame\fmopl.cpp">
+      <Filter>hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\hardware\mame\saa1099.cpp">
+      <Filter>hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\hardware\mame\sn76496.cpp">
+      <Filter>hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\hardware\mame\ymdeltat.cpp">
+      <Filter>hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\hardware\mame\ymf262.cpp">
+      <Filter>hardware\mame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dos\drive_overlay.cpp">
+      <Filter>dos\drives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gui\touch_overlay.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cpu">
@@ -576,6 +618,9 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{382cd992-e7ad-44ba-9e49-c48775d8901e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hardware\mame">
+      <UniqueIdentifier>{20b6d6e9-d037-4594-a597-700adb40e25f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

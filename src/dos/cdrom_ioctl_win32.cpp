@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,12 +11,15 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 #ifdef CDROM_ENABLED
+
+#include "cdrom.h"
+
 #if defined (WIN32)
 
 // *****************************************************************
@@ -27,15 +30,13 @@
 #include <io.h>
 
 #if (defined (_MSC_VER)) || (defined __MINGW64_VERSION_MAJOR)
-#include <ntddcdrm.h>			// Ioctl stuff
 #include <winioctl.h>			// Ioctl stuff
+#include <ntddcdrm.h>			// Ioctl stuff
 #else 
 #include "ddk/ntddcdrm.h"		// Ioctl stuff
 #endif
 
 #include <mmsystem.h>
-
-#include "cdrom.h"
 
 // for a more sophisticated implementation of the mci cdda functionality
 // see the SDL sources, which the mci_ functions are based on
@@ -90,10 +91,10 @@ bool CDROM_Interface_Ioctl::mci_CDPlay(int start, int length) {
 	mci_play.dwCallback = 0;
 
 	int m, s, f;
-	FRAMES_TO_MSF(start, &m, &s, &f);
+	frames_to_msf(start, &m, &s, &f);
 	mci_play.dwFrom = MCI_MAKE_MSF(m, s, f);
 
-	FRAMES_TO_MSF(start+length, &m, &s, &f);
+	frames_to_msf(start+length, &m, &s, &f);
 	mci_play.dwTo = MCI_MAKE_MSF(m, s, f);
 
 	return mci_CDioctl(MCI_PLAY, flags, &mci_play);
@@ -160,7 +161,7 @@ bool CDROM_Interface_Ioctl::mci_CDPosition(int *position) {
 		case MCI_MODE_PAUSE:
 			mci_status.dwItem = MCI_STATUS_POSITION;
 			if (!mci_CDioctl(MCI_STATUS, flags, &mci_status)) {
-				*position = MSF_TO_FRAMES(
+				*position = msf_to_frames(
 					MCI_MSF_MINUTE(mci_status.dwReturn),
 					MCI_MSF_SECOND(mci_status.dwReturn),
 					MCI_MSF_FRAME(mci_status.dwReturn));
@@ -176,7 +177,7 @@ bool CDROM_Interface_Ioctl::mci_CDPosition(int *position) {
 CDROM_Interface_Ioctl::dxPlayer CDROM_Interface_Ioctl::player = {
 	NULL, NULL, NULL, {0}, 0, 0, 0, false, false, false, {0} };
 
-CDROM_Interface_Ioctl::CDROM_Interface_Ioctl(cdioctl_cdatype ioctl_cda) {
+CDROM_Interface_Ioctl::CDROM_Interface_Ioctl(CDROM_Interface_Ioctl::cdioctl_cdatype ioctl_cda) {
 	pathname[0] = 0;
 	hIOCTL = INVALID_HANDLE_VALUE;
 	memset(&oldLeadOut,0,sizeof(oldLeadOut));
@@ -213,8 +214,10 @@ bool CDROM_Interface_Ioctl::GetAudioTracks(int& stTrack, int& endTrack, TMSF& le
 		// get track start address of all tracks
 		for (Bits i=toc.FirstTrack; i<=toc.LastTrack+1; i++) {
 			if (((toc.TrackData[i].Control&1)==0) || (i==toc.LastTrack+1)) {
-				track_start[track_num] = MSF_TO_FRAMES(toc.TrackData[track_num].Address[1],toc.TrackData[track_num].Address[2],toc.TrackData[track_num].Address[3])-150;
-				track_start[track_num] += 150;
+				track_start[track_num] = msf_to_frames(
+					toc.TrackData[track_num].Address[1],
+					toc.TrackData[track_num].Address[2],
+					toc.TrackData[track_num].Address[3]);
 				track_num++;
 			}
 		}
@@ -253,8 +256,10 @@ bool CDROM_Interface_Ioctl::GetAudioTracksAll(void) {
 	// get track start address of all tracks
 	for (Bits i=toc.FirstTrack; i<=toc.LastTrack+1; i++) {
 		if (((toc.TrackData[i].Control&1)==0) || (i==toc.LastTrack+1)) {
-			track_start[track_num] = MSF_TO_FRAMES(toc.TrackData[track_num].Address[1],toc.TrackData[track_num].Address[2],toc.TrackData[track_num].Address[3])-150;
-			track_start[track_num] += 150;
+			track_start[track_num] = msf_to_frames(
+				toc.TrackData[track_num].Address[1],
+				toc.TrackData[track_num].Address[2],
+				toc.TrackData[track_num].Address[3]);
 			track_num++;
 		}
 	}
@@ -267,8 +272,8 @@ bool CDROM_Interface_Ioctl::GetAudioTracksAll(void) {
 bool CDROM_Interface_Ioctl::GetAudioSub(unsigned char& attr, unsigned char& track, unsigned char& index, TMSF& relPos, TMSF& absPos) {
 	if (use_dxplay) {
 		track = 1;
-		FRAMES_TO_MSF(player.currFrame + 150, &absPos.min, &absPos.sec, &absPos.fr);
-		FRAMES_TO_MSF(player.currFrame + 150, &relPos.min, &relPos.sec, &relPos.fr);
+		frames_to_msf(player.currFrame + 150, &absPos.min, &absPos.sec, &absPos.fr);
+		frames_to_msf(player.currFrame + 150, &relPos.min, &relPos.sec, &relPos.fr);
 
 		if (GetAudioTracksAll()) {
 			// get track number from current frame
@@ -276,7 +281,11 @@ bool CDROM_Interface_Ioctl::GetAudioSub(unsigned char& attr, unsigned char& trac
 				if ((player.currFrame + 150<track_start[i+1]) && (player.currFrame + 150>=track_start[i])) {
 					// track found, calculate relative position
 					track = i;
-					FRAMES_TO_MSF(player.currFrame + 150-track_start[i],&relPos.min,&relPos.sec,&relPos.fr);
+					frames_to_msf(
+						player.currFrame + 150 - track_start[i],
+						&relPos.min,
+						&relPos.sec,
+						&relPos.fr);
 					break;
 				}
 			}
@@ -313,12 +322,12 @@ bool CDROM_Interface_Ioctl::GetAudioSub(unsigned char& attr, unsigned char& trac
 				for (int i=track_start_first; i<=track_start_last; i++) {
 					if ((cur_pos<track_start[i+1]) && (cur_pos>=track_start[i])) {
 						// track found, calculate relative position
-						FRAMES_TO_MSF(cur_pos-track_start[i],&relPos.min,&relPos.sec,&relPos.fr);
+						frames_to_msf(cur_pos-track_start[i], &relPos.min, &relPos.sec, &relPos.fr);
 						break;
 					}
 				}
 			}
-			FRAMES_TO_MSF(cur_pos,&absPos.min,&absPos.sec,&absPos.fr);
+			frames_to_msf(cur_pos, &absPos.min, &absPos.sec, &absPos.fr);
 		}
 	}
 
@@ -462,8 +471,15 @@ bool CDROM_Interface_Ioctl::StopAudio(void) {
 
 void CDROM_Interface_Ioctl::ChannelControl(TCtrl ctrl)
 {
-	player.ctrlUsed = (ctrl.out[0]!=0 || ctrl.out[1]!=1 || ctrl.vol[0]<0xfe || ctrl.vol[1]<0xfe);
-	player.ctrlData = ctrl;
+	if (player.channel == NULL) return;
+
+	// Adjust the volme of our mixer channel as defined by the application
+	player.channel->SetScale(static_cast<float>(ctrl.vol[0]/255.0),  // left vol
+	                         static_cast<float>(ctrl.vol[1]/255.0)); // right vol
+
+	// Map the audio channels in our mixer channel as defined by the application
+	player.channel->MapChannels(ctrl.out[0],  // left map
+	                            ctrl.out[1]); // right map
 }
 
 bool CDROM_Interface_Ioctl::LoadUnloadMedia(bool unload) {
@@ -557,16 +573,6 @@ void CDROM_Interface_Ioctl::dx_CDAudioCallBack(Bitu len) {
 		}
 	}
 	SDL_mutexV(player.mutex);
-	if (player.ctrlUsed) {
-		Bit16s sample0,sample1;
-		Bit16s * samples=(Bit16s *)&player.buffer;
-		for (Bitu pos=0;pos<len/4;pos++) {
-			sample0=samples[pos*2+player.ctrlData.out[0]];
-			sample1=samples[pos*2+player.ctrlData.out[1]];
-			samples[pos*2+0]=(Bit16s)(sample0*player.ctrlData.vol[0]/255.0);
-			samples[pos*2+1]=(Bit16s)(sample1*player.ctrlData.vol[1]/255.0);
-		}
-	}
 	player.channel->AddSamples_s16(len/4,(Bit16s *)player.buffer);
 	memmove(player.buffer, &player.buffer[len], player.bufLen - len);
 	player.bufLen -= len;

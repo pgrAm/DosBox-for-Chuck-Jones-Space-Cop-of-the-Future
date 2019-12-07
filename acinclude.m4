@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
           echo "*** If you have an old version installed, it is best to remove it, although"
           echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
         [ echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means SDL was incorrectly installed"
+          echo "*** exact error that occurred. This usually means SDL was incorrectly installed"
           echo "*** or that you have moved SDL since it was installed. In the latter case, you"
           echo "*** may want to edit the sdl-config script: $SDL_CONFIG" ])
           CFLAGS="$ac_save_CFLAGS"
@@ -305,7 +305,7 @@ AC_SUBST(ALSA_LIBS)
 
 AH_TOP([
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -317,9 +317,9 @@ AH_TOP([
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Library General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 ])
 

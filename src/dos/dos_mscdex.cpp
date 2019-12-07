@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,12 +11,11 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
-#ifdef  CDROM_ENABLED
+#ifdef CDROM_ENABLED
 
 #include <string.h>
 #include <ctype.h>
@@ -408,9 +407,11 @@ bool CMscdex::HasDrive(Bit16u drive) {
 }
 
 void CMscdex::ReplaceDrive(CDROM_Interface* newCdrom, Bit8u subUnit) {
-	delete cdrom[subUnit];
+	if (cdrom[subUnit] != NULL) {
+		StopAudio(subUnit);
+		delete cdrom[subUnit];
+	}
 	cdrom[subUnit] = newCdrom;
-	StopAudio(subUnit);
 }
 
 PhysPt CMscdex::GetDefaultBuffer(void) {
@@ -716,29 +717,24 @@ bool CMscdex::GetDirectoryEntry(Bit16u drive, bool copyFlag, PhysPt pathname, Ph
 		do {
 			entryLength = mem_readb(defBuffer+index);
 			if (entryLength==0) break;
-			if (mem_readb(defBuffer+index+iso ? 0x19:0x18) & 4) {
+			if (mem_readb(defBuffer + index + (iso?0x19:0x18) ) & 4) {
 				// skip associated files
 				index += entryLength;
 				continue;
 			}
 			nameLength  = mem_readb(defBuffer+index+32);
 			MEM_StrCopy(defBuffer+index+33,entryName,nameLength);
+			// strip separator and file version number
+			char* separator = strchr(entryName,';');
+			if (separator) *separator = 0;
+			// strip trailing period
+			size_t entrylen = strlen(entryName);
+			if (entrylen>0 && entryName[entrylen-1]=='.') entryName[entrylen-1] = 0;
+
 			if (strcmp(entryName,useName)==0) {
 				//LOG(LOG_MISC,LOG_ERROR)("MSCDEX: Get DirEntry : Found : %s",useName);
 				foundName = true;
 				break;
-			}
-			/* Xcom Apocalipse searches for MUSIC. and expects to find MUSIC;1
-			 * All Files on the CDROM are of the kind blah;1
-			 */
-			char* longername = strchr(entryName,';');
-			if(longername) {
-				*longername = 0;
-				if (strcmp(entryName,useName)==0) {
-					//LOG(LOG_MISC,LOG_ERROR)("MSCDEX: Get DirEntry : Found : %s",useName);
-					foundName = true;
-					break;
-				}
 			}
 			index += entryLength;
 		} while (index+33<=2048);
@@ -914,7 +910,7 @@ static Bit16u MSCDEX_IOCTL_Input(PhysPt buffer,Bit8u drive_unit) {
 					mscdex->GetCurrentPos(drive_unit,pos);
 					Bit8u addr_mode = mem_readb(buffer+1);
 					if (addr_mode==0) {			// HSG
-						Bit32u frames=MSF_TO_FRAMES(pos.min, pos.sec, pos.fr);
+						Bit32u frames = msf_to_frames(pos.min, pos.sec, pos.fr);
 						if (frames<150) MSCDEX_LOG("MSCDEX: Get position: invalid position %d:%d:%d", pos.min, pos.sec, pos.fr);
 						else frames-=150;
 						mem_writed(buffer+2,frames);
@@ -1304,6 +1300,11 @@ void MSCDEX_ReplaceDrive(CDROM_Interface* cdrom, Bit8u subUnit)
 	mscdex->ReplaceDrive(cdrom, subUnit);
 }
 
+Bit8u MSCDEX_GetSubUnit(char driveLetter)
+{
+	return mscdex->GetSubUnit(driveLetter-'A');
+}
+
 bool MSCDEX_GetVolumeName(Bit8u subUnit, char* name)
 {
 	return mscdex->GetVolumeName(subUnit,name);
@@ -1356,5 +1357,4 @@ void MSCDEX_Init(Section* sec) {
 	/* Create MSCDEX */
 	mscdex = new CMscdex;
 }
-
-#endif //  CDROM_ENABLED
+#endif

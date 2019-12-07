@@ -154,7 +154,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../zlib/include;../libpng/include;../include;../src/platform/visualc;../SDL2-2.0.8/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../zlib/include;../libpng/include;../include;../src/platform/visualc;../SDL2-2.0.10/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -168,14 +168,15 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;zlib.lib;libpng16.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/dosbox.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>../libpng;../zlib/lib;../SDL2-2.0.8/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../libpng;../zlib/lib;../SDL2-2.0.10/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <TypeLibraryName>.\Debug/dosbox.tlb</TypeLibraryName>
@@ -186,6 +187,9 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
@@ -279,7 +283,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../zlib/include;../libpng/include;../include;../src/platform/visualc;../SDL2-2.0.8/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../zlib/include;../libpng/include;../include;../src/platform/visualc;../SDL2-2.0.10/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -298,16 +302,17 @@
       <CompileAs>Default</CompileAs>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;zlib.lib;libpng.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;zlib.lib;libpng16.lib;sdl2main.lib;sdl2.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <FixedBaseAddress>false</FixedBaseAddress>
-      <AdditionalLibraryDirectories>../libpng;../zlib/lib;../SDL2-2.0.8/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../libpng;../zlib/lib;../SDL2-2.0.10/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <TypeLibraryName>.\Release/dosbox.tlb</TypeLibraryName>
@@ -318,6 +323,9 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
@@ -406,6 +414,7 @@
     <ClCompile Include="..\src\dos\drive_fat.cpp" />
     <ClCompile Include="..\src\dos\drive_iso.cpp" />
     <ClCompile Include="..\src\dos\drive_local.cpp" />
+    <ClCompile Include="..\src\dos\drive_overlay.cpp" />
     <ClCompile Include="..\src\dos\drive_virtual.cpp" />
     <ClCompile Include="..\src\fpu\fpu.cpp" />
     <ClCompile Include="..\src\gui\midi.cpp" />
@@ -414,6 +423,7 @@
     <ClCompile Include="..\src\gui\sdlmain.cpp" />
     <ClCompile Include="..\src\gui\sdl_gui.cpp" />
     <ClCompile Include="..\src\gui\sdl_mapper.cpp" />
+    <ClCompile Include="..\src\gui\touch_overlay.cpp" />
     <ClCompile Include="..\src\hardware\adlib.cpp" />
     <ClCompile Include="..\src\hardware\cmos.cpp" />
     <ClCompile Include="..\src\hardware\dbopl.cpp" />
@@ -427,6 +437,11 @@
     <ClCompile Include="..\src\hardware\ipxserver.cpp" />
     <ClCompile Include="..\src\hardware\joystick.cpp" />
     <ClCompile Include="..\src\hardware\keyboard.cpp" />
+    <ClCompile Include="..\src\hardware\mame\fmopl.cpp" />
+    <ClCompile Include="..\src\hardware\mame\saa1099.cpp" />
+    <ClCompile Include="..\src\hardware\mame\sn76496.cpp" />
+    <ClCompile Include="..\src\hardware\mame\ymdeltat.cpp" />
+    <ClCompile Include="..\src\hardware\mame\ymf262.cpp" />
     <ClCompile Include="..\src\hardware\memory.cpp" />
     <ClCompile Include="..\src\hardware\mixer.cpp" />
     <ClCompile Include="..\src\hardware\mpu401.cpp" />
@@ -572,7 +587,14 @@
     <ClInclude Include="..\src\gui\midi_win32.h" />
     <ClInclude Include="..\src\gui\render_scalers.h" />
     <ClInclude Include="..\src\gui\render_templates.h" />
+    <ClInclude Include="..\src\gui\touch_overlay.h" />
     <ClInclude Include="..\src\hardware\font-switch.h" />
+    <ClInclude Include="..\src\hardware\mame\emu.h" />
+    <ClInclude Include="..\src\hardware\mame\fmopl.h" />
+    <ClInclude Include="..\src\hardware\mame\saa1099.h" />
+    <ClInclude Include="..\src\hardware\mame\sn76496.h" />
+    <ClInclude Include="..\src\hardware\mame\ymdeltat.h" />
+    <ClInclude Include="..\src\hardware\mame\ymf262.h" />
     <ClInclude Include="..\src\hardware\serialport\directserial.h" />
     <ClInclude Include="..\src\hardware\serialport\libserial.h" />
     <ClInclude Include="..\src\hardware\serialport\misc_util.h" />

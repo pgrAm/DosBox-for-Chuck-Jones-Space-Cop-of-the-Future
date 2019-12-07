@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2017  The DOSBox Team
+ *  Copyright (C) 2002-2019  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -45,7 +45,7 @@ public:
 		notusable=false;dynreg=0;
 	}
 	DynReg  * dynreg;
-	Bitu last_used;			//Keeps track of last assigned regs
+	Bitu last_used;			//Keeps track of last assigned regs 
     Bit8u index;
 	bool notusable;
 	void Load(DynReg * _dynreg,bool stale=false) {
@@ -231,9 +231,10 @@ static void gen_synchreg(DynReg * dnew,DynReg * dsynch) {
 	/* Always use the loadonce flag from either state */
 	dnew->flags|=(dsynch->flags & dnew->flags&DYNFLG_ACTIVE);
 	if ((dnew->flags ^ dsynch->flags) & DYNFLG_CHANGED) {
-		/* Ensure the changed value gets saved */
+		/* Ensure the changed value gets saved */	
 		if (dnew->flags & DYNFLG_CHANGED) {
-			dnew->genreg->Save();
+			if (GCC_LIKELY(dnew->genreg != NULL))
+				dnew->genreg->Save();
 		} else dnew->flags|=DYNFLG_CHANGED;
 	}
 }
@@ -328,7 +329,7 @@ static void gen_mov_host(void * data,DynReg * dr1,Bitu size,Bit8u di1=0) {
 
 static void gen_dop_byte(DualOps op,DynReg * dr1,Bit8u di1,DynReg * dr2,Bit8u di2) {
 	GenReg * gr1=FindDynReg(dr1);GenReg * gr2=FindDynReg(dr2);
-	Bit8u tmp;
+	Bit8u tmp = 0x00;
 	switch (op) {
 	case DOP_ADD:	tmp=0x02; break;
 	case DOP_ADC:	tmp=0x12; break;
@@ -388,7 +389,7 @@ static void gen_dop_byte_imm_mem(DualOps op,DynReg * dr1,Bit8u di1,void* data) {
 	case DOP_AND:	tmp=0x0522; break;
 	case DOP_OR:	tmp=0x050a; break;
 	case DOP_TEST:	tmp=0x0584; goto nochange;	//Doesn't change
-	case DOP_MOV:	tmp=0x0585; break;
+	case DOP_MOV:	tmp=0x058A; break;
 	default:
 		IllegalOption("gen_dop_byte_imm_mem");
 	}
@@ -531,7 +532,7 @@ static void gen_dop_word_imm(DualOps op,bool dword,DynReg * dr1,Bits imm) {
 	Bit16u tmp;
 	if (!dword) cache_addb(0x66);
 	switch (op) {
-	case DOP_ADD:	tmp=0xc081; break;
+	case DOP_ADD:	tmp=0xc081; break; 
 	case DOP_ADC:	tmp=0xd081; break;
 	case DOP_SUB:	tmp=0xe881; break;
 	case DOP_SBB:	tmp=0xd881; break;
@@ -556,7 +557,7 @@ static void gen_dop_word_imm_mem(DualOps op,bool dword,DynReg * dr1,void* data) 
 	GenReg * gr1=FindDynReg(dr1,dword && op==DOP_MOV);
 	Bit16u tmp;
 	switch (op) {
-	case DOP_ADD:	tmp=0x0503; break;
+	case DOP_ADD:	tmp=0x0503; break; 
 	case DOP_ADC:	tmp=0x0513; break;
 	case DOP_SUB:	tmp=0x052b; break;
 	case DOP_SBB:	tmp=0x051b; break;
@@ -671,7 +672,7 @@ static void gen_shift_word_imm(Bitu op,bool dword,DynReg * dr1,Bit8u imm) {
 	dr1->flags|=DYNFLG_CHANGED;
 	if (!dword) {
 		cache_addd(0x66|((0xc0c1+((Bit16u)op << 11) + (gr1->index<<8))|imm<<16)<<8);
-	} else {
+	} else { 
 		cache_addw(0xc0c1+((Bit16u)op << 11) + (gr1->index<<8));
 		cache_addb(imm);
 	}
@@ -769,6 +770,7 @@ static void gen_call_function(void * func,char const* ops,...) {
 			}
 			ops++;
 		}
+		va_end(params);
 
 #if defined (MACOSX)
 		/* align stack */
@@ -887,7 +889,7 @@ static void gen_call_function(void * func,char const* ops,...) {
 			cache_addw(0xc08b+(genreg->index <<(8+3)));	//mov reg,eax
 			break;
 		case 'w':
-			cache_addb(0x66);
+			cache_addb(0x66);							
 			cache_addw(0xc08b+(genreg->index <<(8+3)));	//mov reg,eax
 			break;
 		case 'l':
@@ -1068,4 +1070,28 @@ static void gen_init(void) {
 	x86gen.regs[X86_REG_EDI]=new GenReg(7);
 }
 
-
+#if defined(X86_DYNFPU_DH_ENABLED)
+static void gen_dh_fpu_save(void)
+#if defined (_MSC_VER)
+{
+	__asm {
+	__asm	fnsave	dyn_dh_fpu.state
+	__asm	fldcw	dyn_dh_fpu.host_cw
+	}
+	dyn_dh_fpu.state_used=false;
+	dyn_dh_fpu.state.cw|=0x3f;
+}
+#else
+{
+	__asm__ volatile (
+		"fnsave		%0			\n"
+		"fldcw		%1			\n"
+		:	"=m" (dyn_dh_fpu.state)
+		:	"m" (dyn_dh_fpu.host_cw)
+		:	"memory"
+	);
+	dyn_dh_fpu.state_used=false;
+	dyn_dh_fpu.state.cw|=0x3f;
+}
+#endif
+#endif
