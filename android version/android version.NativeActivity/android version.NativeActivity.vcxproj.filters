@@ -248,6 +248,9 @@
     <ClInclude Include="..\..\src\hardware\mame\ymf262.h">
       <Filter>hardware\mame</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\gui\touch_overlay.h">
+      <Filter>gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cpu\callback.cpp">
@@ -559,6 +562,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\dos\drive_overlay.cpp">
       <Filter>dos\drives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gui\touch_overlay.cpp">
+      <Filter>gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

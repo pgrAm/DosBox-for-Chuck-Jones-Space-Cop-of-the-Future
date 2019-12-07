@@ -68,16 +68,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-21</AndroidAPILevel>
-    <UseOfStl>gnustl_shared</UseOfStl>
+    <UseOfStl>c++_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-21</AndroidAPILevel>
-    <UseOfStl>gnustl_shared</UseOfStl>
+    <UseOfStl>c++_shared</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -321,6 +321,7 @@
     <ClInclude Include="..\..\src\dos\dev_con.h" />
     <ClInclude Include="..\..\src\gui\render_scalers.h" />
     <ClInclude Include="..\..\src\gui\render_templates.h" />
+    <ClInclude Include="..\..\src\gui\touch_overlay.h" />
     <ClInclude Include="..\..\src\hardware\font-switch.h" />
     <ClInclude Include="..\..\src\hardware\mame\emu.h" />
     <ClInclude Include="..\..\src\hardware\mame\fmopl.h" />
@@ -369,6 +370,7 @@
     <ClCompile Include="..\..\src\gui\sdlmain.cpp" />
     <ClCompile Include="..\..\src\gui\sdl_gui.cpp" />
     <ClCompile Include="..\..\src\gui\sdl_mapper.cpp" />
+    <ClCompile Include="..\..\src\gui\touch_overlay.cpp" />
     <ClCompile Include="..\..\src\hardware\adlib.cpp" />
     <ClCompile Include="..\..\src\hardware\cmos.cpp" />
     <ClCompile Include="..\..\src\hardware\dbopl.cpp" />

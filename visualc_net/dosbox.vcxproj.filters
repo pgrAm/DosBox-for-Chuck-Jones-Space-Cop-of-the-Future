@@ -437,6 +437,9 @@
     <ClCompile Include="..\src\dos\drive_overlay.cpp">
       <Filter>Source Files\dos\drives</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gui\touch_overlay.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc">
@@ -746,6 +749,9 @@
     </ClInclude>
     <ClInclude Include="..\src\hardware\mame\ymdeltat.h">
       <Filter>Source Files\hardware\mame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gui\touch_overlay.h">
+      <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

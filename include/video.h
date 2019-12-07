@@ -68,10 +68,6 @@ bool GFX_StartUpdate(Bit8u * & pixels,Bitu & pitch);
 void GFX_EndUpdate( const Bit16u *changedLines );
 void GFX_LosingFocus(void);
 
-#if defined (WIN32)
-bool GFX_SDLUsingWinDIB(void);
-#endif
-
 #if defined (REDUCE_JOYSTICK_POLLING)
 void MAPPER_UpdateJoysticks(void);
 #endif
