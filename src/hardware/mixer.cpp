@@ -553,8 +553,11 @@ static void SDLCALL MIXER_CallBack(void * userdata, Uint8 *stream, int len) {
 	/* Enough room in the buffer ? */
 	if (mixer.done < need) {
 //		LOG_MSG("Full underrun need %d, have %d, min %d", need, mixer.done, mixer.min_needed);
-		if((need - mixer.done) > (need >>7) ) //Max 1 procent stretch.
+		if ((need - mixer.done) > (need >> 7)) //Max 1 procent stretch.
+		{
+			memset(stream, 0, len);
 			return;
+		}
 		reduce = mixer.done;
 		index_add = (reduce << TICK_SHIFT) / need;
 		mixer.tick_add = calc_tickadd(mixer.freq+mixer.min_needed);
