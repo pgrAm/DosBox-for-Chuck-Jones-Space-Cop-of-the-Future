@@ -1341,7 +1341,6 @@ void Mouse_AutoLock(bool enable)
 
 struct
 {
-	float lastX = 0.5, lastY = 0.5;
 	int lastPixX = 160, lastPixY = 120;
 } mouseInfo;
 
@@ -1354,16 +1353,21 @@ static void HandleMouseMotion(SDL_MouseMotionEvent * motion)
 		float deltaX = (float)motion->xrel * sdl.mouse.sensitivity / 100.0f;
 		float deltaY = (float)motion->yrel * sdl.mouse.sensitivity / 100.0f;
 
+		if (!sdl.mouse.locked)
+		{
+			int pixX = std::clamp((int)((motion->x - sdl.clip.x) / sdl.render.scaleFactor), 0, sdl.draw.width);
+			int pixY = std::clamp((int)((motion->y - sdl.clip.y) / sdl.render.scaleFactor), 0, sdl.draw.height);
+			deltaX = pixX - mouseInfo.lastPixX;
+			deltaY = pixY - mouseInfo.lastPixY;
+		}
+
 		Mouse_CursorMoved(	deltaX, deltaY,
 							(float)(motion->x - sdl.clip.x) / (sdl.clip.w - 1)*sdl.mouse.sensitivity / 100.0f,
 							(float)(motion->y - sdl.clip.y) / (sdl.clip.h - 1)*sdl.mouse.sensitivity / 100.0f,
 							sdl.mouse.locked);
 
-		//if (sdl.mouse.locked)
-		{
-			mouseInfo.lastPixX = std::clamp((int)(mouseInfo.lastPixX + deltaX), 0, sdl.draw.width);
-			mouseInfo.lastPixY = std::clamp((int)(mouseInfo.lastPixY + deltaY), 0, sdl.draw.height);
-		}
+		mouseInfo.lastPixX = std::clamp((int)(mouseInfo.lastPixX + deltaX), 0, sdl.draw.width);
+		mouseInfo.lastPixY = std::clamp((int)(mouseInfo.lastPixY + deltaY), 0, sdl.draw.height);
 	}
 }
 
@@ -1423,12 +1427,17 @@ bool checkOverlayTap(SDL_TouchFingerEvent * finger)
 
 	static SDL_Scancode key = SDL_NUM_SCANCODES;
 
-	if(finger->type == SDL_FINGERDOWN)
+	if(finger->type == SDL_FINGERDOWN || finger->type == SDL_FINGERMOTION)
 	{
 		for(int i = 0; i < NUM_ACTIONS; i++)
 		{
 			if(actions[i]->checkBounds(xcoord, ycoord))
 			{
+				if (finger->type == SDL_FINGERMOTION) 
+				{
+					return true;
+				}
+
 				if(i < 4)
 				{
 					GFX_ResetScreen();
@@ -1469,11 +1478,8 @@ bool checkOverlayTap(SDL_TouchFingerEvent * finger)
 
 void moveFinger(SDL_TouchFingerEvent* finger)
 {
-	double xscale = (sdl.curr_w / sdl.render.scaleFactor);
-	double yscale = (sdl.curr_h / sdl.render.scaleFactor);
-
-	int pixX = std::clamp((int)((finger->x * xscale) - (xscale - sdl.draw.width) / 2.0), 0, sdl.draw.width);
-	int pixY = std::clamp((int)((finger->y * yscale) - (yscale - sdl.draw.height) / 2.0), 0, sdl.draw.height);
+	int pixX = std::clamp((int)(((double)finger->x * sdl.curr_w - sdl.clip.x) / sdl.render.scaleFactor), 0, sdl.draw.width);
+	int pixY = std::clamp((int)(((double)finger->y * sdl.curr_h - sdl.clip.y) / sdl.render.scaleFactor), 0, sdl.draw.height);
 
 	int x = pixX - mouseInfo.lastPixX;
 	int y = pixY - mouseInfo.lastPixY;
@@ -1542,8 +1548,7 @@ void GFX_Events()
 		switch(event.type)
 		{
 		case SDL_WINDOWEVENT:
-
-			switch(event.window.type)
+			switch(event.window.event)
 			{
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 #ifdef WIN32
@@ -1576,8 +1581,15 @@ void GFX_Events()
 				GFX_LosingFocus();
 				CPU_Enable_SkipAutoAdjust();
 				break;
+			case SDL_WINDOWEVENT_EXPOSED:
+				if (sdl.draw.callback) sdl.draw.callback(GFX_CallBackRedraw);
+				break;
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				SDL_RenderClear(sdl.render.renderer);
+				break;
+			case SDL_WINDOWEVENT_MOVED:
+				SDL_PauseAudio(1);
+				SDL_PauseAudio(0);
 				break;
 			}
 #ifndef __ANDROID__
@@ -1585,44 +1597,45 @@ void GFX_Events()
 			*/
 			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
 			{
-				/* Window has lost focus, pause the emulator.
-				* This is similar to what PauseDOSBox() does, but the exit criteria is different.
-				* Instead of waiting for the user to hit Alt-Break, we wait for the window to
-				* regain window or input focus.
-				*/
-				bool paused = true;
-				SDL_Event ev;
-
-				GFX_SetTitle(-1, -1, true);
-				KEYBOARD_ClrBuffer();
-				//					SDL_Delay(500);
-				//					while (SDL_PollEvent(&ev)) {
-				// flush event queue.
-				//					}
-
-				while(paused)
+				if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) 
 				{
-					// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
-					SDL_WaitEvent(&ev);
+					/* Window has lost focus, pause the emulator.
+					* This is similar to what PauseDOSBox() does, but the exit criteria is different.
+					* Instead of waiting for the user to hit Alt-Break, we wait for the window to
+					* regain window or input focus.
+					*/
+					SDL_PauseAudio(1);
+					bool paused = true;
+					SDL_Event ev;
 
-					switch(ev.type)
+					GFX_SetTitle(-1, -1, true);
+					KEYBOARD_ClrBuffer();
+
+					while (paused)
 					{
-					case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
-					case SDL_WINDOWEVENT:     // wait until we get window focus back
-						if(ev.window.type == SDL_WINDOWEVENT_FOCUS_GAINED)
-						{
-							// We've got focus back, so unpause and break out of the loop
-							paused = false;
-							GFX_SetTitle(-1, -1, false);
+						// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
+						SDL_WaitEvent(&ev);
 
-							/* Now poke a "release ALT" command into the keyboard buffer
-							* we have to do this, otherwise ALT will 'stick' and cause
-							* problems with the app running in the DOSBox.
-							*/
-							KEYBOARD_AddKey(KBD_leftalt, false);
-							KEYBOARD_AddKey(KBD_rightalt, false);
+						switch (ev.type)
+						{
+						case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
+						case SDL_WINDOWEVENT:     // wait until we get window focus back
+							if (ev.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+							{
+								SDL_PauseAudio(0);
+								// We've got focus back, so unpause and break out of the loop
+								paused = false;
+								GFX_SetTitle(-1, -1, false);
+
+								/* Now poke a "release ALT" command into the keyboard buffer
+								* we have to do this, otherwise ALT will 'stick' and cause
+								* problems with the app running in the DOSBox.
+								*/
+								KEYBOARD_AddKey(KBD_leftalt, false);
+								KEYBOARD_AddKey(KBD_rightalt, false);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
