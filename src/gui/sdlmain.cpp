@@ -154,7 +154,6 @@ struct SDL_Block
 	} mouse;
 	Bitu num_joysticks = 0;
 #if defined (WIN32)
-	//bool using_windib;
 	// Time when sdl regains focus (alt-tab) in windowed mode
 	Bit32u focus_ticks = 0;
 #endif
@@ -578,32 +577,17 @@ Bitu GFX_SetSize(Bitu width, Bitu height, Bitu flags, double scalex, double scal
 void GFX_CaptureMouse(void)
 {
 	sdl.mouse.locked = !sdl.mouse.locked;
-	if(sdl.mouse.locked)
-	{
-		//SDL_WM_GrabInput(SDL_GRAB_ON);
-		SDL_SetRelativeMouseMode(SDL_TRUE);
-	}
-	else
-	{
-		SDL_SetRelativeMouseMode(SDL_FALSE);
-		if(sdl.mouse.autoenable || !sdl.mouse.autolock) SDL_ShowCursor(SDL_ENABLE);
-	}
+
+	SDL_SetRelativeMouseMode((SDL_bool)sdl.mouse.locked);
+	if (!sdl.mouse.locked && (sdl.mouse.autoenable || !sdl.mouse.autolock)) { SDL_ShowCursor(SDL_ENABLE); };
+
 	mouselocked = sdl.mouse.locked;
 }
 
 void GFX_UpdateSDLCaptureState(void)
 {
-	if(sdl.mouse.locked)
-	{
-		//SDL_WM_GrabInput(SDL_GRAB_ON);
-		SDL_SetRelativeMouseMode(SDL_TRUE);
-	}
-	else
-	{
-		SDL_SetRelativeMouseMode(SDL_FALSE);
-		//SDL_WM_GrabInput(SDL_GRAB_OFF);
-		if(sdl.mouse.autoenable || !sdl.mouse.autolock) SDL_ShowCursor(SDL_ENABLE);
-	}
+	SDL_SetRelativeMouseMode((SDL_bool)sdl.mouse.locked);
+
 	CPU_Reset_AutoAdjust();
 	GFX_SetTitle(-1, -1, false);
 }
@@ -1310,6 +1294,51 @@ bool GFX_IsFullscreen(void)
 
 void MAPPER_CheckEvent(SDL_Event * event);
 
+void setNonFocusState()
+{
+	// Non-focus priority is set to pause; check to see if we've lost window or input focus
+	if (sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
+	{
+		// Window has lost focus, pause the emulator.
+		// This is similar to what PauseDOSBox() does, but the exit criteria is different.
+		// Instead of waiting for the user to hit Alt-Break, we wait for the window to
+		// regain window or input focus.
+		SDL_PauseAudio(1);
+		bool paused = true;
+		SDL_Event ev;
+
+		GFX_SetTitle(-1, -1, true);
+		KEYBOARD_ClrBuffer();
+
+		while (paused)
+		{
+			// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
+			SDL_WaitEvent(&ev);
+
+			switch (ev.type)
+			{
+			case SDL_QUIT: throw(0); break;
+			case SDL_WINDOWEVENT:
+				// wait until we get window focus back
+				if (ev.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				{
+					SDL_PauseAudio(0);
+					// We've got focus back, so unpause and break out of the loop
+					paused = false;
+					GFX_SetTitle(-1, -1, false);
+
+					// Now poke a "release ALT" command into the keyboard buffer
+					// we have to do this, otherwise ALT will 'stick' and cause
+					// problems with the app running in the DOSBox.
+					KEYBOARD_AddKey(KBD_leftalt, false);
+					KEYBOARD_AddKey(KBD_rightalt, false);
+				}
+				break;
+			}
+		}
+	}
+}
+
 void GFX_Events()
 {
 	SDL_Event event;
@@ -1352,7 +1381,6 @@ void GFX_Events()
 					if(sdl.desktop.fullscreen)
 					{
 						VGA_KillDrawing();
-						GFX_ForceFullscreenExit();
 					}
 #endif
 					GFX_CaptureMouse();
@@ -1360,66 +1388,21 @@ void GFX_Events()
 				SetPriority(sdl.priority.nofocus);
 				GFX_LosingFocus();
 				CPU_Enable_SkipAutoAdjust();
+
+				setNonFocusState();
 				break;
 			case SDL_WINDOWEVENT_EXPOSED:
 				if (sdl.draw.callback) sdl.draw.callback(GFX_CallBackRedraw);
 				break;
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
-				SDL_RenderClear(sdl.render.renderer);
+				//SDL_RenderClear(sdl.render.renderer);
 				break;
 			case SDL_WINDOWEVENT_MOVED:
 				break;
-			}
-
-			/* Non-focus priority is set to pause; check to see if we've lost window or input focus
-			*/
-			if(sdl.priority.nofocus == PRIORITY_LEVEL_PAUSE)
-			{
-				if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) 
-				{
-					/* Window has lost focus, pause the emulator.
-					* This is similar to what PauseDOSBox() does, but the exit criteria is different.
-					* Instead of waiting for the user to hit Alt-Break, we wait for the window to
-					* regain window or input focus.
-					*/
-					SDL_PauseAudio(1);
-					bool paused = true;
-					SDL_Event ev;
-
-					GFX_SetTitle(-1, -1, true);
-					KEYBOARD_ClrBuffer();
-
-					while (paused)
-					{
-						// WaitEvent waits for an event rather than polling, so CPU usage drops to zero
-						SDL_WaitEvent(&ev);
-
-						switch (ev.type)
-						{
-						case SDL_QUIT: throw(0); break; // a bit redundant at linux at least as the active events gets before the quit event.
-						case SDL_WINDOWEVENT:     // wait until we get window focus back
-							if (ev.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
-							{
-								SDL_PauseAudio(0);
-								// We've got focus back, so unpause and break out of the loop
-								paused = false;
-								GFX_SetTitle(-1, -1, false);
-
-								/* Now poke a "release ALT" command into the keyboard buffer
-								* we have to do this, otherwise ALT will 'stick' and cause
-								* problems with the app running in the DOSBox.
-								*/
-								KEYBOARD_AddKey(KBD_leftalt, false);
-								KEYBOARD_AddKey(KBD_rightalt, false);
-							}
-							break;
-						}
-					}
-				}
-			}
+			}	
 			break;
 		case SDL_APP_DIDENTERFOREGROUND:
-			GFX_ResetScreen();
+			//GFX_ResetScreen();
 			break;
 		case SDL_MOUSEMOTION:
 #ifndef __IPHONEOS__
@@ -1464,7 +1447,8 @@ void GFX_Events()
 
 				SDL_Event sdlevent;
 				sdlevent.type = SDL_KEYDOWN;
-				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName((char[2]) { character, 0 });
+				const char keyName[] = { character, 0 };
+				sdlevent.key.keysym.scancode = SDL_GetScancodeFromName(keyName);
 
 				MAPPER_CheckEvent(&sdlevent);
 

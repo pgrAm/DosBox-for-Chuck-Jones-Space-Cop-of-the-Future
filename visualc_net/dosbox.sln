@@ -1,13 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dosbox", "dosbox.vcxproj", "{7FCFFB9B-8629-4D51-849C-8490CECF8AB7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "android version", "android version", "{C1CACD4C-636C-46F5-8E40-F46328177144}"
-	ProjectSection(SolutionItems) = preProject
-		Chuck App\res\files\dosbox.conf = Chuck App\res\files\dosbox.conf
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "..\android version\android version.NativeActivity\android version.NativeActivity.vcxproj", "{6FA3041B-1FE1-4161-B5AE-3A381E5CE680}"
 EndProject

@@ -183,10 +183,6 @@
   </ItemGroup>
   <ItemGroup>
     <JavaCompile Include="src\com\Chuck App\Chuck_App.java" />
-    <JavaCompile Include="src\HIDDevice.java" />
-    <JavaCompile Include="src\HIDDeviceBLESteamController.java" />
-    <JavaCompile Include="src\HIDDeviceManager.java" />
-    <JavaCompile Include="src\HIDDeviceUSB.java" />
     <JavaCompile Include="src\SDL.java" />
     <JavaCompile Include="src\SDLActivity.java" />
     <JavaCompile Include="src\SDLAudioManager.java" />
