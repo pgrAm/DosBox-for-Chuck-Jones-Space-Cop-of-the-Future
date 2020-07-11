@@ -15,6 +15,8 @@
 /* Enable some heavy debugging options */
 #define C_HEAVY_DEBUG 0
 
+#define C_DIRECTSERIAL 1
+
 /* The type of cpu this host has */
 #if defined(_WIN64)
 	#define C_TARGETCPU X86_64
