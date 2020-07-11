@@ -39,7 +39,7 @@
 #endif
 
 #include "cross.h"
-#include "SDL.h"
+#include <SDL2/SDL.h>
 
 #include "dosbox.h"
 #include "video.h"
@@ -200,6 +200,8 @@ SDL_Window* SDL_SetVideoMode_Wrap(int width, int height, int bpp, Bit32u flags)
 	if(flags & SDL_WINDOW_FULLSCREEN)
 	{
 		SDL_DisplayMode mode;
+
+		assert(sdl.window);
 
 		SDL_GetWindowDisplayMode(sdl.window, &mode);
 
@@ -964,8 +966,6 @@ static void GUI_StartUp(Section * sec)
 	sdl.active = false;
 	sdl.updating = false;
 
-	GFX_SetIcon();
-
 	sdl.desktop.fullscreen = section->Get_bool("fullscreen");
 	sdl.wait_on_error = section->Get_bool("waitonerror");
 
@@ -1106,6 +1106,7 @@ static void GUI_StartUp(Section * sec)
 		}
 	}
 
+	GFX_SetIcon();
 	GFX_Stop();
 	SDL_SetWindowTitle(sdl.window, "DOSBox");
 
@@ -1564,23 +1565,14 @@ void Config_Add_SDL()
 	Pstring->Set_help("Scale the window to this size IF the output device supports hardware scaling.\n"
 					  "  (output=software does not!)");
 
-	const char* outputs[] = 
-	{
-		"software",
-		"opengl",
-		"opengles",
-		"opengles2",
-#if defined (MACOSX) || defined(__IPHONEOS__)
-		"metal",
-#endif
-#if _WIN32
-		"direct3d",
-#endif
-		0};
-
 	Pstring = sdl_sec->Add_string("output", Property::Changeable::Always, "direct3d");
 	Pstring->Set_help("What video system to use for output.");
-	Pstring->Set_values(outputs);
+	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
+	{
+		SDL_RendererInfo rendererInfo{};
+		SDL_GetRenderDriverInfo(i, &rendererInfo);
+		Pstring->Add_value(rendererInfo.name);
+	}
 
 	Pbool = sdl_sec->Add_bool("autolock", Property::Changeable::Always, true);
 	Pbool->Set_help("Mouse will automatically lock, if you click on the screen. (Press CTRL-F10 to unlock)");

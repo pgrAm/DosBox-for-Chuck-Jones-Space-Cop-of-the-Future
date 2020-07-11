@@ -1,7 +1,7 @@
 #ifndef TOUCH_OVERLAY_H
 #define TOUCH_OVERLAY_H
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 
 namespace touchOverlay
 {

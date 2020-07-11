@@ -498,6 +498,12 @@ void Section_prop::Add_double(char const * const _propname, double _value) {
 	properties.push_back(test);
 }*/
 
+void Property::Add_value(const std::string& in)
+{
+	Value val(in, default_value.type);
+	suggested_values.push_back(val);
+}
+
 void Property::Set_values(const char * const *in) {
 	Value::Etype type = default_value.type;
 	int i = 0;

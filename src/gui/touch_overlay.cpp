@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <string>
 
-#include "SDL.h"
-#include "SDL_system.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_system.h>
 
 #include "touch_overlay.h"
 #include "video.h"

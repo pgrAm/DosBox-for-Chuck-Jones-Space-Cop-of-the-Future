@@ -24,7 +24,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "SDL_system.h"
+#include <SDL2/SDL_system.h>
 
 #ifdef WIN32
 #ifndef _WIN32_IE
