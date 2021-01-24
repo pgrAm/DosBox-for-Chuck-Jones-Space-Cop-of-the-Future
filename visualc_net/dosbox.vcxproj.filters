@@ -75,6 +75,9 @@
     <Filter Include="Source Files\hardware\mame">
       <UniqueIdentifier>{42d7d9e2-ce5a-4626-92dd-b6200d1b1759}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hardware\sound\nuked_opl">
+      <UniqueIdentifier>{588dad88-3b74-4df3-ad53-dfb76b6a7037}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dosbox.cpp">
@@ -439,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\src\gui\touch_overlay.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hardware\nuked_opl\opl3.c">
+      <Filter>Source Files\hardware\sound\nuked_opl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

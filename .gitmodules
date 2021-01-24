@@ -1,0 +1,3 @@
+[submodule "src/hardware/nuked_opl"]
+	path = src/hardware/nuked_opl
+	url = https://github.com/nukeykt/Nuked-OPL3.git
